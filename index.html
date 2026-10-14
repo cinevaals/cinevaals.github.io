@@ -4,92 +4,79 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#111111">
-<meta name="description" content="Cronograma de lançamentos de filmes e séries — CineVaals.">
+<meta name="description" content="Cronograma semanal de filmes e séries — CineVaals.">
 <title>CineVaals | Cronograma</title>
 <style>
 :root{--bg:#101010;--panel:#1b1b1b;--panel2:#242424;--text:#f5f5f5;--muted:#aaa;--accent:#d52b35;--line:#333}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-header{padding:28px 18px 20px;background:linear-gradient(135deg,#260d10,#111 65%);border-bottom:1px solid var(--line)}
-.wrap{max-width:1100px;margin:auto}.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:12px;background:var(--accent);display:grid;place-items:center;font-size:23px;font-weight:900}
-h1{font-size:clamp(22px,5vw,34px);margin:0;letter-spacing:1.5px}.tagline{color:#c5c5c5;font-size:13px;margin:5px 0 0}
-nav{display:flex;gap:8px;overflow:auto;padding:18px 0 0}
-nav button,.search{border:1px solid #3b3b3b;background:#202020;color:#eee;border-radius:999px;padding:10px 14px;font-size:13px;white-space:nowrap}
-nav button.active{background:var(--accent);border-color:var(--accent)}
-main{max-width:1100px;margin:auto;padding:22px 16px 50px}
-.intro{display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
-h2{margin:0 0 6px;font-size:23px}.muted{color:var(--muted);font-size:13px}
-.search{border-radius:10px;width:100%;max-width:310px;padding:12px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.card{background:var(--panel);border:1px solid #2b2b2b;border-radius:13px;overflow:hidden;min-width:0}
-.poster{width:100%;aspect-ratio:2/2.7;object-fit:cover;display:block;background:#292929}
-.poster-fallback{width:100%;aspect-ratio:2/2.7;display:grid;place-items:center;background:linear-gradient(145deg,#3a2023,#171717);color:#bbb;font-size:38px}
-.info{padding:12px}.category{display:inline-block;color:#ff8a91;background:#3a191c;padding:5px 8px;border-radius:6px;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.5px}
-.card h3{font-size:16px;margin:9px 0 6px;line-height:1.25}.date{font-size:12px;color:#ddd;margin:0 0 7px}.desc{font-size:12px;line-height:1.45;color:var(--muted);margin:0}
-.empty{grid-column:1/-1;border:1px dashed #444;border-radius:12px;padding:30px;text-align:center;color:var(--muted)}
-footer{text-align:center;padding:25px 14px;color:#777;font-size:12px;border-top:1px solid var(--line)}
-@media(min-width:650px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.info{padding:15px}.card h3{font-size:18px}}
-@media(min-width:900px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+header{padding:22px 16px 16px;background:linear-gradient(135deg,#260d10,#111 65%);border-bottom:1px solid var(--line)}
+.wrap{max-width:1000px;margin:auto}.brand{display:flex;align-items:center;gap:11px}.logo{width:42px;height:42px;border-radius:11px;background:var(--accent);display:grid;place-items:center;font-size:22px;font-weight:900}
+h1{font-size:clamp(22px,5vw,32px);margin:0;letter-spacing:1.5px}.tagline{color:#c5c5c5;font-size:12px;margin:5px 0 0}
+nav{display:flex;gap:7px;overflow-x:auto;padding:16px 0 0}button,input{font:inherit}nav button,.week-btn{border:1px solid #3b3b3b;background:#202020;color:#eee;border-radius:999px;padding:9px 13px;font-size:12px;white-space:nowrap;cursor:pointer}nav button.active,.week-btn.primary{background:var(--accent);border-color:var(--accent)}
+main{max-width:1000px;margin:auto;padding:20px 13px 42px}.intro{display:flex;align-items:end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:17px}h2{margin:0 0 5px;font-size:22px}.muted{color:var(--muted);font-size:12px;line-height:1.45}
+.search{border:1px solid #3b3b3b;background:#202020;color:#eee;border-radius:10px;width:100%;max-width:300px;padding:11px 12px;font-size:13px}
+.weekbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0 18px;padding:12px;background:#191919;border:1px solid #2e2e2e;border-radius:12px}.week-label{text-align:center;font-weight:700;font-size:13px}.week-btn{padding:9px 11px}
+.days{display:grid;grid-template-columns:1fr;gap:12px}.day{background:#151515;border:1px solid #303030;border-radius:12px;overflow:hidden;min-width:0}.day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#202020;padding:12px 14px;border-bottom:1px solid #303030}.day-name{font-weight:800;font-size:14px}.day-date{color:#aaa;font-size:12px}.day-body{padding:10px;display:grid;gap:10px}.event{display:flex;gap:11px;background:#1c1c1c;border:1px solid #2c2c2c;border-radius:10px;padding:9px;min-width:0}.poster{width:76px;min-width:76px;aspect-ratio:2/2.8;object-fit:cover;border-radius:6px;background:linear-gradient(145deg,#3a2023,#171717);display:grid;place-items:center;color:#bbb;font-size:25px}.poster img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block}.event-info{min-width:0;align-self:center}.category{display:inline-block;color:#ff9ba1;background:#3a191c;padding:4px 6px;border-radius:5px;font-size:9px;font-weight:bold;text-transform:uppercase;letter-spacing:.4px}.event h3{font-size:14px;line-height:1.3;margin:7px 0 5px;overflow-wrap:anywhere}.event p{font-size:11px;line-height:1.45;color:var(--muted);margin:0;overflow-wrap:anywhere}.empty-day{padding:13px 8px;color:#777;font-size:12px;text-align:center}.empty-results{border:1px dashed #444;border-radius:12px;padding:26px;text-align:center;color:var(--muted)}
+footer{text-align:center;padding:23px 12px;color:#777;font-size:11px;border-top:1px solid var(--line)}
+@media(min-width:650px){main{padding-left:18px;padding-right:18px}.days{grid-template-columns:repeat(2,minmax(0,1fr))}.poster{width:84px;min-width:84px}.event h3{font-size:15px}}
+@media(min-width:900px){.days{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <header><div class="wrap">
   <div class="brand"><div class="logo">C</div><div><h1>CINEVAALS</h1><p class="tagline">CRONOGRAMA DE FILMES E SÉRIES</p></div></div>
   <nav id="filters" aria-label="Filtrar por categoria">
-    <button class="active" data-filter="Todos">Todos</button>
-    <button data-filter="Filme">Filmes</button>
-    <button data-filter="Série">Séries</button>
-    <button data-filter="Anime">Animes</button>
+    <button class="active" data-filter="Todos">Todos</button><button data-filter="Filme">Filmes</button><button data-filter="Série">Séries</button><button data-filter="Anime">Animes</button>
   </nav>
 </div></header>
 <main>
-  <div class="intro"><div><h2>Próximos lançamentos</h2><div class="muted">Confira as datas e novidades.</div></div>
-    <input class="search" id="search" type="search" placeholder="Buscar filme ou série..." aria-label="Buscar título">
-  </div>
-  <section class="grid" id="catalog" aria-live="polite"></section>
+  <div class="intro"><div><h2>Programação semanal</h2><div class="muted">Veja o que está programado para cada dia da semana.</div></div><input class="search" id="search" type="search" placeholder="Buscar filme ou série..." aria-label="Buscar título"></div>
+  <div class="weekbar"><button class="week-btn" id="prevWeek" aria-label="Semana anterior">‹ Anterior</button><div class="week-label" id="weekLabel">Carregando semana...</div><button class="week-btn" id="nextWeek" aria-label="Próxima semana">Próxima ›</button></div>
+  <section class="days" id="schedule" aria-live="polite"></section>
 </main>
-<footer>© <span id="year"></span> CineVaals · Datas sujeitas a alterações.</footer>
+<footer>© <span id="year"></span> CineVaals · Programação sujeita a alterações.</footer>
 <script>
 /*
-COMO ATUALIZAR O CRONOGRAMA:
-1. No GitHub, abra o arquivo index.html e toque no lápis (Edit).
-2. Procure por "const titles = [".
-3. Copie um objeto de exemplo e altere título, categoria, data, imagem e descrição.
-4. Para imagem, use um link público direto de uma imagem que você tenha direito de usar.
-5. Salve com Commit changes.
+COMO PERSONALIZAR OS LANÇAMENTOS (por enquanto, editando este arquivo):
+Cada item precisa de title, category, date e description. A image pode ficar vazia ou receber um link direto para a capa.
+Use a data no formato AAAA-MM-DD. Exemplo: 2026-10-16.
+Depois de editar no GitHub, toque em Commit changes para publicar.
 */
 const titles = [
-  {title:"Exemplo de filme", category:"Filme", date:"2026-11-20", image:"", description:"Troque este exemplo pelo lançamento que você quer divulgar."},
-  {title:"Exemplo de série", category:"Série", date:"2026-12-04", image:"", description:"Adicione a data, a capa e uma breve descrição."},
-  {title:"Exemplo de anime", category:"Anime", date:"2027-01-15", image:"", description:"Você pode apagar estes exemplos e cadastrar seus títulos."}
+  {title:"Exemplo de filme",category:"Filme",date:"2026-10-14",image:"",description:"Substitua pelo lançamento e pela descrição que você quer divulgar."},
+  {title:"Exemplo de série",category:"Série",date:"2026-10-16",image:"",description:"Adicione a data de lançamento e uma breve descrição."},
+  {title:"Exemplo de anime",category:"Anime",date:"2026-10-18",image:"",description:"Este é apenas um exemplo; você pode alterar ou apagar."}
 ];
-const catalog=document.getElementById("catalog");
-const search=document.getElementById("search");
-let activeFilter="Todos";
-function formatDate(value){
- if(!value)return "Data a confirmar";
- const parts=value.split("-");
- if(parts.length!==3)return value;
- return `${parts[2]}/${parts[1]}/${parts[0]}`;
-}
+const schedule=document.getElementById('schedule'), search=document.getElementById('search');
+const dayNames=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+let activeFilter='Todos';
+function dateOnly(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function mondayOf(d){const x=dateOnly(d);const shift=(x.getDay()+6)%7;x.setDate(x.getDate()-shift);return x;}
+function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function shortDate(d){return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});}
+function longDate(d){return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long'});}
+let weekStart=mondayOf(new Date());
+function escapeHtml(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function posterFor(item){if(item.image)return `<div class="poster"><img src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.parentElement.textContent='🎬'"></div>`;return '<div class="poster">🎬</div>';}
 function render(){
- const term=search.value.trim().toLocaleLowerCase("pt-BR");
- const list=titles.filter(item=>(activeFilter==="Todos"||item.category===activeFilter)&&(`${item.title} ${item.description} ${item.category}`).toLocaleLowerCase("pt-BR").includes(term))
- .sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"));
- if(!list.length){catalog.innerHTML='<div class="empty">Nenhum lançamento encontrado.</div>';return}
- catalog.innerHTML=list.map(item=>{
- const poster=item.image?`<img class="poster" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.outerHTML='<div class=&quot;poster-fallback&quot;>🎬</div>'">`:'<div class="poster-fallback">🎬</div>';
- return `<article class="card">${poster}<div class="info"><span class="category">${escapeHtml(item.category)}</span><h3>${escapeHtml(item.title)}</h3><p class="date">📅 ${formatDate(item.date)}</p><p class="desc">${escapeHtml(item.description||"")}</p></div></article>`;
- }).join("");
+ const term=search.value.trim().toLocaleLowerCase('pt-BR');
+ const end=addDays(weekStart,6);
+ document.getElementById('weekLabel').textContent=`${longDate(weekStart)} – ${longDate(end)}`;
+ const days=[];
+ for(let i=0;i<7;i++){
+  const d=addDays(weekStart,i), key=iso(d);
+  const list=titles.filter(item=>(activeFilter==='Todos'||item.category===activeFilter)&&item.date===key&&(`${item.title} ${item.description} ${item.category}`).toLocaleLowerCase('pt-BR').includes(term));
+  const cards=list.map(item=>`<article class="event">${posterFor(item)}<div class="event-info"><span class="category">${escapeHtml(item.category)}</span><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.description||'')}</p></div></article>`).join('');
+  days.push(`<section class="day"><div class="day-head"><span class="day-name">${dayNames[d.getDay()]}</span><span class="day-date">${shortDate(d)}</span></div><div class="day-body">${cards||'<div class="empty-day">Nenhum lançamento programado.</div>'}</div></section>`);
+ }
+ schedule.innerHTML=days.join('');
 }
-function escapeHtml(value){return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));}
-document.getElementById("filters").addEventListener("click",event=>{
- const button=event.target.closest("button[data-filter]");if(!button)return;
- activeFilter=button.dataset.filter;
- document.querySelectorAll("#filters button").forEach(b=>b.classList.toggle("active",b===button));render();
-});
-search.addEventListener("input",render);
-document.getElementById("year").textContent=new Date().getFullYear();
-render();
+document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;activeFilter=b.dataset.filter;document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('active',x===b));render();});
+search.addEventListener('input',render);
+document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});
+document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
+document.getElementById('year').textContent=new Date().getFullYear();render();
 </script>
 </body>
 </html>
