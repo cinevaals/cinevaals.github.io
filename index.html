@@ -15,6 +15,61 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 .days-wrap{overflow-x:auto;padding:0 0 12px;scrollbar-color:#1b568d #07101e;scrollbar-width:thin}.days{display:grid;grid-template-columns:repeat(7,minmax(160px,1fr));gap:10px;min-width:1160px;align-items:stretch}.day{background:linear-gradient(180deg,#09172a,#060d19);border:1px solid #16385b;border-radius:11px;overflow:hidden;min-width:0;box-shadow:0 5px 18px #0003}.day.today{border:2px solid #65bfff;box-shadow:0 0 6px #65bfff,0 0 14px #2f83d1,0 0 28px #087bff88,inset 0 0 12px #2f83d133}today-label{color:#65bfff;font-size:11px;font-weight:bold;margin-left:6px;white-space:normal;text-transform:uppercase}.day-head{display:flex;align-items:center;justify-content:space-between;gap:5px;padding:11px 10px;background:linear-gradient(100deg,#102846,#0a172a);border-bottom:1px solid #1b4774}.day-name{font-size:12px;font-weight:bold;color:#a8dcff}.day-date{font-size:11px;color:#c0d0e5;white-space:nowrap}.day-body{padding:7px;display:flex;flex-direction:column;gap:8px;min-height:130px}.event{display:flex;gap:8px;align-items:stretch;padding:6px;background:rgba(8,21,39,.86);border:1px solid #122d4d;border-radius:8px;min-width:0;transition:transform .15s,border-color .15s}.event:hover{transform:translateY(-2px);border-color:#2f83d1}.poster{width:68px;min-width:68px;aspect-ratio:2/2.85;border-radius:5px;background:linear-gradient(145deg,#153b66,#101b2e);overflow:hidden;display:grid;place-items:center;color:#83caff;font-size:25px}.poster img{width:100%;height:100%;object-fit:cover;display:block}.event-info{min-width:0;align-self:center}.category{display:inline-block;color:#8fd1ff;background:#0e3156;border:1px solid #164879;padding:3px 5px;border-radius:4px;font-size:8px;font-weight:bold;text-transform:uppercase;letter-spacing:.3px}.event h3{font-size:12px;line-height:1.25;margin:6px 0 4px;overflow-wrap:anywhere;color:#f1f7ff}.meta{font-size:10px;color:#65bfff;margin:0 0 4px}.event p{font-size:10px;line-height:1.35;color:#9daec4;margin:0;overflow-wrap:anywhere}.empty-day{font-size:11px;text-align:center;color:#6e819c;padding:24px 5px}.empty-day:before{content:'✧';display:block;font-size:19px;color:#235789;margin-bottom:7px}.empty-results{border:1px dashed #254a70;padding:28px;border-radius:10px;color:var(--muted);text-align:center}
 .ornament{display:flex;align-items:center;gap:12px;color:#287ce0;margin:25px 0 0;font-size:19px}.ornament:before,.ornament:after{content:'';height:1px;flex:1;background:linear-gradient(90deg,transparent,#1766b5)}.ornament:after{background:linear-gradient(90deg,#1766b5,transparent)}footer{text-align:center;padding:22px 12px 30px;color:#7890ad;font-size:11px;border-top:1px solid #142b46}footer span{color:#63baff}
 @media(max-width:700px){.banner{height:140px;background-position:center}.nav-inner{gap:6px;padding:8px 10px;flex-wrap:wrap}.brand{font-size:20px}.nav-link{font-size:11px;padding:8px}.search{order:5;width:100%;max-width:none}.nav-spacer{display:none}main{padding:20px 12px 30px}.intro{align-items:flex-start}.heading p{max-width:290px}.controls{justify-content:space-between}.week-label{min-width:0;flex:1;font-size:12px}.week-btn{padding:9px 8px;font-size:11px}.days{grid-template-columns:repeat(7, minmax(155px,1fr));min-width:1160px}.filters{margin-bottom:5px}}
+/* Menu suspenso Vaquinhas */
+.nav-dropdown{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+.nav-dropdown-btn{
+  font-family:inherit;
+  background:transparent;
+  border:0;
+  cursor:pointer;
+  line-height:normal;
+  margin:0;
+}
+
+.nav-dropdown-btn:hover{
+  color:white;
+  background:#0d2b50;
+  border-bottom:2px solid var(--blue);
+}
+
+.nav-dropdown-menu{
+  display:none;
+  position:absolute;
+  top:100%;
+  left:0;
+  min-width:150px;
+  padding:6px;
+  background:#071326;
+  border:1px solid #21466e;
+  border-radius:9px;
+  box-shadow:0 8px 22px #0008;
+  z-index:20;
+}
+
+.nav-dropdown-menu a{
+  display:block;
+  padding:10px 12px;
+  border-radius:6px;
+  color:#c6d8ef;
+  text-decoration:none;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+.nav-dropdown-menu a:hover{
+  color:white;
+  background:#0d2b50;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown:focus-within .nav-dropdown-menu{
+  display:block;
+}
 </style>
 <link rel="icon" type="image/png" href="/favicon.png">
 </head>
