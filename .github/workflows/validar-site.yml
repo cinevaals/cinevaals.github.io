@@ -1,0 +1,35 @@
+name: Validar site
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feature/edicao-inline-cronograma]
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verificar sintaxe dos scripts JavaScript inline
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path("index.html").read_text(encoding="utf-8")
+          scripts = re.findall(r"<script\b(?![^>]*\bsrc\s*=)[^>]*>(.*?)</script\s*>", html, flags=re.I | re.S)
+          if not scripts:
+              raise SystemExit("Nenhum script inline encontrado em index.html")
+          for i, script in enumerate(scripts, 1):
+              Path(f"/tmp/inline-script-{i}.js").write_text(script, encoding="utf-8")
+          print(f"Encontrados {len(scripts)} script(s) inline.")
+          PY
+          for file in /tmp/inline-script-*.js; do
+            echo "Verificando $file"
+            node --check "$file"
+          done
