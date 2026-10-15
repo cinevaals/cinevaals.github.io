@@ -88,6 +88,7 @@
 
       <button type="submit">Entrar no painel</button>
     </form>
+    <button id="forgotPasswordButton" type="button" class="secondary">Esqueci minha senha</button>
     <p id="loginMessage" class="message muted" role="status"></p>
   </section>
 
@@ -200,7 +201,26 @@ const SUPABASE_KEY = '232cdd31-a0ad-4c24-be6d-a53a91b6a111';
   window.location.hash = '';
   window.location.reload();
   }
+$('forgotPasswordButton').addEventListener('click', async () => {
+  const email = $('email').value.trim();
 
+  if (!email) {
+    showMessage('loginMessage', 'Digite seu e-mail primeiro.');
+    return;
+  }
+
+  showMessage('loginMessage', 'Enviando link de recuperação...');
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+
+  if (error) {
+    showMessage('loginMessage', 'Erro ao enviar: ' + error.message);
+  } else {
+    showMessage('loginMessage', 'Confira seu e-mail para redefinir a senha.');
+  }
+});
   const $ = id => document.getElementById(id);
   let contents = [];
 
