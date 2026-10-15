@@ -3,465 +3,186 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Painel | CineVaals</title>
+  <title>Administração | CineVaals</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 24px 16px;
-      background: #100e16;
-      color: #f7f3ff;
+      padding: 20px;
+      background: #111;
+      color: #f5f5f5;
       font-family: Arial, sans-serif;
     }
-    main { max-width: 760px; margin: auto; }
-    h1 { color: #d7a5ff; }
-    .panel {
-      background: #1d1927;
-      border: 1px solid #393044;
-      border-radius: 16px;
-      padding: 20px;
-      margin: 18px 0;
+    main {
+      max-width: 650px;
+      margin: 0 auto;
     }
+    h1 { color: #f17bb5; }
     label {
       display: block;
-      margin: 14px 0 6px;
-      color: #e2d5f3;
+      margin-top: 15px;
     }
-    input, select, textarea {
+    input, select, textarea, button {
       width: 100%;
       padding: 12px;
-      border: 1px solid #514360;
-      border-radius: 9px;
-      background: #100e16;
-      color: white;
+      margin-top: 6px;
+      border: 1px solid #555;
+      border-radius: 8px;
       font: inherit;
     }
-    textarea { min-height: 80px; resize: vertical; }
-    button, .link-button {
-      display: inline-block;
+    input, select, textarea {
+      background: #222;
+      color: white;
+    }
+    button {
+      margin-top: 18px;
       border: 0;
-      border-radius: 9px;
-      padding: 12px 16px;
-      margin-top: 14px;
-      background: #b77aff;
-      color: #1a1025;
+      background: #e85d9e;
+      color: white;
       font-weight: bold;
       cursor: pointer;
-      text-decoration: none;
-      font-size: 14px;
     }
-    button.secondary { background: #393044; color: white; }
-    button.danger { background: #8c354b; color: white; }
-    button + button { margin-left: 6px; }
-    .hidden { display: none !important; }
-    .muted { color: #b8adca; line-height: 1.5; }
-    .message { white-space: pre-wrap; overflow-wrap: anywhere; }
-    .content-item {
-      padding: 14px 0;
-      border-bottom: 1px solid #393044;
+    .secondary { background: #444; }
+    #status { overflow-wrap: anywhere; }
+    #login-area, #admin-area {
+      padding: 20px;
+      margin-top: 20px;
+      background: #1e1e1e;
+      border-radius: 12px;
     }
-    .content-item:last-child { border-bottom: 0; }
-    .content-item h3 { margin: 4px 0; }
-    .content-item p { color: #c8bdd6; overflow-wrap: anywhere; }
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    #admin-area { display: none; }
   </style>
 </head>
 <body>
 <main>
-  <h1>✦ CineVaals</h1>
-  <p class="muted">Painel privado de administração</p>
+  <h1>CineVaals</h1>
+  <p>Painel administrativo</p>
 
-  <section id="loginPanel" class="panel">
+  <section id="login-area">
     <h2>Entrar</h2>
-    <form id="loginForm">
+    <form id="login-form">
       <label for="email">E-mail</label>
-      <input id="email" type="email" autocomplete="username" required>
+      <input id="email" type="email" required>
 
       <label for="password">Senha</label>
-      <input id="password" type="password" autocomplete="current-password" required>
+      <input id="password" type="password" required>
 
-      <button type="submit">Entrar no painel</button>
+      <button type="submit">Entrar</button>
     </form>
-    <button id="forgotPasswordButton" type="button" class="secondary">Esqueci minha senha</button>
-    <p id="loginMessage" class="message muted" role="status"></p>
   </section>
 
-  <section id="adminPanel" class="hidden">
-    <div class="topbar">
-      <h2>Gerenciar programação</h2>
-      <button id="logoutButton" class="secondary">Sair</button>
-    </div>
+  <section id="admin-area">
+    <h2>Cadastrar conteúdo</h2>
+    <form id="content-form">
+      <label for="title">Título *</label>
+      <input id="title" required>
 
-    <section class="panel">
-      <h2 id="formTitle">Adicionar conteúdo</h2>
-      <form id="contentForm">
-        <input id="contentId" type="hidden">
+      <label for="category">Categoria *</label>
+      <select id="category" required>
+        <option value="Filme">Filmes</option>
+        <option value="Série">Séries</option>
+        <option value="Animação">Animações</option>
+        <option value="Dorama">Doramas</option>
+        <option value="Anime">Animes</option>
+      </select>
 
-        <label for="title">Título *</label>
-        <input id="title" required maxlength="200">
+      <label for="date">Data *</label>
+      <input id="date" type="date" required>
 
-        <label for="category">Categoria *</label>
-        <select id="category" required>
-          <option value="Filme">🎬 Filme</option>
-          <option value="Série">📺 Série</option>
-          <option value="Animação">🐰 Animação</option>
-          <option value="Dorama">💗 Dorama</option>
-          <option value="Anime">⛩️ Anime</option>
-          <option value="Outro">✨ Outro</option>
-        </select>
+      <label for="image">URL da imagem</label>
+      <input id="image" type="url" placeholder="https://...">
 
-        <label for="date">Data de publicação *</label>
-        <input id="date" type="date" required>
+      <label for="description">Descrição</label>
+      <textarea id="description" rows="4"></textarea>
 
-        <label for="time">Horário</label>
-        <input id="time" placeholder="Ex.: 20h">
+      <label for="time">Horário (opcional)</label>
+      <input id="time" type="time">
 
-        <label for="image">URL da imagem do pôster</label>
-        <input id="image" type="url" placeholder="https://...">
+      <button type="submit">Salvar conteúdo</button>
+    </form>
 
-        <label for="description">Descrição</label>
-        <textarea id="description" maxlength="2000" placeholder="Ex.: Temporada 1 · Episódio 1"></textarea>
-
-        <button id="saveButton" type="submit">Salvar conteúdo</button>
-        <button id="cancelEdit" type="button" class="secondary hidden">Cancelar edição</button>
-      </form>
-      <p id="formMessage" class="message muted" role="status"></p>
-    </section>
-
-    <section class="panel">
-      <h2>Conteúdos cadastrados</h2>
-      <p class="muted">Edite ou exclua os itens da programação.</p>
-      <button id="refreshButton" class="secondary">Atualizar lista</button>
-      <div id="contentList"></div>
-    </section>
+    <p id="status" role="status"></p>
+    <button id="logout" class="secondary" type="button">Sair</button>
   </section>
-
-  <p id="statusMessage" class="message muted" role="status"></p>
-  <p><a class="link-button" href="./index.html">← Voltar ao site</a></p>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = 'https://bvctuotluoasnflafyrd.supabase.co/rest/v1/';';
-const SUPABASE_KEY = '232cdd31-a0ad-4c24-be6d-a53a91b6a111';
+<script type="module">
+  import { createClient } from
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-  );
-  async function handlePasswordRecovery() {
-  const hash = window.location.hash;
+  const SUPABASE_URL = 'https://bfiikxuyratcvhfmdeia.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_y0BudXGL8t3yDJLE4h5IZg_UZRPHJk6';
 
-  if (!hash.includes('type=recovery')) {
-    return;
-  }
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const status = document.getElementById('status');
 
-  const params = new URLSearchParams(hash.substring(1));
-  const accessToken = params.get('access_token');
-  const refreshToken = params.get('refresh_token');
-
-  if (!accessToken || !refreshToken) {
-    alert('Link de recuperação inválido ou expirado. Solicite outro.');
-    return;
-  }
-
-  const { error } = await supabaseClient.auth.setSession({
-    access_token: accessToken,
-    refresh_token: refreshToken
-  });
-
-  if (error) {
-    alert('Não foi possível validar o link: ' + error.message);
-    return;
-  }
-
-  const newPassword = prompt('Digite sua nova senha:');
-
-  if (!newPassword) {
-    alert('Recuperação cancelada. Você pode abrir novamente o link.');
-    return;
-  }
-
-  const { error: updateError } = await supabaseClient.auth.updateUser({
-    password: newPassword
-  });
-
-  if (updateError) {
-    alert('Não foi possível alterar a senha: ' + updateError.message);
-    return;
-  }
-
-  alert('Senha alterada com sucesso! Agora você pode entrar no painel.');
-  window.location.hash = '';
-  window.location.reload();
-  }
-$('forgotPasswordButton').addEventListener('click', async () => {
-  const email = $('email').value.trim();
-
-  if (!email) {
-    showMessage('loginMessage', 'Digite seu e-mail primeiro.');
-    return;
-  }
-
-  showMessage('loginMessage', 'Enviando link de recuperação...');
-
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + window.location.pathname
-  });
-
-  if (error) {
-    showMessage('loginMessage', 'Erro ao enviar: ' + error.message);
-  } else {
-    showMessage('loginMessage', 'Confira seu e-mail para redefinir a senha.');
-  }
-});
-  const $ = id => document.getElementById(id);
-  let contents = [];
-
-  function showMessage(id, message) {
-    $(id).textContent = message || '';
-  }
-$('forgotPasswordButton').addEventListener('click', async () => {
-  const email = $('email').value.trim();
-
-  if (!email) {
-    showMessage('loginMessage', 'Digite seu e-mail primeiro.');
-    return;
-  }
-
-  showMessage('loginMessage', 'Enviando link de recuperação...');
-
-  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + window.location.pathname
-  });
-
-  if (error) {
-    showMessage('loginMessage', 'Erro ao enviar: ' + error.message);
-  } else {
-    showMessage('loginMessage', 'Confira seu e-mail para redefinir a senha.');
-  }
-});
-  function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, char => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    })[char]);
-  }
-
-  function resetForm() {
-    $('contentForm').reset();
-    $('contentId').value = '';
-    $('formTitle').textContent = 'Adicionar conteúdo';
-    $('saveButton').textContent = 'Salvar conteúdo';
-    $('cancelEdit').classList.add('hidden');
-    showMessage('formMessage', '');
-  }
-
-  async function checkAdmin() {
-    const { data: sessionData, error: sessionError } =
-      await supabaseClient.auth.getSession();
-
-    if (sessionError) throw sessionError;
-
-    const session = sessionData.session;
-    if (!session) {
-      $('loginPanel').classList.remove('hidden');
-      $('adminPanel').classList.add('hidden');
+  async function verifyAdmin() {
+    const { data, error } = await supabase.rpc('is_cinevaals_admin');
+    if (error || data !== true) {
+      await supabase.auth.signOut();
+      document.getElementById('login-area').style.display = 'block';
+      document.getElementById('admin-area').style.display = 'none';
+      status.textContent = 'Acesso administrativo não autorizado.';
       return false;
     }
 
-    const { data: isAdmin, error } =
-      await supabaseClient.rpc('is_cinevaals_admin');
-
-    if (error) throw error;
-
-    if (!isAdmin) {
-      $('loginPanel').classList.add('hidden');
-      $('adminPanel').classList.add('hidden');
-      showMessage(
-        'statusMessage',
-        'Sua conta entrou, mas ainda não tem permissão de administrador. Confira se o UID dessa conta foi cadastrado na tabela admin_users.'
-      );
-      return false;
-    }
-
-    $('loginPanel').classList.add('hidden');
-    $('adminPanel').classList.remove('hidden');
-    showMessage('statusMessage', '');
-    await loadContents();
+    document.getElementById('login-area').style.display = 'none';
+    document.getElementById('admin-area').style.display = 'block';
     return true;
   }
 
-  async function loadContents() {
-    showMessage('formMessage', 'Carregando conteúdos...');
+  document.getElementById('login-form').addEventListener('submit',
+    async (event) => {
+      event.preventDefault();
+      status.textContent = 'Verificando acesso...';
 
-    const { data, error } = await supabaseClient
-      .from('contents')
-      .select('id, title, category, date, image, description, time')
-      .order('date', { ascending: true });
-
-    if (error) {
-      showMessage('formMessage', 'Erro ao carregar: ' + error.message);
-      return;
-    }
-
-    contents = data || [];
-    renderContents();
-    showMessage('formMessage', '');
-  }
-
-  function renderContents() {
-    if (!contents.length) {
-      $('contentList').innerHTML =
-        '<p class="muted">Nenhum conteúdo cadastrado ainda.</p>';
-      return;
-    }
-
-    $('contentList').innerHTML = contents.map(item => `
-      <article class="content-item">
-        <h3>${escapeHtml(item.title)}</h3>
-        <div class="muted">
-          ${escapeHtml(item.category)} · ${escapeHtml(item.date)}
-          ${item.time ? ' · ' + escapeHtml(item.time) : ''}
-        </div>
-        <p>${escapeHtml(item.description || '')}</p>
-        <button type="button" data-edit="${escapeHtml(item.id)}">Editar</button>
-        <button type="button" class="danger" data-delete="${escapeHtml(item.id)}">Excluir</button>
-      </article>
-    `).join('');
-  }
-
-  $('loginForm').addEventListener('submit', async event => {
-    event.preventDefault();
-    showMessage('loginMessage', 'Entrando...');
-
-    const { error } = await supabaseClient.auth.signInWithPassword({
-      email: $('email').value.trim(),
-      password: $('password').value
-    });
-
-    if (error) {
-      showMessage('loginMessage', 'Não foi possível entrar: ' + error.message);
-      return;
-    }
-
-    try {
-      await checkAdmin();
-    } catch (error) {
-      showMessage('loginMessage', 'Erro ao verificar acesso: ' + error.message);
-    }
-  });
-
-  $('contentForm').addEventListener('submit', async event => {
-    event.preventDefault();
-    showMessage('formMessage', 'Salvando...');
-
-    const item = {
-      title: $('title').value.trim(),
-      category: $('category').value,
-      date: $('date').value,
-      time: $('time').value.trim(),
-      image: $('image').value.trim(),
-      description: $('description').value.trim()
-    };
-
-    const id = $('contentId').value;
-    const result = id
-      ? await supabaseClient.from('contents').update(item).eq('id', id)
-      : await supabaseClient.from('contents').insert(item);
-
-    if (result.error) {
-      showMessage('formMessage', 'Erro ao salvar: ' + result.error.message);
-      return;
-    }
-
-    resetForm();
-    showMessage('formMessage', 'Conteúdo salvo com sucesso!');
-    await loadContents();
-  });
-
-  $('contentList').addEventListener('click', async event => {
-    const editButton = event.target.closest('[data-edit]');
-    const deleteButton = event.target.closest('[data-delete]');
-
-    if (editButton) {
-      const item = contents.find(x => String(x.id) === editButton.dataset.edit);
-      if (!item) return;
-
-      $('contentId').value = item.id;
-      $('title').value = item.title;
-      $('category').value = item.category;
-      $('date').value = item.date;
-      $('time').value = item.time || '';
-      $('image').value = item.image || '';
-      $('description').value = item.description || '';
-      $('formTitle').textContent = 'Editar conteúdo';
-      $('saveButton').textContent = 'Salvar alterações';
-      $('cancelEdit').classList.remove('hidden');
-      $('contentForm').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    if (deleteButton) {
-      const item = contents.find(x => String(x.id) === deleteButton.dataset.delete);
-      if (!item) return;
-
-      if (!confirm('Excluir "' + item.title + '"? Essa ação não pode ser desfeita.')) {
-        return;
-      }
-
-      showMessage('formMessage', 'Excluindo...');
-
-      const { error } = await supabaseClient
-        .from('contents')
-        .delete()
-        .eq('id', item.id);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value
+      });
 
       if (error) {
-        showMessage('formMessage', 'Erro ao excluir: ' + error.message);
+        status.textContent = 'Erro: ' + error.message;
         return;
       }
 
-      showMessage('formMessage', 'Conteúdo excluído.');
-      await loadContents();
-    }
+      await verifyAdmin();
+    });
+
+  document.getElementById('content-form').addEventListener('submit',
+    async (event) => {
+      event.preventDefault();
+      status.textContent = 'Salvando conteúdo...';
+
+      const content = {
+        title: document.getElementById('title').value.trim(),
+        category: document.getElementById('category').value,
+        date: document.getElementById('date').value,
+        image: document.getElementById('image').value.trim() || null,
+        description: document.getElementById('description').value.trim() || null,
+        time: document.getElementById('time').value || null
+      };
+
+      const { error } = await supabase.from('contents').insert(content);
+
+      if (error) {
+        status.textContent = 'Erro ao salvar: ' + error.message;
+        return;
+      }
+
+      status.textContent = 'Conteúdo cadastrado com sucesso!';
+      document.getElementById('content-form').reset();
+    });
+
+  document.getElementById('logout').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    document.getElementById('admin-area').style.display = 'none';
+    document.getElementById('login-area').style.display = 'block';
+    status.textContent = 'Você saiu do painel.';
   });
 
-  $('cancelEdit').addEventListener('click', resetForm);
-  $('refreshButton').addEventListener('click', loadContents);
-
-  $('logoutButton').addEventListener('click', async () => {
-    await supabaseClient.auth.signOut();
-    contents = [];
-    resetForm();
-    $('adminPanel').classList.add('hidden');
-    $('loginPanel').classList.remove('hidden');
-    showMessage('loginMessage', 'Você saiu da sua conta.');
-  });
-
-  supabaseClient.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_OUT') {
-      $('adminPanel').classList.add('hidden');
-      $('loginPanel').classList.remove('hidden');
-    }
-  });
-
-  (async () => {
-  try {
-    await handlePasswordRecovery();
-    await checkAdmin();
-  } catch (error) {
-    showMessage('statusMessage', 'Erro ao iniciar o painel: ' + error.message);
-  }
-})();
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (sessionData.session) await verifyAdmin();
 </script>
 </body>
 </html>
