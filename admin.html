@@ -86,6 +86,12 @@
         <option value="Anime">Animes</option>
       </select>
 
+      <label for="status-select">Status *</label>
+      <select id="status-select" required>
+        <option value="PARA ASSISTIR">PARA ASSISTIR</option>
+        <option value="ASSISTIDO">ASSISTIDO</option>
+      </select>
+
       <label for="date">Data *</label>
       <input id="date" type="date" required>
 
@@ -160,7 +166,8 @@
         date: document.getElementById('date').value,
         image: document.getElementById('image').value.trim() || null,
         description: document.getElementById('description').value.trim() || null,
-        time: document.getElementById('time').value || null
+        time: document.getElementById('time').value || null,
+        status: document.getElementById('status-select').value
       };
 
       const { error } = await supabase.from('contents').insert(content);
