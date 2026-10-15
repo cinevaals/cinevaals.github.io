@@ -154,6 +154,52 @@ const SUPABASE_KEY = '232cdd31-a0ad-4c24-be6d-a53a91b6a111';
     SUPABASE_URL,
     SUPABASE_KEY
   );
+  async function handlePasswordRecovery() {
+  const hash = window.location.hash;
+
+  if (!hash.includes('type=recovery')) {
+    return;
+  }
+
+  const params = new URLSearchParams(hash.substring(1));
+  const accessToken = params.get('access_token');
+  const refreshToken = params.get('refresh_token');
+
+  if (!accessToken || !refreshToken) {
+    alert('Link de recuperação inválido ou expirado. Solicite outro.');
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.setSession({
+    access_token: accessToken,
+    refresh_token: refreshToken
+  });
+
+  if (error) {
+    alert('Não foi possível validar o link: ' + error.message);
+    return;
+  }
+
+  const newPassword = prompt('Digite sua nova senha:');
+
+  if (!newPassword) {
+    alert('Recuperação cancelada. Você pode abrir novamente o link.');
+    return;
+  }
+
+  const { error: updateError } = await supabaseClient.auth.updateUser({
+    password: newPassword
+  });
+
+  if (updateError) {
+    alert('Não foi possível alterar a senha: ' + updateError.message);
+    return;
+  }
+
+  alert('Senha alterada com sucesso! Agora você pode entrar no painel.');
+  window.location.hash = '';
+  window.location.reload();
+  }
 
   const $ = id => document.getElementById(id);
   let contents = [];
@@ -369,9 +415,14 @@ const SUPABASE_KEY = '232cdd31-a0ad-4c24-be6d-a53a91b6a111';
     }
   });
 
-  checkAdmin().catch(error => {
+  (async () => {
+  try {
+    await handlePasswordRecovery();
+    await checkAdmin();
+  } catch (error) {
     showMessage('statusMessage', 'Erro ao iniciar o painel: ' + error.message);
-  });
+  }
+})();
 </script>
 </body>
 </html>
