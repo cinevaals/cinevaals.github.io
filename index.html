@@ -95,8 +95,15 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
     <p style="margin:0;line-height:1.8;">Bom dia, boa tarde e boa noite! Eu espero que você 🫵🏼 esteja bem. Eu sou a Vaal e de seg a sáb (ou n), tem react. Gravo sozinha offlive. Bem vindos, espero que se divirtam! 💙</p>
   </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const SUPABASE_URL = 'https://bvctuotluoasnflafyrd.supabase.co/rest/v1/';
+const SUPABASE_KEY = '232cdd31-a0ad-4c24-be6d-a53a91b6a111';
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 /*
 PERSONALIZAR A PROGRAMAÇÃO:
 No GitHub, edite este arquivo e procure por const titles = [
