@@ -227,7 +227,26 @@ $('forgotPasswordButton').addEventListener('click', async () => {
   function showMessage(id, message) {
     $(id).textContent = message || '';
   }
+$('forgotPasswordButton').addEventListener('click', async () => {
+  const email = $('email').value.trim();
 
+  if (!email) {
+    showMessage('loginMessage', 'Digite seu e-mail primeiro.');
+    return;
+  }
+
+  showMessage('loginMessage', 'Enviando link de recuperação...');
+
+  const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname
+  });
+
+  if (error) {
+    showMessage('loginMessage', 'Erro ao enviar: ' + error.message);
+  } else {
+    showMessage('loginMessage', 'Confira seu e-mail para redefinir a senha.');
+  }
+});
   function escapeHtml(value) {
     return String(value ?? '').replace(/[&<>"']/g, char => ({
       '&': '&amp;',
