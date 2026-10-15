@@ -120,7 +120,18 @@ let weekStart=mondayOf(new Date());
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function posterFor(item){if(item.image)return `<div class="poster"><img src="${escapeHtml(item.image)}" alt="Pôster de ${escapeHtml(item.title)}" loading="lazy" onerror="this.parentElement.textContent='🎬'"></div>`;return '<div class="poster">🎬</div>';}
 function render(){const term=search.value.trim().toLocaleLowerCase('pt-BR');const end=addDays(weekStart,6);document.getElementById('weekLabel').innerHTML=`${longDate(weekStart)} – ${longDate(end)}<small>✦ ${iso(weekStart)===iso(mondayOf(new Date()))?'SEMANA ATUAL':'PROGRAMAÇÃO SEMANAL'} ✦</small>`;const days=[];for(let i=0;i<7;i++){const d=addDays(weekStart,i),key=iso(d);const list=titles.filter(item=>(activeFilter==='Todos'||item.category===activeFilter)&&item.date===key&&(`${item.title} ${item.description} ${item.category}`).toLocaleLowerCase('pt-BR').includes(term));const cards=list.map(item=>`<article class="event">${posterFor(item)}<div class="event-info"><span class="category">${escapeHtml(item.category)}</span><h3>${escapeHtml(item.title)}</h3>${item.time?`<div class="meta">◷ ${escapeHtml(item.time)}</div>`:''}<p>${escapeHtml(item.description||'')}</p></div></article>`).join('');days.push(`<section class="day ${iso(d)===iso(new Date())?'today':''}"><div class="day-head"><span class="day-name">${dayNames[i]}${iso(d)===iso(new Date())?' <span class="today-label">(hoje)</span>':''}</span><span class="day-date">${shortDate(d)}</span></div><div class="day-body">${cards||'<div class="empty-day">Nenhuma reação programada</div>'}</div></section>`);}schedule.innerHTML=days.join('');}
-document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;activeFilter=b.dataset.filter;document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('active',x===b));render();});search.addEventListener('input',render);document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});document.getElementById('aboutLink').addEventListener('click',e=>{e.preventDefault();document.getElementById('sobre').scrollIntoView({behavior:'smooth'});});render();
+document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;activeFilter=b.dataset.filter;document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('active',x===b));render();});search.addEventListener('input',render);document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
+const aboutModal = document.getElementById('aboutModal');
+document.getElementById('aboutLink').addEventListener('click', () => {
+  aboutModal.style.display = 'flex';
+});
+document.getElementById('closeAbout').addEventListener('click', () => {
+  aboutModal.style.display = 'none';
+});
+aboutModal.addEventListener('click', e => {
+  if (e.target === aboutModal) aboutModal.style.display = 'none';
+});
+
 </script>
 </body>
 </html>
