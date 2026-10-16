@@ -82,11 +82,30 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 <main id="cronograma">
  <div class="intro"><div class="heading"><h1>✧ Cronograma Semanal</h1><p>Aqui você encontra todos os conteúdos que vão virar reação por aqui! 💙</p></div></div>
  <div class="controls"><button class="week-btn" id="prevWeek">← Semana anterior</button><div class="week-label" id="weekLabel">Carregando semana...<small>✦ SEMANA ATUAL ✦</small></div><button class="week-btn" id="nextWeek">Próxima semana →</button></div>
-
+<div class="filters" id="filters" aria-label="Filtrar conteúdos"><button class="filter-btn active" data-filter="Todos">✨ Todos</button><button class="filter-btn" data-filter="Filme">🎬 Filmes</button><button class="filter-btn" data-filter="Série">📺 Séries</button><button class="filter-btn" data-filter="Animação">🐰 Animações</button><button class="filter-btn" data-filter="Dorama">💗 Doramas</button><button class="filter-btn" data-filter="Anime">⛩️ Animes</button></div>
  <div class="days-wrap"><section class="days" id="schedule" aria-live="polite"></section></div>
  <div class="ornament" aria-hidden="true">✿　⌁　🦇　⌁　✿</div>
 </main>
 <footer id="sobre"><strong style="font-size: 18px; font-weight: 700; color: #65bfff; text-shadow: 0 0 6px #65bfff, 0 0 14px #2f83d1, 0 0 28px #087bff88;">Programação sujeita a alterações.</strong></footer>
+
+<div id="catalogModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:16px;">
+  <section role="dialog" aria-modal="true" aria-labelledby="catalogTitle" style="position:relative;width:100%;max-width:1000px;max-height:90vh;overflow:auto;padding:26px 20px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #65bfff;border-radius:16px;box-shadow:0 0 24px #087bff55;color:#eaf5ff;">
+    <button type="button" id="closeCatalog" aria-label="Fechar catálogo" style="position:sticky;float:right;top:0;z-index:2;background:#102846;border:1px solid #65bfff;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;">✕ Fechar</button>
+    <h2 id="catalogTitle" style="margin:0 100px 16px 0;color:#65bfff;">Catálogo</h2>
+    <label for="catalogSearch" style="display:block;margin-bottom:12px;">
+      <span style="display:block;margin-bottom:6px;">🔎 Pesquisar pelo título</span>
+      <input id="catalogSearch" type="search" placeholder="Digite o título..." aria-label="Pesquisar pelo título" style="width:100%;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #37618b;background:#071326;color:#fff;font:inherit;">
+    </label>
+    <div id="catalogGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:14px;"></div>
+    <p id="catalogEmpty" style="display:none;text-align:center;color:#c6d8ef;padding:24px 0;">Nenhum conteúdo encontrado nessa categoria.</p>
+  </section>
+</div>
+<style>
+  .catalog-card{overflow:hidden;border:1px solid #204b79;border-radius:12px;background:#09172a;}
+  .catalog-card img,.catalog-poster{display:flex;width:100%;aspect-ratio:2/3;object-fit:cover;align-items:center;justify-content:center;background:#102846;color:#65bfff;font-size:42px;}
+  .catalog-card h3{font-size:14px;line-height:1.4;margin:0;padding:10px;color:#eaf5ff;overflow-wrap:anywhere;}
+  @media(max-width:520px){#catalogModal section{padding:20px 12px!important}.catalog-card h3{font-size:12px}}
+</style>
 
 <div id="aboutModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:20px;">
   <div style="position:relative;width:100%;max-width:420px;padding:28px 24px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #65bfff;border-radius:16px;box-shadow:0 0 18px #087bff55;text-align:center;color:#c6d8ef;">
@@ -117,7 +136,6 @@ let titles = [
 ];
 const schedule=document.getElementById('schedule'),search=document.getElementById('search');
 const dayNames=['Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado','Domingo'];
-
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
 function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x;}
 function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -142,14 +160,41 @@ async function loadContents() {
   if (data && data.length > 0) {
     titles = data;
     render();
+    if (catalogModal && catalogModal.style.display === 'flex') renderCatalog();
   } else {
     console.log('A tabela contents está vazia. Mantendo os exemplos.');
     render();
   }
 }
-search.addEventListener('input',render);
-document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});
-document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
+  const catalogModal=document.getElementById('catalogModal');
+const catalogTitle=document.getElementById('catalogTitle');
+const catalogSearch=document.getElementById('catalogSearch');
+const catalogGrid=document.getElementById('catalogGrid');
+const catalogEmpty=document.getElementById('catalogEmpty');
+let catalogCategory='Todos';
+function renderCatalog(){
+  const term=catalogSearch.value.trim().toLocaleLowerCase('pt-BR');
+  const filtered=titles.filter(item=>(catalogCategory==='Todos'||item.category===catalogCategory)&&String(item.title||'').toLocaleLowerCase('pt-BR').includes(term));
+  catalogGrid.innerHTML=filtered.map(item=>{
+    const image=item.image?`<img src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
+    return `<article class="catalog-card">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><h3>${escapeHtml(item.title||'Sem título')}</h3></article>`;
+  }).join('');
+  catalogEmpty.style.display=filtered.length?'none':'block';
+}
+function openCatalog(category){
+  catalogCategory=category;
+  catalogTitle.textContent=category==='Todos'?'✨ Todos os conteúdos':({Filme:'🎬 Filmes',Série:'📺 Séries',Animação:'🐰 Animações',Dorama:'💗 Doramas',Anime:'⛩️ Animes'}[category]||category);
+  catalogSearch.value='';
+  renderCatalog();
+  catalogModal.style.display='flex';
+  catalogSearch.focus();
+}
+document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(b)openCatalog(b.dataset.filter);});
+catalogSearch.addEventListener('input',renderCatalog);
+document.getElementById('closeCatalog').addEventListener('click',()=>{catalogModal.style.display='none';});
+catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)catalogModal.style.display='none';});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')catalogModal.style.display='none';});
+search.addEventListener('input',render);document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
 const aboutModal = document.getElementById('aboutModal');
 document.getElementById('aboutLink').addEventListener('click', () => {
   aboutModal.style.display = 'flex';
