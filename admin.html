@@ -172,7 +172,13 @@ const content = {
   status: document.getElementById('status').value
 };
 
-      const { error } = await supabase.from('contents').insert(content);
+      const { data, error } = await supabase
+  .from('contents')
+  .insert(content)
+  .select();
+
+console.log('Conteúdo enviado:', content);
+console.log('Resposta do Supabase:', { data, error });
 
       if (error) {
         status.textContent = 'Erro ao salvar: ' + error.message;
