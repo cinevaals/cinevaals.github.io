@@ -217,7 +217,7 @@ const catalogEmpty=document.getElementById('catalogEmpty');
 let catalogCategory='Todos';
 let catalogTitles=[];
 async function loadCatalog(){
-  const {data,error}=await supabaseClient.from('catalog').select('id,title,category,status,image,description,sort_order').order('sort_order',{ascending:true}).order('title',{ascending:true});
+  const {data,error}=await supabaseClient.from('catalog').select('id,title,category,status,season,image,description,sort_order').order('sort_order',{ascending:true}).order('title',{ascending:true});
   if(error){console.error('Erro ao carregar catálogo:',error);catalogTitles=[];if(catalogModal&&catalogModal.style.display==='flex')renderCatalog();return;}
   catalogTitles=data||[];
   if(catalogModal&&catalogModal.style.display==='flex')renderCatalog();
