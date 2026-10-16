@@ -70,47 +70,6 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 .nav-dropdown:focus-within .nav-dropdown-menu{
   display:block;
 }
-
-/* Status dos conteúdos no catálogo */
-.status-badge {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 5px 10px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  background: #17385c;
-  color: #c6e3ff;
-  border: 1px solid #315b85;
-}
-
-.status-badge:where(*) {
-  white-space: nowrap;
-}
-
-.catalog-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 18px;
-  align-items: start;
-}
-
-#catalogo {
-  margin-bottom: 36px;
-}
-
-#catalogo .intro {
-  margin-bottom: 20px;
-}
-
-@media (max-width: 520px) {
-  .catalog-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-}
-  
 </style>
 <link rel="icon" type="image/png" href="/favicon.png">
 </head>
@@ -119,39 +78,11 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 <div class="topnav"><div class="nav-inner"><div class="brand">✦ CineVaals</div><a class="nav-link active" href="" onclick="window.location.reload(); return false;">🗓️ Cronograma</a><div class="nav-dropdown"><button class="nav-link nav-dropdown-btn" type="button">🐮 Vaquinhas ▾</button><div class="nav-dropdown-menu"><a href="https://incentive.gg/a_valzinha" target="_blank" rel="noopener noreferrer">Incentive</a><a href="https://livepix.gg/vaalzinha" target="_blank" rel="noopener noreferrer">LivePix</a></div></div>
 <div class="nav-dropdown"><button class="nav-link nav-dropdown-btn" type="button">🌐 Social ▾</button><div class="nav-dropdown-menu"><a href="https://instagram.com/a_vaalzinha" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://www.tiktok.com/@a_vaalzinha" target="_blank" rel="noopener noreferrer">TikTok</a><a href="https://cinefy.gg/a_valzinha" target="_blank" rel="noopener noreferrer">Cinefy</a></div></div>
 <button class="nav-link" type="button" id="aboutLink" style="font-family:inherit;background:transparent;border:0;cursor:pointer;">ℹ️ Sobre</button>
-
 <div class="nav-spacer"></div><input class="search" id="search" type="search" placeholder="🔎 Buscar no cronograma..." aria-label="Buscar no cronograma"></div></div>
-<main id="catalogo">
-  <div class="intro">
-    <div class="heading">
-      <h1>✧ Meu Catálogo</h1>
-      <p>Todos os conteúdos, organizados do seu jeito! 💙</p>
-    </div>
-  </div>
-  <div class="filters" id="catalogFilters" aria-label="Filtrar catálogo">
-    <button class="filter-btn active" data-catalog-filter="Todos">✨ Todos</button>
-    <button class="filter-btn" data-catalog-filter="Filme">🎬 Filmes</button>
-    <button class="filter-btn" data-catalog-filter="Série">📺 Séries</button>
-    <button class="filter-btn" data-catalog-filter="Animação">🐰 Animações</button>
-    <button class="filter-btn" data-catalog-filter="Dorama">💗 Doramas</button>
-    <button class="filter-btn" data-catalog-filter="Anime">⛩️ Animes</button>
-  </div>
-
-  <div class="days-wrap">
-   <section id="catalogGrid" class="catalog-grid" aria-live="polite"></section>
-  </div>
-</main>
-  <main id="cronograma">
+<main id="cronograma">
  <div class="intro"><div class="heading"><h1>✧ Cronograma Semanal</h1><p>Aqui você encontra todos os conteúdos que vão virar reação por aqui! 💙</p></div></div>
  <div class="controls"><button class="week-btn" id="prevWeek">← Semana anterior</button><div class="week-label" id="weekLabel">Carregando semana...<small>✦ SEMANA ATUAL ✦</small></div><button class="week-btn" id="nextWeek">Próxima semana →</button></div>
-<div class="filters" id="scheduleFilters" aria-label="Filtrar programação semanal">
-  <button class="filter-btn" data-filter="Filme">🎬 Filmes</button>
-  <button class="filter-btn" data-filter="Série">📺 Séries</button>
-  <button class="filter-btn" data-filter="Animação">🐰 Animações</button>
-  <button class="filter-btn" data-filter="Dorama">💗 Doramas</button>
-  <button class="filter-btn" data-filter="Anime">⛩️ Animes</button>
-  <button class="filter-btn" data-filter="Todos">✨ Todos</button>
-</div>
+<div class="filters" id="filters" aria-label="Filtrar conteúdos"><button class="filter-btn active" data-filter="Todos">✨ Todos</button><button class="filter-btn" data-filter="Filme">🎬 Filmes</button><button class="filter-btn" data-filter="Série">📺 Séries</button><button class="filter-btn" data-filter="Animação">🐰 Animações</button><button class="filter-btn" data-filter="Dorama">💗 Doramas</button><button class="filter-btn" data-filter="Anime">⛩️ Animes</button></div>
  <div class="days-wrap"><section class="days" id="schedule" aria-live="polite"></section></div>
  <div class="ornament" aria-hidden="true">✿　⌁　🦇　⌁　✿</div>
 </main>
@@ -196,56 +127,10 @@ let weekStart=mondayOf(new Date());
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function posterFor(item){if(item.image)return `<div class="poster"><img src="${escapeHtml(item.image)}" alt="Pôster de ${escapeHtml(item.title)}" loading="lazy" onerror="this.parentElement.textContent='🎬'"></div>`;return '<div class="poster">🎬</div>';}
 function render(){const term=search.value.trim().toLocaleLowerCase('pt-BR');const end=addDays(weekStart,6);document.getElementById('weekLabel').innerHTML=`${longDate(weekStart)} – ${longDate(end)}<small>✦ ${iso(weekStart)===iso(mondayOf(new Date()))?'SEMANA ATUAL':'PROGRAMAÇÃO SEMANAL'} ✦</small>`;const days=[];for(let i=0;i<7;i++){const d=addDays(weekStart,i),key=iso(d);const list=titles.filter(item=>(activeFilter==='Todos'||item.category===activeFilter)&&item.date===key&&(`${item.title} ${item.description} ${item.category}`).toLocaleLowerCase('pt-BR').includes(term));const cards=list.map(item=>`<article class="event">${posterFor(item)}<div class="event-info"><span class="category">${escapeHtml(item.category)}</span><h3>${escapeHtml(item.title)}</h3>${item.time?`<div class="meta">◷ ${escapeHtml(item.time)}</div>`:''}<p>${escapeHtml(item.description||'')}</p></div></article>`).join('');days.push(`<section class="day ${iso(d)===iso(new Date())?'today':''}"><div class="day-head"><span class="day-name">${dayNames[i]}${iso(d)===iso(new Date())?' <span class="today-label">(hoje)</span>':''}</span><span class="day-date">${shortDate(d)}</span></div><div class="day-body">${cards||'<div class="empty-day">Nenhuma reação programada</div>'}</div></section>`);}schedule.innerHTML=days.join('');}
-let catalogFilter = null;
-
-function renderCatalog() {
-  const grid = document.getElementById('catalogGrid');
-  if (!grid) return;
-
-  // Não exibe conteúdos até o visitante escolher uma categoria.
-  if (!catalogFilter) {
-    grid.innerHTML = '';
-    return;
-  }
-
-  const items = titles.filter(item =>
-    catalogFilter === 'Todos' || item.category === catalogFilter
-  );
-
-  grid.innerHTML = items.length
-    ? items.map(item => `
-        <article class="event">
-          ${posterFor(item)}
-          <div class="event-info">
-            <span class="category">${escapeHtml(item.category)}</span>
-            <h3>${escapeHtml(item.title)}</h3>
-            ${item.time ? <div class="meta">◷ ${escapeHtml(item.time)}</div> : ''}
-            <p>${escapeHtml(item.description || '')}</p>
-            <span class="status-badge">
-              ${escapeHtml(item.status || 'PARA ASSISTIR')}
-            </span>
-          </div>
-        </article>
-      `).join('')
-    : '<p>Nenhum conteúdo encontrado nesta categoria.</p>';
-}
-
-document.getElementById('catalogFilters').addEventListener('click', e => {
-  const button = e.target.closest('button[data-catalog-filter]');
-  if (!button) return;
-
-  catalogFilter = button.dataset.catalogFilter;
-
-  document.querySelectorAll('#catalogFilters button').forEach(item => {
-    item.classList.toggle('active', item === button);
-  });
-
-  renderCatalog();
-});
-  async function loadContents() {
+async function loadContents() {
   const { data, error } = await supabaseClient
     .from('contents')
-   .select('id, title, category, date, image, description, time, status')
+    .select('id, title, category, date, image, description, time')
     .order('date', { ascending: true });
 
   if (error) {
@@ -255,13 +140,14 @@ document.getElementById('catalogFilters').addEventListener('click', e => {
   }
 
   if (data && data.length > 0) {
-  titles = data;
+    titles = data;
+    render();
+  } else {
+    console.log('A tabela contents está vazia. Mantendo os exemplos.');
+    render();
+  }
 }
-
-render();
-renderCatalog();
-}
-  document.getElementById('scheduleFilters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;activeFilter=b.dataset.filter;document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('active',x===b));render();});search.addEventListener('input',render);document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
+  document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;activeFilter=b.dataset.filter;document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('active',x===b));render();});search.addEventListener('input',render);document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
 const aboutModal = document.getElementById('aboutModal');
 document.getElementById('aboutLink').addEventListener('click', () => {
   aboutModal.style.display = 'flex';
