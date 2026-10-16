@@ -71,7 +71,7 @@
             <div class="full"><label for="catalog-item-title">Título *</label><input id="catalog-item-title" required maxlength="200"></div>
             <div><label for="catalog-item-category">Categoria *</label><select id="catalog-item-category" required><option value="Filme">Filmes</option><option value="Série">Séries</option><option value="Animação">Animações</option><option value="Dorama">Doramas</option><option value="Anime">Animes</option></select></div>
             <div><label for="catalog-item-status">Status *</label><select id="catalog-item-status" required><option value="Já Assistido">Já Assistido</option><option value="Está no Cronograma">Está no Cronograma</option><option value="Está na Fila" selected>Está na Fila</option></select></div>
-            <div id="catalog-season-wrap" class="full hidden"><label for="catalog-item-season">Temporada (opcional)</label><input id="catalog-item-season" placeholder="Ex.: Temporada 1, Temporadas 1–3"></div>
+            <div id="catalog-season-wrap" class="full hidden"><label for="catalog-item-season">Temporada *</label><select id="catalog-item-season"><option value="">Selecione a temporada</option><option value="Temporada 1">Temporada 1</option><option value="Temporada 2">Temporada 2</option><option value="Temporada 3">Temporada 3</option><option value="Temporada 4">Temporada 4</option><option value="Temporada 5">Temporada 5</option><option value="Temporada 6">Temporada 6</option><option value="Temporada 7">Temporada 7</option><option value="Temporada 8">Temporada 8</option><option value="Temporada 9">Temporada 9</option><option value="Temporada 10">Temporada 10</option><option value="Temporada 11">Temporada 11</option><option value="Temporada 12">Temporada 12</option><option value="Temporada 13">Temporada 13</option><option value="Temporada 14">Temporada 14</option><option value="Temporada 15">Temporada 15</option><option value="Temporada 16">Temporada 16</option><option value="Temporada 17">Temporada 17</option><option value="Temporada 18">Temporada 18</option><option value="Temporada 19">Temporada 19</option><option value="Temporada 20">Temporada 20</option><option value="Todas as temporadas">Todas as temporadas</option></select></div>
             <div class="full"><label for="catalog-item-image">URL da imagem</label><input id="catalog-item-image" type="url" placeholder="https://..."></div>
             <div class="full"><label for="catalog-item-description">Descrição (opcional)</label><textarea id="catalog-item-description" rows="3"></textarea></div>
           </div>
@@ -365,7 +365,7 @@
   });
 
 
-  function updateCatalogSeasonField(){const isMovie=$('catalog-item-category').value==='Filme';$('catalog-season-wrap').classList.toggle('hidden',isMovie);if(isMovie)$('catalog-item-season').value='';}
+  function updateCatalogSeasonField(){const isMovie=$('catalog-item-category').value==='Filme';$('catalog-season-wrap').classList.toggle('hidden',isMovie);$('catalog-item-season').required=!isMovie;if(isMovie)$('catalog-item-season').value='';}
   function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-status').value='Está na Fila';$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
   function renderCatalogAdmin(){
     const term=$('catalog-admin-search').value.trim().toLocaleLowerCase('pt-BR');
@@ -426,7 +426,7 @@
     $('catalog-item-image').value=item.poster_path?'https://image.tmdb.org/t/p/w500'+item.poster_path:'';
     $('catalog-item-description').value=item.overview||'';
     $('catalog-item-season').value='';updateCatalogSeasonField();
-    $('catalog-admin-status').textContent='Dados preenchidos. Informe a temporada se necessário e salve no catálogo.';
+    $('catalog-admin-status').textContent='Dados preenchidos. Selecione a temporada e salve no catálogo.';
     $('catalog-item-title').focus();
   });
 
