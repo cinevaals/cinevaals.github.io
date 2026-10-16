@@ -6,7 +6,7 @@ create table if not exists public.catalog (
   title text not null,
   category text not null check (category in ('Filme', 'Série', 'Animação', 'Dorama', 'Anime')),
   status text not null default 'Está na Fila'
-    check (status in ('Já Assistido', 'Assistindo', 'Está na Fila')),
+    check (status in ('Em Andamento', 'Está na Fila', 'Já Assistido', 'Finalizado')),
   image text,
   description text,
   created_at timestamptz not null default now(),
@@ -54,5 +54,6 @@ alter table public.catalog add column if not exists season text;
 -- Status e progresso de séries/animes/doramas em andamento.
 alter table public.catalog add column if not exists episode integer;
 alter table public.catalog drop constraint if exists catalog_status_check;
+update public.catalog set status = 'Em Andamento' where status = 'Assistindo';
 alter table public.catalog add constraint catalog_status_check
-  check (status in ('Já Assistido', 'Assistindo', 'Está na Fila', 'Em Andamento', 'Finalizado'));
+  check (status in ('Em Andamento', 'Está na Fila', 'Já Assistido', 'Finalizado'));
