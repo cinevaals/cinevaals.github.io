@@ -49,3 +49,10 @@ grant usage, select on sequence public.catalog_id_seq to authenticated;
 
 -- Temporada opcional para séries, animações, doramas e animes.
 alter table public.catalog add column if not exists season text;
+
+
+-- Status e progresso de séries/animes/doramas em andamento.
+alter table public.catalog add column if not exists episode integer;
+alter table public.catalog drop constraint if exists catalog_status_check;
+alter table public.catalog add constraint catalog_status_check
+  check (status in ('Já Assistido', 'Assistindo', 'Está no Cronograma', 'Está na Fila'));
