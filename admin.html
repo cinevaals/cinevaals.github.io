@@ -169,7 +169,7 @@ const content = {
   image: document.getElementById('image').value.trim() || null,
   description: document.getElementById('description').value.trim() || null,
   time: document.getElementById('time').value || null,
-  status: document.getElementById('status').value
+  status: document.getElementById('status').value || 'PARA ASSISTIR'
 };
 
       const { data, error } = await supabase
