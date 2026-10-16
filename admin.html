@@ -84,9 +84,17 @@
         <option value="Animação">Animações</option>
         <option value="Dorama">Doramas</option>
         <option value="Anime">Animes</option>
+      
+      </select>
+
+      <label for="status">Status *</label>
+      <select id="status" required>
+        <option value="PARA ASSISTIR">📌 Para assistir</option>
+        <option value="ASSISTIDO">✅ Assistido</option>
       </select>
 
       <label for="date">Data *</label>
+
       <input id="date" type="date" required>
 
       <label for="image">URL da imagem</label>
@@ -154,14 +162,15 @@
       event.preventDefault();
       status.textContent = 'Salvando conteúdo...';
 
-      const content = {
-        title: document.getElementById('title').value.trim(),
-        category: document.getElementById('category').value,
-        date: document.getElementById('date').value,
-        image: document.getElementById('image').value.trim() || null,
-        description: document.getElementById('description').value.trim() || null,
-        time: document.getElementById('time').value || null
-      };
+const content = {
+  title: document.getElementById('title').value.trim(),
+  category: document.getElementById('category').value,
+  date: document.getElementById('date').value,
+  image: document.getElementById('image').value.trim() || null,
+  description: document.getElementById('description').value.trim() || null,
+  time: document.getElementById('time').value || null,
+  status: document.getElementById('status').value
+};
 
       const { error } = await supabase.from('contents').insert(content);
 
