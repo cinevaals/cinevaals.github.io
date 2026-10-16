@@ -23,7 +23,10 @@
     .days-wrap{overflow-x:auto;padding:0 0 12px;scrollbar-color:#1b568d #07101e;scrollbar-width:thin}.days{display:grid;grid-template-columns:repeat(7,minmax(160px,1fr));gap:10px;min-width:1160px;align-items:stretch}
     .day{background:linear-gradient(180deg,#09172a,#060d19);border:1px solid #16385b;border-radius:11px;overflow:hidden;min-width:0;box-shadow:0 5px 18px #0003;padding:0}.day-head{margin:0;padding:11px 10px;background:linear-gradient(100deg,#102846,#0a172a);border-bottom:1px solid #1b4774;align-items:center}.day-head h3{margin:0;font-size:12px;font-weight:bold;color:#a8dcff}.day-date{display:block;color:#c0d0e5;font-size:11px;margin-top:4px}.day-items{padding:7px;display:flex;flex-direction:column;gap:8px;min-height:130px}
     .item{background:rgba(8,21,39,.86);border:1px solid #122d4d;border-radius:8px;padding:7px;align-items:stretch;gap:7px;transition:transform .15s,border-color .15s;cursor:grab}.item[draggable="true"]:active{cursor:grabbing}.item.dragging{opacity:.42;border:1px dashed #65bfff}.item.drag-over{border-color:#65bfff;box-shadow:0 0 0 2px #168bff33}.item:hover{transform:translateY(-2px);border-color:#2f83d1}.item-main{min-width:0;flex:1;align-self:center}.item-title{font-weight:700;font-size:12px;line-height:1.25;overflow-wrap:anywhere;margin:6px 0 4px;color:#f1f7ff}.category{display:inline-block;color:#8fd1ff;background:#0e3156;border:1px solid #164879;padding:3px 5px;border-radius:4px;font-size:8px;font-weight:bold;text-transform:uppercase;letter-spacing:.3px}.meta{font-size:10px;color:#65bfff;line-height:1.4;margin:3px 0;overflow-wrap:anywhere}.item-description{font-size:10px;color:#9daec4;line-height:1.35;overflow-wrap:anywhere}.item-actions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;align-content:flex-start}.empty{color:#6e819c;font-size:11px;text-align:center;padding:24px 5px}.empty:before{content:'✧';display:block;font-size:19px;color:#235789;margin-bottom:7px}
-    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.full{grid-column:1/-1}#status{overflow-wrap:anywhere;color:#65bfff;min-height:1.2em;margin:14px 0 0}.hidden{display:none!important}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.full{grid-column:1/-1}
+    .search-box{margin-bottom:16px;padding:14px;background:#071326;border:1px solid #21466e;border-radius:10px}.search-row{display:flex;gap:8px;align-items:stretch}.search-row input{min-width:0;flex:1}.search-row button{margin-top:6px;white-space:nowrap}
+    .catalog-results{display:grid;gap:8px;margin-top:10px}.catalog-result{display:flex;align-items:center;gap:10px;text-align:left;width:100%;background:#0b1c33;border:1px solid #21466e}.catalog-result img{width:42px;height:62px;object-fit:cover;border-radius:4px;background:#15243a;flex-shrink:0}.catalog-result span{display:block}.catalog-result .result-title{font-size:14px;color:#f4f7ff}.catalog-result .result-meta{font-size:11px;color:#9bc9f4;margin-top:4px}.catalog-message{font-size:13px;color:#9bc9f4;margin:10px 0 0}
+    #status{overflow-wrap:anywhere;color:#65bfff;min-height:1.2em;margin:14px 0 0}.hidden{display:none!important}
     @media(max-width:700px){main{padding:20px 12px 30px}header{margin:0 -12px 20px;padding:8px 12px}h1{font-size:20px}.days{grid-template-columns:repeat(7,minmax(155px,1fr));min-width:1160px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.week-controls button{font-size:.78rem;padding:9px 8px}.week-title{min-width:0}.toolbar{align-items:flex-start}}
   </style>
 </head>
@@ -58,6 +61,14 @@
     <section id="editor" class="panel hidden">
       <h2 id="editor-title">Adicionar conteúdo</h2>
       <form id="content-form">
+        <div class="search-box full">
+          <label for="catalog-query">Buscar por título</label>
+          <div class="search-row">
+            <input id="catalog-query" type="search" placeholder="Digite o nome de um filme ou série" autocomplete="off">
+            <button id="catalog-search" class="primary" type="button">Buscar por título</button>
+          </div>
+          <div id="catalog-results" class="catalog-results" role="listbox" aria-label="Resultados da busca"></div>
+        </div>
         <div class="form-grid">
           <div class="full"><label for="title">Título *</label><input id="title" required maxlength="200"></div>
           <div><label for="category">Categoria *</label><select id="category" required>
@@ -155,6 +166,67 @@
     if(error){status.textContent='Erro: '+error.message;return;}
     await verifyAdmin();
   });
+  function showCatalogMessage(message){
+    $('catalog-results').innerHTML = message ? `<p class="catalog-message">${escapeHtml(message)}</p>` : '';
+  }
+
+  $('catalog-search').addEventListener('click', searchCatalog);
+  $('catalog-query').addEventListener('keydown', event=>{
+    if(event.key==='Enter'){event.preventDefault();searchCatalog();}
+  });
+
+  async function searchCatalog(){
+    const query=$('catalog-query').value.trim();
+    if(!query){showCatalogMessage('Digite um título para pesquisar.');return;}
+    $('catalog-search').disabled=true;
+    $('catalog-search').textContent='Buscando...';
+    showCatalogMessage('Buscando filmes e séries...');
+    try{
+      const {data:sessionData}=await supabase.auth.getSession();
+      const token=sessionData.session?.access_token;
+      if(!token){showCatalogMessage('Sua sessão expirou. Entre novamente no painel.');return;}
+      const {data,error}=await supabase.functions.invoke('tmdb-search',{
+        body:{query},
+        headers:{Authorization:`Bearer ${token}`}
+      });
+      if(error) throw error;
+      const results=Array.isArray(data)?data:(data?.results||[]);
+      if(!results.length){showCatalogMessage('Nenhum resultado encontrado. Tente outro título.');return;}
+      $('catalog-results').innerHTML=results.map((item,index)=>{
+        const title=item.title||item.name||'Sem título';
+        const type=item.media_type||(item.title?'movie':'tv');
+        const year=(item.release_date||item.first_air_date||'').slice(0,4);
+        const poster=item.poster_path?`https://image.tmdb.org/t/p/w185${item.poster_path}`:'';
+        return `<button class="catalog-result" type="button" data-result-index="${index}">
+          ${poster?`<img src="${escapeHtml(poster)}" alt="" loading="lazy">`:'<span class="catalog-result-poster" aria-hidden="true">🎬</span>'}
+          <span><span class="result-title">${escapeHtml(title)}</span><span class="result-meta">${type==='tv'?'Série':'Filme'}${year?' · '+escapeHtml(year):''}</span></span>
+        </button>`;
+      }).join('');
+      $('catalog-results').dataset.results=JSON.stringify(results);
+    }catch(error){
+      console.error('Erro na busca de catálogo:',error);
+      showCatalogMessage('Não foi possível realizar a busca. Confira sua conexão e tente novamente.');
+    }finally{
+      $('catalog-search').disabled=false;
+      $('catalog-search').textContent='Buscar por título';
+    }
+  }
+
+  $('catalog-results').addEventListener('click',event=>{
+    const button=event.target.closest('[data-result-index]');
+    if(!button)return;
+    const results=JSON.parse($('catalog-results').dataset.results||'[]');
+    const item=results[Number(button.dataset.resultIndex)];
+    if(!item)return;
+    const type=item.media_type||(item.title?'movie':'tv');
+    $('title').value=item.title||item.name||'';
+    $('category').value=type==='tv'?'Série':'Filme';
+    $('image').value=item.poster_path?`https://image.tmdb.org/t/p/w500${item.poster_path}`:'';
+    $('description').value=item.overview||'';
+    showCatalogMessage('Dados preenchidos. Confira a categoria e escolha a data e o horário antes de salvar.');
+    $('title').focus();
+  });
+
   $('content-form').addEventListener('submit',async event=>{
     event.preventDefault(); $('save-content').disabled=true; status.textContent='Salvando conteúdo...';
     const targetDate=$('date').value;
