@@ -396,7 +396,12 @@
   }
   $('new-content').addEventListener('click',openCatalogManager);
   $('catalog-item-category').addEventListener('change',updateCatalogSeasonField);
-  $('catalog-item-status').addEventListener('change',updateCatalogSeasonField);
+  $('catalog-item-status').addEventListener('change',()=>{
+    updateCatalogSeasonField();
+    if($('catalog-item-category').value==='Série' && $('catalog-item-status').value==='Já Assistido'){
+      $('catalog-item-season').value='Todas as temporadas';
+    }
+  });
   $('catalog-manager-search').addEventListener('click',()=>searchCatalogForManager(false));
   $('catalog-manager-query').addEventListener('input',()=>{
     clearTimeout(managerSearchTimer);
