@@ -274,7 +274,7 @@ async function openContentDetails(item){
   const $detail=id=>document.getElementById(id);
   $detail('detailTitle').textContent=title;
   $detail('detailMeta').textContent=[item.category,item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'',item.time?'Horário: '+item.time:''].filter(Boolean).join(' · ');
-  const scheduleDescription=/^Episódios para assistir: \\d+$/.test(String(item.description||''))?'':(item.description||'');
+  const scheduleDescription=/^Episódios para assistir: \d+$/.test(String(item.description||''))?'':(item.description||'');
   $detail('detailDescription').textContent=scheduleDescription||'Carregando informações do TMDB…';
   const wrap=$detail('detailPosterWrap');
   wrap.innerHTML=item.image?`<img class="detail-poster" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(title)}">`:'<div class="detail-poster" style="display:grid;place-items:center;color:#65bfff">🎬</div>';
