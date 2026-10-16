@@ -144,7 +144,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   <main id="cronograma">
  <div class="intro"><div class="heading"><h1>✧ Cronograma Semanal</h1><p>Aqui você encontra todos os conteúdos que vão virar reação por aqui! 💙</p></div></div>
  <div class="controls"><button class="week-btn" id="prevWeek">← Semana anterior</button><div class="week-label" id="weekLabel">Carregando semana...<small>✦ SEMANA ATUAL ✦</small></div><button class="week-btn" id="nextWeek">Próxima semana →</button></div>
-<div class="filters" id="filters" aria-label="Filtrar conteúdos">
+<div class="filters" id="scheduleFilters" aria-label="Filtrar programação semanal">
   <button class="filter-btn" data-filter="Filme">🎬 Filmes</button>
   <button class="filter-btn" data-filter="Série">📺 Séries</button>
   <button class="filter-btn" data-filter="Animação">🐰 Animações</button>
@@ -219,7 +219,7 @@ function renderCatalog() {
           <div class="event-info">
             <span class="category">${escapeHtml(item.category)}</span>
             <h3>${escapeHtml(item.title)}</h3>
-            ${item.time ? `<div class="meta">◷ ${escapeHtml(item.time)}</div>` : ''}
+            ${item.time ? <div class="meta">◷ ${escapeHtml(item.time)}</div> : ''}
             <p>${escapeHtml(item.description || '')}</p>
             <span class="status-badge">
               ${escapeHtml(item.status || 'PARA ASSISTIR')}
@@ -230,19 +230,18 @@ function renderCatalog() {
     : '<p>Nenhum conteúdo encontrado nesta categoria.</p>';
 }
 
-document.getElementById('filters').addEventListener('click', e => {
-  const button = e.target.closest('button[data-filter]');
+document.getElementById('catalogFilters').addEventListener('click', e => {
+  const button = e.target.closest('button[data-catalog-filter]');
   if (!button) return;
 
-  catalogFilter = button.dataset.filter;
+  catalogFilter = button.dataset.catalogFilter;
 
-  document.querySelectorAll('#filters button').forEach(item => {
+  document.querySelectorAll('#catalogFilters button').forEach(item => {
     item.classList.toggle('active', item === button);
   });
 
   renderCatalog();
 });
-
   async function loadContents() {
   const { data, error } = await supabaseClient
     .from('contents')
@@ -262,7 +261,7 @@ document.getElementById('filters').addEventListener('click', e => {
 render();
 renderCatalog();
 }
-  document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;activeFilter=b.dataset.filter;document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('active',x===b));render();});search.addEventListener('input',render);document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
+  document.getElementById('scheduleFilters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(!b)return;activeFilter=b.dataset.filter;document.querySelectorAll('#filters button').forEach(x=>x.classList.toggle('active',x===b));render();});search.addEventListener('input',render);document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
 const aboutModal = document.getElementById('aboutModal');
 document.getElementById('aboutLink').addEventListener('click', () => {
   aboutModal.style.display = 'flex';
