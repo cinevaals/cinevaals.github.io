@@ -109,7 +109,7 @@
       <button type="submit">Salvar conteúdo</button>
     </form>
 
-    <p id="status" role="status"></p>
+    <p id="status-message" role="status"></p>
     <button id="logout" class="secondary" type="button">Sair</button>
   </section>
 </main>
@@ -122,7 +122,7 @@
   const SUPABASE_KEY = 'sb_publishable_y0BudXGL8t3yDJLE4h5IZg_UZRPHJk6';
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-  const status = document.getElementById('status');
+  const status = document.getElementById('status-message');
 
   async function verifyAdmin() {
     const { data, error } = await supabase.rpc('is_cinevaals_admin');
