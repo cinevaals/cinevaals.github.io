@@ -70,8 +70,8 @@
           <input id="catalog-id" type="hidden">
           <div class="form-grid">
             <div class="full"><label for="catalog-item-title">Título *</label><input id="catalog-item-title" required maxlength="200"></div>
-            <div><label for="catalog-item-category">Categoria *</label><select id="catalog-item-category" required><option value="Filme">Filmes</option><option value="Série">Séries</option><option value="Animação">Animações</option><option value="Dorama">Doramas</option><option value="Anime">Animes</option></select></div>
-            <div><label for="catalog-item-status">Status *</label><select id="catalog-item-status" required><option value="Já Assistido">Já Assistido</option><option value="Assistindo">Assistindo</option><option value="Está na Fila" selected>Está na Fila</option></select></div>
+            <div><label for="catalog-item-category">Categoria *</label><select id="catalog-item-category" required><option value="" selected disabled>Selecionar</option><option value="Filme">Filmes</option><option value="Série">Séries</option><option value="Animação">Animações</option><option value="Dorama">Doramas</option><option value="Anime">Animes</option></select></div>
+            <div><label for="catalog-item-status">Status *</label><select id="catalog-item-status" required><option value="" selected disabled>Selecionar</option><option value="Já Assistido">Já Assistido</option><option value="Assistindo">Assistindo</option><option value="Está na Fila" selected>Está na Fila</option></select></div>
             <div id="catalog-season-wrap" class="full hidden"><label for="catalog-item-season">Temporada *</label><select id="catalog-item-season"><option value="">Selecione a temporada</option></select></div>
             <div id="catalog-episode-wrap" class="full hidden"><label for="catalog-item-episode">Episódio atual *</label><select id="catalog-item-episode"><option value="">Selecione o episódio</option></select></div>
             <div class="full"><label for="catalog-item-image">URL da imagem</label><input id="catalog-item-image" type="url" placeholder="https://..."></div>
@@ -417,7 +417,7 @@
     if([...episodeSelect.options].some(o=>o.value===selectedEpisode))episodeSelect.value=selectedEpisode;
   }
   function updateCatalogSeasonField(){const isMovie=$('catalog-item-category').value==='Filme';const isWatching=$('catalog-item-status').value==='Assistindo';$('catalog-season-wrap').classList.toggle('hidden',isMovie);$('catalog-item-season').required=!isMovie;$('catalog-episode-wrap').classList.toggle('hidden',isMovie||!isWatching);$('catalog-item-episode').required=!isMovie&&isWatching;if(isMovie){$('catalog-item-season').value='';$('catalog-item-episode').value='';}else if(!isWatching){$('catalog-item-episode').value='';}}
-  function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-status').value='Está na Fila';$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
+  function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
   function renderCatalogAdmin(){
     const term=$('catalog-admin-search').value.trim().toLocaleLowerCase('pt-BR');
     const list=catalogItems.filter(item=>String(item.title||'').toLocaleLowerCase('pt-BR').includes(term));
