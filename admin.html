@@ -485,6 +485,12 @@
     const results=JSON.parse($('catalog-manager-results').dataset.results||'[]'),item=results[Number(button.dataset.managerResult)];if(!item)return;
     const type=item.media_type||(item.title?'movie':'tv');
     $('catalog-item-title').value=item.title||item.name||'';
+    // Fecha as sugestões assim que um resultado é selecionado.
+    $('catalog-manager-results').innerHTML='';
+    $('catalog-manager-results').dataset.results='[]';
+    $('catalog-manager-query').value='';
+    managerSearchSequence++;
+    clearTimeout(managerSearchTimer);
     $('catalog-item-category').value=type==='tv'?'Série':'Filme';
     $('catalog-item-image').value=item.poster_path?'https://image.tmdb.org/t/p/w500'+item.poster_path:'';
     $('catalog-item-description').value=item.overview||'';
