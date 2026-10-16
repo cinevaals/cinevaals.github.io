@@ -78,7 +78,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 <div class="topnav"><div class="nav-inner"><div class="brand">✦ CineVaals</div><a class="nav-link active" href="" onclick="window.location.reload(); return false;">🗓️ Cronograma</a><div class="nav-dropdown"><button class="nav-link nav-dropdown-btn" type="button">🐮 Vaquinhas ▾</button><div class="nav-dropdown-menu"><a href="https://incentive.gg/a_valzinha" target="_blank" rel="noopener noreferrer">Incentive</a><a href="https://livepix.gg/vaalzinha" target="_blank" rel="noopener noreferrer">LivePix</a></div></div>
 <div class="nav-dropdown"><button class="nav-link nav-dropdown-btn" type="button">🌐 Social ▾</button><div class="nav-dropdown-menu"><a href="https://instagram.com/a_vaalzinha" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://www.tiktok.com/@a_vaalzinha" target="_blank" rel="noopener noreferrer">TikTok</a><a href="https://cinefy.gg/a_valzinha" target="_blank" rel="noopener noreferrer">Cinefy</a></div></div>
 <button class="nav-link" type="button" id="aboutLink" style="font-family:inherit;background:transparent;border:0;cursor:pointer;">ℹ️ Sobre</button>
-<div class="nav-spacer"></div><input class="search" id="search" type="search" placeholder="🔎 Buscar no cronograma..." aria-label="Buscar no cronograma"></div></div>
+<div class="nav-spacer"></div></div></div>
 <main id="cronograma">
  <div class="intro">
    <div class="heading"><h1>✧ Cronograma Semanal</h1><p>Aqui você encontra todos os conteúdos que vão virar reação por aqui! 💙</p></div>
@@ -136,7 +136,7 @@ let titles = [
  {title:'Exemplo de série',category:'Série',date:'2026-10-16',image:'',description:'Temporada 1 · Episódio 1',time:'20h'},
  {title:'Exemplo de anime',category:'Anime',date:'2026-10-18',image:'',description:'Novo episódio',time:'18h'}
 ];
-const schedule=document.getElementById('schedule'),search=document.getElementById('search');
+const schedule=document.getElementById('schedule');
 const dayNames=['Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado','Domingo'];
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
 function mondayOf(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x;}
@@ -146,7 +146,7 @@ function longDate(d){return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'l
 let weekStart=mondayOf(new Date());
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function posterFor(item){if(item.image)return `<div class="poster"><img src="${escapeHtml(item.image)}" alt="Pôster de ${escapeHtml(item.title)}" loading="lazy" onerror="this.parentElement.textContent='🎬'"></div>`;return '<div class="poster">🎬</div>';}
-function render(){const term=search.value.trim().toLocaleLowerCase('pt-BR');const end=addDays(weekStart,6);document.getElementById('weekLabel').innerHTML=`${longDate(weekStart)} – ${longDate(end)}<small>✦ ${iso(weekStart)===iso(mondayOf(new Date()))?'SEMANA ATUAL':'PROGRAMAÇÃO SEMANAL'} ✦</small>`;const days=[];for(let i=0;i<7;i++){const d=addDays(weekStart,i),key=iso(d);const list=titles.filter(item=>item.date===key&&(`${item.title} ${item.description} ${item.category}`).toLocaleLowerCase('pt-BR').includes(term));const cards=list.map(item=>`<article class="event">${posterFor(item)}<div class="event-info"><span class="category">${escapeHtml(item.category)}</span><h3>${escapeHtml(item.title)}</h3>${item.time?`<div class="meta">◷ ${escapeHtml(item.time)}</div>`:''}<p>${escapeHtml(item.description||'')}</p></div></article>`).join('');days.push(`<section class="day ${iso(d)===iso(new Date())?'today':''}"><div class="day-head"><span class="day-name">${dayNames[i]}${iso(d)===iso(new Date())?' <span class="today-label">(hoje)</span>':''}</span><span class="day-date">${shortDate(d)}</span></div><div class="day-body">${cards||'<div class="empty-day">Nenhuma reação programada</div>'}</div></section>`);}schedule.innerHTML=days.join('');}
+function render(){const end=addDays(weekStart,6);document.getElementById('weekLabel').innerHTML=`${longDate(weekStart)} – ${longDate(end)}<small>✦ ${iso(weekStart)===iso(mondayOf(new Date()))?'SEMANA ATUAL':'PROGRAMAÇÃO SEMANAL'} ✦</small>`;const days=[];for(let i=0;i<7;i++){const d=addDays(weekStart,i),key=iso(d);const list=titles.filter(item=>item.date===key);const cards=list.map(item=>`<article class="event">${posterFor(item)}<div class="event-info"><span class="category">${escapeHtml(item.category)}</span><h3>${escapeHtml(item.title)}</h3>${item.time?`<div class="meta">◷ ${escapeHtml(item.time)}</div>`:''}<p>${escapeHtml(item.description||'')}</p></div></article>`).join('');days.push(`<section class="day ${iso(d)===iso(new Date())?'today':''}"><div class="day-head"><span class="day-name">${dayNames[i]}${iso(d)===iso(new Date())?' <span class="today-label">(hoje)</span>':''}</span><span class="day-date">${shortDate(d)}</span></div><div class="day-body">${cards||'<div class="empty-day">Nenhuma reação programada</div>'}</div></section>`);}schedule.innerHTML=days.join('');}
 async function loadContents() {
   const { data, error } = await supabaseClient
     .from('contents')
@@ -196,7 +196,7 @@ catalogSearch.addEventListener('input',renderCatalog);
 document.getElementById('closeCatalog').addEventListener('click',()=>{catalogModal.style.display='none';});
 catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)catalogModal.style.display='none';});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')catalogModal.style.display='none';});
-search.addEventListener('input',render);document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
+document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
 const aboutModal = document.getElementById('aboutModal');
 document.getElementById('aboutLink').addEventListener('click', () => {
   aboutModal.style.display = 'flex';
