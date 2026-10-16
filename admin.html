@@ -132,6 +132,8 @@
   let catalogSearchSequence = 0;
   let catalogItems = [];
   let editingCatalogId = null;
+  let managerSearchTimer = null;
+  let managerSearchSequence = 0;
 
 
   function mondayOf(date){ const d = new Date(date); d.setHours(12,0,0,0); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return d; }
@@ -381,19 +383,30 @@
   }
   $('new-content').addEventListener('click',openCatalogManager);
   $('catalog-item-category').addEventListener('change',updateCatalogSeasonField);
-  $('catalog-manager-search').addEventListener('click',searchCatalogForManager);
-  $('catalog-manager-query').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();searchCatalogForManager();}});
-  async function searchCatalogForManager(){
+  $('catalog-manager-search').addEventListener('click',()=>searchCatalogForManager(false));
+  $('catalog-manager-query').addEventListener('input',()=>{
+    clearTimeout(managerSearchTimer);
+    const query=$('catalog-manager-query').value.trim();
+    managerSearchSequence++;
+    if(query.length<2){$('catalog-manager-results').innerHTML='';$('catalog-manager-results').dataset.results='[]';return;}
+    $('catalog-manager-results').innerHTML='<p class="catalog-message">Procurando sugestões...</p>';
+    managerSearchTimer=setTimeout(()=>searchCatalogForManager(true),350);
+  });
+  $('catalog-manager-query').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();clearTimeout(managerSearchTimer);searchCatalogForManager(false);}});
+  async function searchCatalogForManager(automatic=false){
     const query=$('catalog-manager-query').value.trim(), box=$('catalog-manager-results');
     if(!query){box.innerHTML='<p class="catalog-message">Digite um título para pesquisar.</p>';return;}
-    $('catalog-manager-search').disabled=true;$('catalog-manager-search').textContent='Buscando...';box.innerHTML='<p class="catalog-message">Buscando...</p>';
+    if(query.length<2){box.innerHTML='<p class="catalog-message">Digite pelo menos 2 caracteres para ver sugestões.</p>';return;}
+    const searchId=++managerSearchSequence;
+    if(!automatic){$('catalog-manager-search').disabled=true;$('catalog-manager-search').textContent='Buscando...';box.innerHTML='<p class="catalog-message">Buscando filmes e séries...</p>';}
     try{
       const {data:sessionData}=await supabase.auth.getSession(), token=sessionData.session?.access_token;
       if(!token)throw new Error('Sua sessão expirou. Entre novamente no painel.');
       const {data,error}=await supabase.functions.invoke('tmdb-search',{body:{query},headers:{Authorization:'Bearer '+token}});
       if(error)throw error;
+      if(searchId!==managerSearchSequence || query!==$('catalog-manager-query').value.trim())return;
       const results=Array.isArray(data)?data:(data?.results||[]);
-      if(!results.length){box.innerHTML='<p class="catalog-message">Nenhum resultado encontrado.</p>';return;}
+      if(!results.length){box.dataset.results='[]';box.innerHTML='<p class="catalog-message">Nenhuma sugestão encontrada. Tente continuar digitando.</p>';return;}
       box.dataset.results=JSON.stringify(results);
       box.innerHTML=results.map((item,index)=>{
         const title=item.title||item.name||'Sem título', type=item.media_type||(item.title?'movie':'tv');
@@ -401,8 +414,8 @@
         const poster=item.poster_path?'https://image.tmdb.org/t/p/w185'+item.poster_path:'';
         return '<button class="catalog-result" type="button" data-manager-result="'+index+'">'+(poster?'<img src="'+escapeHtml(poster)+'" alt="" loading="lazy">':'<span>🎬</span>')+'<span><span class="result-title">'+escapeHtml(title)+'</span><span class="result-meta">'+(type==='tv'?'Série':'Filme')+(year?' · '+escapeHtml(year):'')+'</span></span></button>';
       }).join('');
-    }catch(error){box.innerHTML='<p class="catalog-message">'+escapeHtml(error.message||'Não foi possível buscar conteúdo.')+'</p>';}
-    finally{$('catalog-manager-search').disabled=false;$('catalog-manager-search').textContent='Buscar conteúdo';}
+    }catch(error){if(searchId===managerSearchSequence)box.innerHTML='<p class="catalog-message">'+escapeHtml(error.message||'Não foi possível buscar conteúdo.')+'</p>';}
+    finally{if(!automatic){$('catalog-manager-search').disabled=false;$('catalog-manager-search').textContent='Buscar conteúdo';}}
   }
   $('catalog-manager-results').addEventListener('click',event=>{
     const button=event.target.closest('[data-manager-result]');if(!button)return;
