@@ -371,7 +371,7 @@
     const episodeSelect=$('catalog-item-episode');
     const selectedSeason=seasonSelect.value;
     const selectedEpisode=episodeSelect.value;
-    seasonSelect.innerHTML='<option value="">Selecione a temporada</option>'+Array.from({length:100},(_,i)=>'<option value="Temporada '+(i+1)+'">Temporada '+(i+1)+'</option>').join('')+'<option value="Todas as temporadas">Todas as temporadas</option>';
+    seasonSelect.innerHTML='<option value="">Selecione a temporada</option>'+Array.from({length:20},(_,i)=>'<option value="Temporada '+(i+1)+'">Temporada '+(i+1)+'</option>').join('')+'<option value="Todas as temporadas">Todas as temporadas</option>';
     episodeSelect.innerHTML='<option value="">Selecione o episódio</option>'+Array.from({length:1000},(_,i)=>'<option value="'+(i+1)+'">Episódio '+(i+1)+'</option>').join('');
     if([...seasonSelect.options].some(o=>o.value===selectedSeason))seasonSelect.value=selectedSeason;
     if([...episodeSelect.options].some(o=>o.value===selectedEpisode))episodeSelect.value=selectedEpisode;
