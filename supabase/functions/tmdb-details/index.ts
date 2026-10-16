@@ -1,5 +1,5 @@
 // Supabase Edge Function: tmdb-details
-// Configure TMDB_API_KEY as a Supabase Function secret before deploying.
+// Uses the existing TMDB_API_KEY secret. Supports both v4 read tokens and v3 API keys.
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 
 const corsHeaders = {
@@ -23,20 +23,30 @@ serve(async (req) => {
     const category = String(body?.category ?? "").trim();
     if (!title) return Response.json({ error: "Informe um título." }, { status: 400, headers: corsHeaders });
 
-    const preferredType = category === "Filme" ? "movie" : "tv";
-    const headers = { Authorization: `Bearer ${apiKey}`, accept: "application/json" };
+    // Try the v4 Bearer token first. If it is a v3 key, retry with api_key query parameter.
+    const tmdbFetch = async (input: URL) => {
+      const bearer = await fetch(input, {
+        headers: { Authorization: `Bearer ${apiKey}`, accept: "application/json" },
+      });
+      if (bearer.status !== 401 && bearer.status !== 403) return bearer;
+
+      const fallbackUrl = new URL(input);
+      fallbackUrl.searchParams.set("api_key", apiKey);
+      return await fetch(fallbackUrl, { headers: { accept: "application/json" } });
+    };
+
     const search = async (type: string) => {
       const url = new URL(`https://api.themoviedb.org/3/search/${type}`);
       url.searchParams.set("query", title);
       url.searchParams.set("language", "pt-BR");
       url.searchParams.set("include_adult", "false");
-      const response = await fetch(url, { headers });
-      if (!response.ok) throw new Error(`Falha na busca TMDB (${response.status}).`);
+      const response = await tmdbFetch(url);
+      if (!response.ok) throw new Error(`Falha na busca TMDB (${response.status}). Verifique o segredo TMDB_API_KEY.`);
       const json = await response.json();
       return Array.isArray(json.results) ? json.results : [];
     };
 
-    let type = preferredType;
+    let type = category === "Filme" ? "movie" : "tv";
     let results = await search(type);
     if (!results.length) {
       type = type === "movie" ? "tv" : "movie";
@@ -46,12 +56,13 @@ serve(async (req) => {
       return Response.json({ error: "Título não encontrado no TMDB." }, { status: 404, headers: corsHeaders });
     }
 
-    const normalized = (value: string) => value.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+    const normalized = (value: string) => value.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-z0-9]/g, "");
     const best = results.find((item: any) => normalized(item.title || item.name || "") === normalized(title)) || results[0];
+
     const detailsUrl = new URL(`https://api.themoviedb.org/3/${type}/${best.id}`);
     detailsUrl.searchParams.set("language", "pt-BR");
     detailsUrl.searchParams.set("append_to_response", "credits");
-    const detailResponse = await fetch(detailsUrl, { headers });
+    const detailResponse = await tmdbFetch(detailsUrl);
     if (!detailResponse.ok) throw new Error(`Falha ao carregar detalhes TMDB (${detailResponse.status}).`);
     const details = await detailResponse.json();
 
