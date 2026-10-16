@@ -55,4 +55,4 @@ alter table public.catalog add column if not exists season text;
 alter table public.catalog add column if not exists episode integer;
 alter table public.catalog drop constraint if exists catalog_status_check;
 alter table public.catalog add constraint catalog_status_check
-  check (status in ('Já Assistido', 'Assistindo', 'Está na Fila'));
+  check (status in ('Já Assistido', 'Assistindo', 'Está na Fila', 'Em Andamento', 'Finalizado'));
