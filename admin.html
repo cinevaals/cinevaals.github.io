@@ -96,15 +96,15 @@
           </div>
           <div id="catalog-results" class="catalog-results" role="listbox" aria-label="Resultados da busca"></div>
         </div>
-        <div class="form-grid">
-          <div class="full"><label for="title">Título *</label><input id="title" required maxlength="200"></div>
-          <div><label for="category">Categoria *</label><select id="category" required>
-            <option value="Filme">Filmes</option><option value="Série">Séries</option><option value="Animação">Animações</option><option value="Dorama">Doramas</option><option value="Anime">Animes</option>
-          </select></div>
-          <div><label for="date">Data *</label><input id="date" type="date" required></div>
-          <div><label for="time">Horário (opcional)</label><input id="time" type="time"></div>
-          <div><label for="image">URL da imagem</label><input id="image" type="url" placeholder="https://..."></div>
-          <div class="full"><label for="description">Descrição</label><textarea id="description" rows="3"></textarea></div>
+        <input id="title" type="hidden">
+        <input id="category" type="hidden">
+        <input id="date" type="hidden">
+        <input id="time" type="hidden">
+        <input id="image" type="hidden">
+        <textarea id="description" class="hidden"></textarea>
+        <div id="episode-count-wrap" class="full hidden">
+          <label for="episode-count">Quantos episódios você vai assistir?</label>
+          <input id="episode-count" type="number" min="1" max="1000" step="1" placeholder="Ex.: 3">
         </div>
         <div class="toolbar" style="margin-top:15px;justify-content:flex-start;flex-wrap:wrap">
           <button id="save-content" type="submit">Salvar conteúdo</button>
@@ -188,13 +188,15 @@
     $('date').value=item?.date||date||dateKey(weekStart);
     $('time').value=item?.time||''; $('image').value=item?.image||'';
     $('description').value=item?.description||'';
+    $('episode-count').value=episodeCountFromDescription(item?.description)||'';
+    updateEpisodeCountField();
     $('save-content').textContent=item?'Salvar alterações':'Salvar conteúdo';
     $('catalog-query').value='';
     $('catalog-results').innerHTML='';
     $('catalog-results').dataset.results='[]';
     $('editor').classList.remove('hidden');
     document.body.style.overflow='hidden';
-    (item ? $('title') : $('catalog-query')).focus();
+    (item ? $('catalog-query') : $('catalog-query')).focus();
   }
   function closeEditor(){
     $('editor').classList.add('hidden');
@@ -222,7 +224,11 @@
     $('catalog-results').innerHTML = message ? `<p class="catalog-message">${escapeHtml(message)}</p>` : '';
   }
 
-  $('catalog-search').addEventListener('click', searchCatalog);
+  function isEpisodicCategory(category){return ['Série','Anime','Dorama','Animação'].includes(category);}
+  function episodeCountFromDescription(description=''){const match=String(description).match(/^Episódios para assistir: (\\d+)$/);return match?match[1]:'';}
+  function updateEpisodeCountField(){const show=isEpisodicCategory($('category').value);$('episode-count-wrap').classList.toggle('hidden',!show);$('episode-count').required=show;if(!show)$('episode-count').value='';}
+  $('episode-count').addEventListener('input',()=>{if($('episode-count').value)$('description').value='Episódios para assistir: '+$('episode-count').value;});
+  const originalOpenEditor=openEditor;
   $('catalog-query').addEventListener('input',()=>{
     clearTimeout(catalogSearchTimer);
     const query=$('catalog-query').value.trim();
@@ -296,9 +302,14 @@
   $('content-form').addEventListener('submit',async event=>{
     event.preventDefault(); $('save-content').disabled=true; status.textContent='Salvando conteúdo...';
     const targetDate=$('date').value;
+    if(!$('title').value.trim()||!targetDate){$('save-content').disabled=false;status.textContent='Busque e selecione um título do catálogo e escolha um dia do cronograma.';return;}
+    const category=$('category').value;
+    const episodeCount=$('episode-count').value;
+    if(isEpisodicCategory(category)&&(!episodeCount||Number(episodeCount)<1||Number(episodeCount)>1000)){ $('save-content').disabled=false;status.textContent='Informe quantos episódios vai assistir.';return; }
+    const description=isEpisodicCategory(category)?'Episódios para assistir: '+Number(episodeCount):null;
     const existingForDate=contents.filter(x=>x.date===targetDate && String(x.id)!==String(editingId));
     const nextOrder=existingForDate.reduce((max,x)=>Math.max(max,Number(x.sort_order)||0),-1)+1;
-    const content={title:$('title').value.trim(),category:$('category').value,date:targetDate,image:$('image').value.trim()||null,description:$('description').value.trim()||null,time:$('time').value||null,sort_order:editingId?(contents.find(x=>String(x.id)===String(editingId))?.date===targetDate?(contents.find(x=>String(x.id)===String(editingId))?.sort_order??nextOrder):nextOrder):nextOrder};
+    const content={title:$('title').value.trim(),category,date:targetDate,image:$('image').value.trim()||null,description,time:null,sort_order:editingId?(contents.find(x=>String(x.id)===String(editingId))?.date===targetDate?(contents.find(x=>String(x.id)===String(editingId))?.sort_order??nextOrder):nextOrder):nextOrder};
     const result=editingId?await supabase.from('contents').update(content).eq('id',editingId):await supabase.from('contents').insert(content);
     $('save-content').disabled=false;
     if(result.error){status.textContent='Erro ao salvar: '+result.error.message;return;}
