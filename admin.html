@@ -386,7 +386,13 @@
     catalogItems=data||[];renderCatalogAdmin();$('catalog-admin-status').textContent=`${catalogItems.length} título(s) no catálogo.`;
   }
   async function openCatalogManager(){
-    $('catalog-manager').classList.remove('hidden');resetCatalogForm();await loadCatalogAdmin();
+    $('catalog-manager').classList.remove('hidden');
+    resetCatalogForm();
+    $('catalog-manager-query').value='';
+    $('catalog-manager-results').innerHTML='';
+    $('catalog-manager-results').dataset.results='[]';
+    await loadCatalogAdmin();
+    $('catalog-manager-query').focus();
   }
   $('new-content').addEventListener('click',openCatalogManager);
   $('catalog-item-category').addEventListener('change',updateCatalogSeasonField);
