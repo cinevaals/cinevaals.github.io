@@ -282,12 +282,11 @@ async function openContentDetails(item){
     const episodes=isTv?d.number_of_episodes:'';
     const cast=renderDetailCredits(d.credits?.cast);
     const genres=renderDetailGenres(d.genres);
-    const score=Number(d.vote_average)>0?Number(d.vote_average).toFixed(1)+'/10':'Sem avaliações';
     const description=d.overview||item.description||'Sinopse não disponível.';
     $detail('detailDescription').textContent=description;
     const meta=[item.category,item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'',item.time?'Horário: '+item.time:''].filter(Boolean).join(' · ');
     $detail('detailMeta').textContent=meta;
-    if(info)info.innerHTML=`<div class="detail-facts"><div><span>⭐ Nota TMDB</span><strong>${escapeHtml(score)}</strong></div><div><span>🎭 Gêneros</span><strong>${escapeHtml(genres)}</strong></div><div><span>⏱️ ${isTv?'Duração':'Duração'}</span><strong>${escapeHtml(runtime)}</strong></div>${isTv?`<div><span>📺 Temporadas</span><strong>${escapeHtml(detailText(seasons))}</strong></div><div><span>🎞️ Episódios</span><strong>${escapeHtml(detailText(episodes))}</strong></div>`:''}<div class="detail-cast"><span>🎬 Elenco principal</span><strong>${escapeHtml(cast)}</strong></div></div>`;
+    if(info)info.innerHTML=`<div class="detail-facts"><div><span>🎭 Gêneros</span><strong>${escapeHtml(genres)}</strong></div><div><span>⏱️ ${isTv?'Duração':'Duração'}</span><strong>${escapeHtml(runtime)}</strong></div>${isTv?`<div><span>📺 Temporadas</span><strong>${escapeHtml(detailText(seasons))}</strong></div><div><span>🎞️ Episódios</span><strong>${escapeHtml(detailText(episodes))}</strong></div>`:''}<div class="detail-cast"><span>🎬 Elenco principal</span><strong>${escapeHtml(cast)}</strong></div></div>`;
     if(d.poster_path){wrap.innerHTML=`<img class="detail-poster" src="https://image.tmdb.org/t/p/w500${escapeHtml(d.poster_path)}" alt="Capa de ${escapeHtml(title)}">`;}
   }catch(error){
     console.error('Não foi possível carregar os detalhes do TMDB:',error);
