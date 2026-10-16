@@ -122,6 +122,15 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 #contentDetailModal h2{margin:0 35px 8px 0;color:#65bfff;font-size:clamp(20px,4vw,30px)}
 #contentDetailModal .detail-meta{color:#a8d8ff;font-size:13px;line-height:1.8;margin-bottom:14px}
 #contentDetailModal .detail-description{color:#d3dfef;font-size:14px;line-height:1.75;white-space:pre-line}
+#contentDetailModal .detail-extra{margin-top:16px}
+#contentDetailModal .detail-loading{color:#a8b7cf;font-size:13px;line-height:1.6}
+#contentDetailModal .detail-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#contentDetailModal .detail-facts>div{padding:10px;border:1px solid #21466e;border-radius:8px;background:#071326;min-width:0}
+#contentDetailModal .detail-facts span,#contentDetailModal .detail-facts strong{display:block;overflow-wrap:anywhere}
+#contentDetailModal .detail-facts span{font-size:11px;color:#8dcaff;margin-bottom:5px}
+#contentDetailModal .detail-facts strong{font-size:12px;color:#eaf5ff;line-height:1.5;font-weight:500}
+#contentDetailModal .detail-facts .detail-cast{grid-column:1/-1}
+@media(max-width:520px){#contentDetailModal .detail-facts{grid-template-columns:1fr 1fr}#contentDetailModal .detail-facts strong{font-size:11px}}
 @media(max-width:520px){#contentDetailModal{padding:10px}#contentDetailModal .detail-card{padding:18px 14px}#contentDetailModal .detail-layout{grid-template-columns:105px minmax(0,1fr);gap:13px}#contentDetailModal .detail-description{font-size:13px}}
 </style>
 
@@ -134,6 +143,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
         <h2 id="detailTitle"></h2>
         <div class="detail-meta" id="detailMeta"></div>
         <div class="detail-description" id="detailDescription"></div>
+        <div id="detailExtra" class="detail-extra"></div>
       </div>
     </div>
   </div>
@@ -240,15 +250,50 @@ aboutModal.addEventListener('click', e => {
 });
 
 const contentDetailModal=document.getElementById('contentDetailModal');
-function openContentDetails(item){
+function detailText(value){return value===null||value===undefined||value===''?'—':String(value);}
+function renderDetailCredits(people){
+  if(!Array.isArray(people)||!people.length)return 'Não disponível';
+  return people.slice(0,8).map(person=>person.name+(person.character?' ('+person.character+')':'')).join(', ');
+}
+function renderDetailGenres(genres){
+  return Array.isArray(genres)&&genres.length?genres.map(g=>g.name).join(', '):'Não informado';
+}
+async function openContentDetails(item){
   if(!item)return;
-  document.getElementById('detailTitle').textContent=item.title||'Sem título';
-  document.getElementById('detailMeta').textContent=[item.category, item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'', item.time?'Horário: '+item.time:''].filter(Boolean).join(' · ');
-  document.getElementById('detailDescription').textContent=item.description||'Sinopse não disponível para este conteúdo.';
-  const wrap=document.getElementById('detailPosterWrap');
-  wrap.innerHTML=item.image?`<img class="detail-poster" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}">`:'<div class="detail-poster" style="display:grid;place-items:center;color:#65bfff">🎬</div>';
+  const title=item.title||'Sem título';
+  const $detail=id=>document.getElementById(id);
+  $detail('detailTitle').textContent=title;
+  $detail('detailMeta').textContent=[item.category,item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'',item.time?'Horário: '+item.time:''].filter(Boolean).join(' · ');
+  $detail('detailDescription').textContent=item.description||'Carregando informações do TMDB…';
+  const wrap=$detail('detailPosterWrap');
+  wrap.innerHTML=item.image?`<img class="detail-poster" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(title)}">`:'<div class="detail-poster" style="display:grid;place-items:center;color:#65bfff">🎬</div>';
+  const info=$detail('detailExtra');
+  if(info)info.innerHTML='<p class="detail-loading">Buscando informações completas…</p>';
   contentDetailModal.style.display='flex';
   document.body.style.overflow='hidden';
+  try{
+    const {data,error}=await supabaseClient.functions.invoke('tmdb-details',{body:{title,category:item.category}});
+    if(error)throw error;
+    const d=data?.details||data;
+    if(!d||!d.id)throw new Error('Detalhes não encontrados');
+    const isTv=Boolean(d.name||d.number_of_seasons!==undefined);
+    const runtime=isTv?(Array.isArray(d.episode_run_time)&&d.episode_run_time.length?d.episode_run_time[0]+' min por episódio':'Não informado'):(d.runtime?d.runtime+' min':'Não informado');
+    const seasons=isTv?d.number_of_seasons:'';
+    const episodes=isTv?d.number_of_episodes:'';
+    const cast=renderDetailCredits(d.credits?.cast);
+    const genres=renderDetailGenres(d.genres);
+    const score=Number(d.vote_average)>0?Number(d.vote_average).toFixed(1)+'/10':'Sem avaliações';
+    const description=d.overview||item.description||'Sinopse não disponível.';
+    $detail('detailDescription').textContent=description;
+    const meta=[item.category,item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'',item.time?'Horário: '+item.time:''].filter(Boolean).join(' · ');
+    $detail('detailMeta').textContent=meta;
+    if(info)info.innerHTML=`<div class="detail-facts"><div><span>⭐ Nota TMDB</span><strong>${escapeHtml(score)}</strong></div><div><span>🎭 Gêneros</span><strong>${escapeHtml(genres)}</strong></div><div><span>⏱️ ${isTv?'Duração':'Duração'}</span><strong>${escapeHtml(runtime)}</strong></div>${isTv?`<div><span>📺 Temporadas</span><strong>${escapeHtml(detailText(seasons))}</strong></div><div><span>🎞️ Episódios</span><strong>${escapeHtml(detailText(episodes))}</strong></div>`:''}<div class="detail-cast"><span>🎬 Elenco principal</span><strong>${escapeHtml(cast)}</strong></div></div>`;
+    if(d.poster_path){wrap.innerHTML=`<img class="detail-poster" src="https://image.tmdb.org/t/p/w500${escapeHtml(d.poster_path)}" alt="Capa de ${escapeHtml(title)}">`;}
+  }catch(error){
+    console.error('Não foi possível carregar os detalhes do TMDB:',error);
+    if(info)info.innerHTML='<p class="detail-loading">Não foi possível carregar os detalhes completos agora. A sinopse cadastrada continua disponível.</p>';
+    $detail('detailDescription').textContent=item.description||'Sinopse não disponível para este conteúdo.';
+  }
 }
 function closeContentDetails(){contentDetailModal.style.display='none';document.body.style.overflow='';}
 schedule.addEventListener('click',event=>{
