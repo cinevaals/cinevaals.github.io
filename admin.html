@@ -64,7 +64,7 @@
     <section id="catalog-manager" class="hidden" aria-modal="true" role="dialog" aria-labelledby="catalog-manager-title" style="position:fixed;inset:0;z-index:1100;overflow-y:auto;padding:20px;background:rgba(1,5,13,.88);backdrop-filter:blur(5px)">
       <div class="editor-card" style="max-width:1000px">
         <div class="toolbar"><div><h2 id="catalog-manager-title">✧ Catálogo CineVaals</h2><p class="subtitle">Independente do cronograma semanal.</p></div><button id="close-catalog-manager" class="secondary" type="button">Fechar</button></div>
-        <div class="search-box"><label for="catalog-manager-query">Buscar conteúdo para cadastrar</label><div class="search-row"><input id="catalog-manager-query" type="search" placeholder="Digite o nome de um filme ou série..." autocomplete="off"><button id="catalog-manager-search" class="primary" type="button">Buscar conteúdo</button></div><div id="catalog-manager-results" class="catalog-results" role="listbox" aria-label="Resultados da busca"></div></div>
+        <div class="search-box"><label for="catalog-manager-query">Buscar conteúdo para cadastrar</label><div class="search-row"><input id="catalog-manager-query" type="search" placeholder="Digite o nome de um filme ou série..." autocomplete="off"><button id="catalog-manager-search" class="primary" type="button">Buscar por título</button></div><div id="catalog-manager-results" class="catalog-results" role="listbox" aria-label="Resultados da busca"></div></div>
         <form id="catalog-form">
           <input id="catalog-id" type="hidden">
           <div class="form-grid">
@@ -415,7 +415,7 @@
         return '<button class="catalog-result" type="button" data-manager-result="'+index+'">'+(poster?'<img src="'+escapeHtml(poster)+'" alt="" loading="lazy">':'<span>🎬</span>')+'<span><span class="result-title">'+escapeHtml(title)+'</span><span class="result-meta">'+(type==='tv'?'Série':'Filme')+(year?' · '+escapeHtml(year):'')+'</span></span></button>';
       }).join('');
     }catch(error){if(searchId===managerSearchSequence)box.innerHTML='<p class="catalog-message">'+escapeHtml(error.message||'Não foi possível buscar conteúdo.')+'</p>';}
-    finally{if(!automatic){$('catalog-manager-search').disabled=false;$('catalog-manager-search').textContent='Buscar conteúdo';}}
+    finally{if(!automatic){$('catalog-manager-search').disabled=false;$('catalog-manager-search').textContent='Buscar por título';}}
   }
   $('catalog-manager-results').addEventListener('click',event=>{
     const button=event.target.closest('[data-manager-result]');if(!button)return;
