@@ -22,7 +22,7 @@
     .week-controls{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:22px 0 16px}.week-center{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;order:0}.week-controls>#prev-week{order:-1}.week-controls>#next-week{order:1}.week-title{font-weight:700;text-align:center;min-width:190px;color:#f3f8ff;font-size:14px}.week-title small{display:block;font-size:10px;color:#60b9ff;margin-top:4px;font-weight:normal}.current-week{font-size:.78rem;padding:8px 11px;white-space:nowrap}
     .days-wrap{overflow-x:auto;padding:0 0 12px;scrollbar-color:#1b568d #07101e;scrollbar-width:thin}.days{display:grid;grid-template-columns:repeat(7,minmax(160px,1fr));gap:10px;min-width:1160px;align-items:stretch}
     .day{background:linear-gradient(180deg,#09172a,#060d19);border:1px solid #16385b;border-radius:11px;overflow:hidden;min-width:0;box-shadow:0 5px 18px #0003;padding:0}.day-head{margin:0;padding:11px 10px;background:linear-gradient(100deg,#102846,#0a172a);border-bottom:1px solid #1b4774;align-items:center}.day-head h3{margin:0;font-size:12px;font-weight:bold;color:#a8dcff}.day-date{display:block;color:#c0d0e5;font-size:11px;margin-top:4px}.day-items{padding:7px;display:flex;flex-direction:column;gap:8px;min-height:130px}
-    .item{background:rgba(8,21,39,.86);border:1px solid #122d4d;border-radius:8px;padding:6px;align-items:flex-start;gap:6px;transition:transform .15s,border-color .15s;cursor:grab;min-width:0}.item[draggable="true"]:active{cursor:grabbing}.item.dragging{opacity:.42;border:1px dashed #65bfff}.item.drag-over{border-color:#65bfff;box-shadow:0 0 0 2px #168bff33}.item:hover{transform:translateY(-2px);border-color:#2f83d1}.item-main{min-width:0;flex:1;align-self:stretch}.item-poster{display:block;width:100%;aspect-ratio:2/3;object-fit:contain;background:#050b16;border-radius:5px;border:1px solid #18395d}.item-poster-placeholder{width:100%;aspect-ratio:2/3;display:grid;place-items:center;background:#102846;color:#65bfff;font-size:25px;border-radius:5px}.item-actions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;align-content:flex-start}.item-actions button{padding:5px 7px;min-width:30px}.empty{color:#6e819c;font-size:11px;text-align:center;padding:24px 5px}.empty:before{content:'✧';display:block;font-size:19px;color:#235789;margin-bottom:7px}
+    .item{background:rgba(8,21,39,.86);border:1px solid #122d4d;border-radius:8px;padding:6px;align-items:flex-start;gap:6px;transition:transform .15s,border-color .15s;cursor:grab;min-width:0}.item[draggable="true"]:active{cursor:grabbing}.item.dragging{opacity:.42;border:1px dashed #65bfff}.item.drag-over{border-color:#65bfff;box-shadow:0 0 0 2px #168bff33}.item:hover{transform:translateY(-2px);border-color:#2f83d1}.item-main{min-width:0;flex:1;align-self:stretch}.item-poster{display:block;width:100%;aspect-ratio:2/3;object-fit:contain;background:#050b16;border-radius:5px;border:1px solid #18395d}.item-poster-placeholder{width:100%;aspect-ratio:2/3;display:grid;place-items:center;background:#102846;color:#65bfff;font-size:25px;border-radius:5px}.item-actions{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;align-content:flex-start}.item-actions button{padding:5px 7px;min-width:30px}.empty{color:#6e819c;font-size:11px;text-align:center;padding:24px 5px}.empty:before{content:'✧';display:block;font-size:19px;color:#235789;margin-bottom:7px}.day-off-card{text-align:center;padding:16px 5px;border:1px solid #355cff;border-radius:9px;background:radial-gradient(ellipse at 50% 30%,#17265b,#081326 75%);color:#dce7ff}.day-off-art{position:relative;font-size:48px;padding:8px}.day-off-art span{position:absolute;font-size:22px;top:0;right:20%}.day-off-card strong{display:block;color:#a9baff;font-size:14px}.day-off-card p{font-size:11px;color:#a8b7cf;margin:7px 0 12px}.day-off-card button{white-space:normal}
     .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.full{grid-column:1/-1}
     #editor{position:fixed;inset:0;z-index:1000;overflow-y:auto;margin:0;padding:24px;background:rgba(1,5,13,.82);backdrop-filter:blur(5px);border:0;border-radius:0;box-shadow:none}
     .editor-card{max-width:850px;margin:2vh auto 5vh;padding:22px;background:linear-gradient(180deg,#09172a,#060d19);border:1px solid #2c5f91;border-radius:14px;box-shadow:0 20px 70px #0009}
@@ -168,7 +168,8 @@
     $('days').innerHTML=weekdays.map((name,i)=>{
       const d=new Date(weekStart); d.setDate(d.getDate()+i); const key=dateKey(d);
       const dayItems=contents.filter(item=>item.date===key).sort((a,b)=>{const ao=Number.isFinite(Number(a.sort_order))?Number(a.sort_order):999999;const bo=Number.isFinite(Number(b.sort_order))?Number(b.sort_order):999999;return ao-bo||(a.time||'99:99').localeCompare(b.time||'99:99');});
-      const cards=dayItems.length?dayItems.map(item=>`
+      const dayOff=dayItems.some(item=>item.category==='Folguinha');
+      const cards=dayOff?`<div class="day-off-card"><div class="day-off-art" aria-hidden="true">🌙<span>💤</span></div><strong>Folguinha</strong><p>Hoje é dia de descanso!</p><button class="small danger" type="button" data-delete="${escapeHtml(dayItems.find(item=>item.category==='Folguinha').id)}">Cancelar folguinha</button></div>`:dayItems.length?dayItems.map(item=>`
         <article class="item" draggable="true" data-drag-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.title)}">
           <div class="item-main">${item.image?`<img class="item-poster" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.outerHTML='<div class=&quot;item-poster-placeholder&quot;>🎬</div>'">`:'<div class="item-poster-placeholder">🎬</div>'}</div>
           <div class="item-actions">
@@ -305,7 +306,16 @@
   });
   $('days').addEventListener('click',async event=>{
     const edit=event.target.closest('[data-edit]'), del=event.target.closest('[data-delete]'), add=event.target.closest('[data-add-date]');
-    if(add){openEditor(null,add.dataset.addDate);return;}
+    if(add){
+      const dayItems=contents.filter(item=>item.date===add.dataset.addDate);
+      if(dayItems.length===0){
+        if(!confirm('Marcar este dia como Folguinha?'))return;
+        const {error}=await supabase.from('contents').insert({title:'Folguinha',category:'Folguinha',date:add.dataset.addDate,description:'Hoje é dia de descanso! 💤',sort_order:0});
+        if(error){status.textContent='Erro ao marcar folguinha: '+error.message;return;}
+        await loadContents();status.textContent='Folguinha marcada!';return;
+      }
+      openEditor(null,add.dataset.addDate);return;
+    }
     if(edit){const item=contents.find(x=>String(x.id)===edit.dataset.edit);if(item)openEditor(item);return;}
     if(del){
       const item=contents.find(x=>String(x.id)===del.dataset.delete); if(!item)return;
