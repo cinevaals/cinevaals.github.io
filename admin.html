@@ -52,7 +52,7 @@
   <section id="admin-area">
     <div class="toolbar">
       <div><h2 style="margin-bottom:5px">✧ Cronograma Semanal</h2><p class="subtitle" style="margin-bottom:0">Gerencie a programação do CineVaals por aqui.</p></div>
-      <button id="new-content" class="primary" type="button">＋ Gerenciar catálogo</button>
+      <button id="new-content" class="primary" type="button">＋ Gerenciar Catálogo</button>
     </div>
     <div class="week-controls">
       <button id="prev-week" class="secondary" type="button">← Semana anterior</button>
@@ -70,6 +70,7 @@
             <div class="full"><label for="catalog-item-title">Título *</label><input id="catalog-item-title" required maxlength="200"></div>
             <div><label for="catalog-item-category">Categoria *</label><select id="catalog-item-category" required><option value="Filme">Filmes</option><option value="Série">Séries</option><option value="Animação">Animações</option><option value="Dorama">Doramas</option><option value="Anime">Animes</option></select></div>
             <div><label for="catalog-item-status">Status *</label><select id="catalog-item-status" required><option value="Já Assistido">Já Assistido</option><option value="Está no Cronograma">Está no Cronograma</option><option value="Está na Fila" selected>Está na Fila</option></select></div>
+            <div id="catalog-season-wrap" class="full hidden"><label for="catalog-item-season">Temporada (opcional)</label><input id="catalog-item-season" placeholder="Ex.: Temporada 1, Temporadas 1–3"></div>
             <div class="full"><label for="catalog-item-image">URL da imagem</label><input id="catalog-item-image" type="url" placeholder="https://..."></div>
             <div class="full"><label for="catalog-item-description">Descrição (opcional)</label><textarea id="catalog-item-description" rows="3"></textarea></div>
           </div>
@@ -361,10 +362,8 @@
   });
 
 
-  function resetCatalogForm(){
-    editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();
-    $('catalog-item-status').value='Está na Fila';$('save-catalog-item').textContent='Salvar no catálogo';
-  }
+  function updateCatalogSeasonField(){const isMovie=$('catalog-item-category').value==='Filme';$('catalog-season-wrap').classList.toggle('hidden',isMovie);if(isMovie)$('catalog-item-season').value='';}
+  function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-status').value='Está na Fila';$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
   function renderCatalogAdmin(){
     const term=$('catalog-admin-search').value.trim().toLocaleLowerCase('pt-BR');
     const list=catalogItems.filter(item=>String(item.title||'').toLocaleLowerCase('pt-BR').includes(term));
@@ -380,12 +379,13 @@
     $('catalog-manager').classList.remove('hidden');resetCatalogForm();await loadCatalogAdmin();
   }
   $('new-content').addEventListener('click',openCatalogManager);
+  $('catalog-item-category').addEventListener('change',updateCatalogSeasonField);
   $('close-catalog-manager').addEventListener('click',()=>$('catalog-manager').classList.add('hidden'));
   $('cancel-catalog-item').addEventListener('click',resetCatalogForm);
   $('catalog-admin-search').addEventListener('input',renderCatalogAdmin);
   $('catalog-form').addEventListener('submit',async event=>{
     event.preventDefault();$('save-catalog-item').disabled=true;$('catalog-admin-status').textContent='Salvando título...';
-    const item={title:$('catalog-item-title').value.trim(),category:$('catalog-item-category').value,status:$('catalog-item-status').value,image:$('catalog-item-image').value.trim()||null,description:$('catalog-item-description').value.trim()||null};
+    const item={title:$('catalog-item-title').value.trim(),category:$('catalog-item-category').value,status:$('catalog-item-status').value,season:$('catalog-item-category').value==='Filme'?null:($('catalog-item-season').value.trim()||null),image:$('catalog-item-image').value.trim()||null,description:$('catalog-item-description').value.trim()||null};
     const result=editingCatalogId?await supabase.from('catalog').update(item).eq('id',editingCatalogId):await supabase.from('catalog').insert(item);
     $('save-catalog-item').disabled=false;
     if(result.error){$('catalog-admin-status').textContent='Erro ao salvar: '+result.error.message;return;}
@@ -393,7 +393,7 @@
   });
   $('catalog-admin-list').addEventListener('click',async event=>{
     const edit=event.target.closest('[data-catalog-edit]'),del=event.target.closest('[data-catalog-delete]');
-    if(edit){const item=catalogItems.find(x=>String(x.id)===edit.dataset.catalogEdit);if(!item)return;editingCatalogId=item.id;$('catalog-id').value=item.id;$('catalog-item-title').value=item.title||'';$('catalog-item-category').value=item.category||'Filme';$('catalog-item-status').value=item.status||'Está na Fila';$('catalog-item-image').value=item.image||'';$('catalog-item-description').value=item.description||'';$('save-catalog-item').textContent='Salvar alterações';$('catalog-item-title').focus();return;}
+    if(edit){const item=catalogItems.find(x=>String(x.id)===edit.dataset.catalogEdit);if(!item)return;editingCatalogId=item.id;$('catalog-id').value=item.id;$('catalog-item-title').value=item.title||'';$('catalog-item-category').value=item.category||'Filme';$('catalog-item-status').value=item.status||'Está na Fila';$('catalog-item-image').value=item.image||'';$('catalog-item-description').value=item.description||'';$('catalog-item-season').value=item.season||'';updateCatalogSeasonField();$('save-catalog-item').textContent='Salvar alterações';$('catalog-item-title').focus();return;}
     if(del){const item=catalogItems.find(x=>String(x.id)===del.dataset.catalogDelete);if(!item||!confirm(`Excluir "${item.title}" do catálogo? Isso não altera o cronograma.`))return;const {error}=await supabase.from('catalog').delete().eq('id',item.id);if(error){$('catalog-admin-status').textContent='Erro ao excluir: '+error.message;return;}await loadCatalogAdmin();$('catalog-admin-status').textContent='Título excluído do catálogo.';}
   });
 
