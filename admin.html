@@ -346,6 +346,20 @@
       await loadContents(); status.textContent='Conteúdo excluído.';
     }
   });
+  document.addEventListener('click',event=>{
+    const choice=event.target.closest('[data-pick-edit]');
+    if(choice){
+      const item=contents.find(x=>String(x.id)===choice.dataset.pickEdit);
+      document.getElementById('edit-picker')?.classList.add('hidden');
+      document.body.style.overflow='';
+      if(item)openEditor(item);
+      return;
+    }
+    if(event.target.closest('[data-close-picker]')){
+      document.getElementById('edit-picker')?.classList.add('hidden');
+      document.body.style.overflow='';
+    }
+  });
   $('days').addEventListener('dragstart', event=>{
     const card=event.target.closest('[data-drag-id]');
     if(!card)return;
