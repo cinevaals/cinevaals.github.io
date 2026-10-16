@@ -193,7 +193,7 @@
     $('catalog-results').dataset.results='[]';
     $('editor').classList.remove('hidden');
     document.body.style.overflow='hidden';
-    $('title').focus();
+    (item ? $('title') : $('catalog-query')).focus();
   }
   function closeEditor(){
     $('editor').classList.add('hidden');
