@@ -228,7 +228,8 @@ function renderCatalog(){
   catalogGrid.innerHTML=filtered.map(item=>{
     const image=item.image?`<img src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
     const status=item.status||'Está na Fila';
-    return `<article class="catalog-card">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><h3>${escapeHtml(item.title||'Sem título')}</h3><p class="catalog-status" style="margin:7px 0 0;padding:5px 8px;border:1px solid #65bfff55;border-radius:999px;color:#9bd7ff;font-size:12px;text-align:center;background:#102846">${escapeHtml(status)}</p></article>`;
+    const season=item.category!=='Filme'&&item.season?`<p style="margin:5px 8px 0;color:#a8d8ff;font-size:12px;text-align:center">${escapeHtml(item.season)}</p>`:'';
+    return `<article class="catalog-card">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><h3>${escapeHtml(item.title||'Sem título')}</h3><p class="catalog-status" style="margin:7px 0 0;padding:5px 8px;border:1px solid #65bfff55;border-radius:999px;color:#9bd7ff;font-size:12px;text-align:center;background:#102846">${escapeHtml(status)}</p>${season}</article>`;
   }).join('');
   catalogEmpty.style.display=filtered.length?'none':'block';
 }
