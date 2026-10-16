@@ -122,7 +122,7 @@
       const d=new Date(weekStart); d.setDate(d.getDate()+i); const key=dateKey(d);
       const dayItems=contents.filter(item=>item.date===key).sort((a,b)=>{const ao=Number.isFinite(Number(a.sort_order))?Number(a.sort_order):999999;const bo=Number.isFinite(Number(b.sort_order))?Number(b.sort_order):999999;return ao-bo||(a.time||'99:99').localeCompare(b.time||'99:99');});
       const cards=dayItems.length?dayItems.map(item=>`
-        <article class="item" draggable="true" data-drag-id="${escapeHtml(item.id)}" title="Arraste para mudar a ordem">
+        <article class="item" draggable="true" data-drag-id="${escapeHtml(item.id)}">
           <div class="item-main"><span class="category">${escapeHtml(item.category||'Sem categoria')}</span><div class="item-title">${escapeHtml(item.title)}</div>
             <div class="meta">◷ ${escapeHtml(item.time||'Horário não definido')}</div>
             ${item.description?`<div class="item-description">${escapeHtml(item.description)}</div>`:''}
