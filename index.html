@@ -274,7 +274,8 @@ async function openContentDetails(item){
   const $detail=id=>document.getElementById(id);
   $detail('detailTitle').textContent=title;
   $detail('detailMeta').textContent=[item.category,item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'',item.time?'Horário: '+item.time:''].filter(Boolean).join(' · ');
-  $detail('detailDescription').textContent=item.description||'Carregando informações do TMDB…';
+  const scheduleDescription=/^Episódios para assistir: \\d+$/.test(String(item.description||''))?'':(item.description||'');
+  $detail('detailDescription').textContent=scheduleDescription||'Carregando informações do TMDB…';
   const wrap=$detail('detailPosterWrap');
   wrap.innerHTML=item.image?`<img class="detail-poster" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(title)}">`:'<div class="detail-poster" style="display:grid;place-items:center;color:#65bfff">🎬</div>';
   const info=$detail('detailExtra');
@@ -292,7 +293,7 @@ async function openContentDetails(item){
     const episodes=isTv?d.number_of_episodes:'';
     const cast=renderDetailCredits(d.credits?.cast);
     const genres=renderDetailGenres(d.genres);
-    const description=d.overview||item.description||'Sinopse não disponível.';
+    const description=d.overview||scheduleDescription||'Sinopse não disponível.';
     $detail('detailDescription').textContent=description;
     const meta=[item.category,item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'',item.time?'Horário: '+item.time:''].filter(Boolean).join(' · ');
     $detail('detailMeta').textContent=meta;
@@ -301,7 +302,7 @@ async function openContentDetails(item){
   }catch(error){
     console.error('Não foi possível carregar os detalhes do TMDB:',error);
     if(info)info.innerHTML='<p class="detail-loading">Não foi possível carregar os detalhes completos agora. A sinopse cadastrada continua disponível.</p>';
-    $detail('detailDescription').textContent=item.description||'Sinopse não disponível para este conteúdo.';
+    $detail('detailDescription').textContent=scheduleDescription||'Sinopse não disponível para este conteúdo.';
   }
 }
 function closeContentDetails(){contentDetailModal.style.display='none';document.body.style.overflow='';}
