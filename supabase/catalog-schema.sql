@@ -45,3 +45,7 @@ create policy "Admins can delete catalog"
 grant select on public.catalog to anon, authenticated;
 grant insert, update, delete on public.catalog to authenticated;
 grant usage, select on sequence public.catalog_id_seq to authenticated;
+
+
+-- Temporada opcional para séries, animações, doramas e animes.
+alter table public.catalog add column if not exists season text;
