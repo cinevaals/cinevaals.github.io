@@ -64,6 +64,7 @@
     <section id="catalog-manager" class="hidden" aria-modal="true" role="dialog" aria-labelledby="catalog-manager-title" style="position:fixed;inset:0;z-index:1100;overflow-y:auto;padding:20px;background:rgba(1,5,13,.88);backdrop-filter:blur(5px)">
       <div class="editor-card" style="max-width:1000px">
         <div class="toolbar"><div><h2 id="catalog-manager-title">✧ Catálogo CineVaals</h2><p class="subtitle">Independente do cronograma semanal.</p></div><button id="close-catalog-manager" class="secondary" type="button">Fechar</button></div>
+        <div class="search-box"><label for="catalog-manager-query">Buscar conteúdo para cadastrar</label><div class="search-row"><input id="catalog-manager-query" type="search" placeholder="Digite o nome de um filme ou série..." autocomplete="off"><button id="catalog-manager-search" class="primary" type="button">Buscar conteúdo</button></div><div id="catalog-manager-results" class="catalog-results" role="listbox" aria-label="Resultados da busca"></div></div>
         <form id="catalog-form">
           <input id="catalog-id" type="hidden">
           <div class="form-grid">
@@ -380,6 +381,42 @@
   }
   $('new-content').addEventListener('click',openCatalogManager);
   $('catalog-item-category').addEventListener('change',updateCatalogSeasonField);
+  $('catalog-manager-search').addEventListener('click',searchCatalogForManager);
+  $('catalog-manager-query').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();searchCatalogForManager();}});
+  async function searchCatalogForManager(){
+    const query=$('catalog-manager-query').value.trim(), box=$('catalog-manager-results');
+    if(!query){box.innerHTML='<p class="catalog-message">Digite um título para pesquisar.</p>';return;}
+    $('catalog-manager-search').disabled=true;$('catalog-manager-search').textContent='Buscando...';box.innerHTML='<p class="catalog-message">Buscando...</p>';
+    try{
+      const {data:sessionData}=await supabase.auth.getSession(), token=sessionData.session?.access_token;
+      if(!token)throw new Error('Sua sessão expirou. Entre novamente no painel.');
+      const {data,error}=await supabase.functions.invoke('tmdb-search',{body:{query},headers:{Authorization:'Bearer '+token}});
+      if(error)throw error;
+      const results=Array.isArray(data)?data:(data?.results||[]);
+      if(!results.length){box.innerHTML='<p class="catalog-message">Nenhum resultado encontrado.</p>';return;}
+      box.dataset.results=JSON.stringify(results);
+      box.innerHTML=results.map((item,index)=>{
+        const title=item.title||item.name||'Sem título', type=item.media_type||(item.title?'movie':'tv');
+        const year=(item.release_date||item.first_air_date||'').slice(0,4);
+        const poster=item.poster_path?'https://image.tmdb.org/t/p/w185'+item.poster_path:'';
+        return '<button class="catalog-result" type="button" data-manager-result="'+index+'">'+(poster?'<img src="'+escapeHtml(poster)+'" alt="" loading="lazy">':'<span>🎬</span>')+'<span><span class="result-title">'+escapeHtml(title)+'</span><span class="result-meta">'+(type==='tv'?'Série':'Filme')+(year?' · '+escapeHtml(year):'')+'</span></span></button>';
+      }).join('');
+    }catch(error){box.innerHTML='<p class="catalog-message">'+escapeHtml(error.message||'Não foi possível buscar conteúdo.')+'</p>';}
+    finally{$('catalog-manager-search').disabled=false;$('catalog-manager-search').textContent='Buscar conteúdo';}
+  }
+  $('catalog-manager-results').addEventListener('click',event=>{
+    const button=event.target.closest('[data-manager-result]');if(!button)return;
+    const results=JSON.parse($('catalog-manager-results').dataset.results||'[]'),item=results[Number(button.dataset.managerResult)];if(!item)return;
+    const type=item.media_type||(item.title?'movie':'tv');
+    $('catalog-item-title').value=item.title||item.name||'';
+    $('catalog-item-category').value=type==='tv'?'Série':'Filme';
+    $('catalog-item-image').value=item.poster_path?'https://image.tmdb.org/t/p/w500'+item.poster_path:'';
+    $('catalog-item-description').value=item.overview||'';
+    $('catalog-item-season').value='';updateCatalogSeasonField();
+    $('catalog-admin-status').textContent='Dados preenchidos. Informe a temporada se necessário e salve no catálogo.';
+    $('catalog-item-title').focus();
+  });
+
   $('close-catalog-manager').addEventListener('click',()=>$('catalog-manager').classList.add('hidden'));
   $('cancel-catalog-item').addEventListener('click',resetCatalogForm);
   $('catalog-admin-search').addEventListener('input',renderCatalogAdmin);
