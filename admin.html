@@ -284,12 +284,11 @@
     const results=JSON.parse($('catalog-results').dataset.results||'[]');
     const item=results[Number(button.dataset.resultIndex)];
     if(!item)return;
-    const type=item.media_type||(item.title?'movie':'tv');
-    $('title').value=item.title||item.name||'';
-    $('category').value=type==='tv'?'Série':'Filme';
-    $('image').value=item.poster_path?`https://image.tmdb.org/t/p/w500${item.poster_path}`:'';
-    $('description').value=item.overview||'';
-    showCatalogMessage('Dados preenchidos. Confira a categoria e escolha a data e o horário antes de salvar.');
+    $('title').value=item.title||'';
+    $('category').value=item.category||'Filme';
+    $('image').value=item.image||'';
+    $('description').value=item.description||'';
+    showCatalogMessage('Dados do catálogo preenchidos. Escolha a data e o horário antes de salvar.');
     $('title').focus();
   });
 
