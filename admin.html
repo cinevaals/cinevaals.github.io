@@ -245,34 +245,31 @@
     if(!automatic){
       $('catalog-search').disabled=true;
       $('catalog-search').textContent='Buscando...';
-      showCatalogMessage('Buscando filmes e séries...');
+      showCatalogMessage('Buscando no catálogo do CineVaals...');
     }
     try{
-      const {data:sessionData}=await supabase.auth.getSession();
-      const token=sessionData.session?.access_token;
-      if(!token){showCatalogMessage('Sua sessão expirou. Entre novamente no painel.');return;}
-      const {data,error}=await supabase.functions.invoke('tmdb-search',{
-        body:{query},
-        headers:{Authorization:`Bearer ${token}`}
-      });
-      if(error) throw error;
+      const {data,error}=await supabase.from('catalog')
+        .select('id,title,category,image,description')
+        .ilike('title',`%${query.replace(/[%_\\\\]/g,'\\\\$&')}%`)
+        .order('title',{ascending:true})
+        .limit(20);
+      if(error)throw error;
       if(searchId!==catalogSearchSequence || query!==$('catalog-query').value.trim())return;
-      const results=Array.isArray(data)?data:(data?.results||[]);
-      if(!results.length){showCatalogMessage('Nenhuma sugestão encontrada. Tente continuar digitando.');return;}
+      const results=data||[];
+      if(!results.length){showCatalogMessage('Nenhum título encontrado no catálogo. Cadastre-o primeiro no Catálogo CineVaals.');$('catalog-results').dataset.results='[]';return;}
       $('catalog-results').innerHTML=results.map((item,index)=>{
-        const title=item.title||item.name||'Sem título';
-        const type=item.media_type||(item.title?'movie':'tv');
-        const year=(item.release_date||item.first_air_date||'').slice(0,4);
-        const poster=item.poster_path?`https://image.tmdb.org/t/p/w185${item.poster_path}`:'';
+        const title=item.title||'Sem título';
+        const category=item.category||'Filme';
+        const poster=item.image||'';
         return `<button class="catalog-result" type="button" data-result-index="${index}">
-          ${poster?`<img src="${escapeHtml(poster)}" alt="" loading="lazy">`:'<span class="catalog-result-poster" aria-hidden="true">🎬</span>'}
-          <span><span class="result-title">${escapeHtml(title)}</span><span class="result-meta">${type==='tv'?'Série':'Filme'}${year?' · '+escapeHtml(year):''}</span></span>
+          ${poster?`<img src="${escapeHtml(poster)}" alt="" loading="lazy" onerror="this.style.display='none'">`:'<span class="catalog-result-poster" aria-hidden="true">🎬</span>'}
+          <span><span class="result-title">${escapeHtml(title)}</span><span class="result-meta">${escapeHtml(category)} · Catálogo CineVaals</span></span>
         </button>`;
       }).join('');
       $('catalog-results').dataset.results=JSON.stringify(results);
     }catch(error){
-      console.error('Erro na busca de catálogo:',error);
-      if(searchId===catalogSearchSequence)showCatalogMessage('Não foi possível realizar a busca. Confira sua conexão e tente novamente.');
+      console.error('Erro na busca do catálogo CineVaals:',error);
+      if(searchId===catalogSearchSequence)showCatalogMessage('Não foi possível pesquisar no catálogo. Tente novamente.');
     }finally{
       if(!automatic){
         $('catalog-search').disabled=false;
