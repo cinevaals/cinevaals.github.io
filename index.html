@@ -215,12 +215,20 @@ const catalogSearch=document.getElementById('catalogSearch');
 const catalogGrid=document.getElementById('catalogGrid');
 const catalogEmpty=document.getElementById('catalogEmpty');
 let catalogCategory='Todos';
+let catalogTitles=[];
+async function loadCatalog(){
+  const {data,error}=await supabaseClient.from('catalog').select('id,title,category,status,image,description,sort_order').order('sort_order',{ascending:true}).order('title',{ascending:true});
+  if(error){console.error('Erro ao carregar catálogo:',error);catalogTitles=[];if(catalogModal&&catalogModal.style.display==='flex')renderCatalog();return;}
+  catalogTitles=data||[];
+  if(catalogModal&&catalogModal.style.display==='flex')renderCatalog();
+}
 function renderCatalog(){
   const term=catalogSearch.value.trim().toLocaleLowerCase('pt-BR');
-  const filtered=titles.filter(item=>(catalogCategory==='Todos'||item.category===catalogCategory)&&String(item.title||'').toLocaleLowerCase('pt-BR').includes(term));
+  const filtered=catalogTitles.filter(item=>(catalogCategory==='Todos'||item.category===catalogCategory)&&String(item.title||'').toLocaleLowerCase('pt-BR').includes(term));
   catalogGrid.innerHTML=filtered.map(item=>{
     const image=item.image?`<img src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
-    return `<article class="catalog-card">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><h3>${escapeHtml(item.title||'Sem título')}</h3></article>`;
+    const status=item.status||'Está na Fila';
+    return `<article class="catalog-card">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><h3>${escapeHtml(item.title||'Sem título')}</h3><p class="catalog-status" style="margin:7px 0 0;padding:5px 8px;border:1px solid #65bfff55;border-radius:999px;color:#9bd7ff;font-size:12px;text-align:center;background:#102846">${escapeHtml(status)}</p></article>`;
   }).join('');
   catalogEmpty.style.display=filtered.length?'none':'block';
 }
@@ -305,6 +313,7 @@ document.getElementById('closeContentDetail').addEventListener('click',closeCont
 contentDetailModal.addEventListener('click',event=>{if(event.target===contentDetailModal)closeContentDetails();});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&contentDetailModal.style.display==='flex')closeContentDetails();});
 loadContents();
+loadCatalog();
 </script>
 </body>
 </html>
