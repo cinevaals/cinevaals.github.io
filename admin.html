@@ -398,7 +398,7 @@
   $('catalog-item-category').addEventListener('change',updateCatalogSeasonField);
   $('catalog-item-status').addEventListener('change',()=>{
     updateCatalogSeasonField();
-    if($('catalog-item-category').value==='Série' && $('catalog-item-status').value==='Já Assistido'){
+    if($('catalog-item-category').value!=='Filme' && $('catalog-item-status').value==='Já Assistido'){
       $('catalog-item-season').value='Todas as temporadas';
     }
   });
