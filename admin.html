@@ -419,12 +419,27 @@
   function updateCatalogSeasonField(){
     const category=$('catalog-item-category').value;
     const isMovie=category==='Filme';
+    const isEpisodic=['Série','Dorama','Anime','Animação'].includes(category);
     const statusSelect=$('catalog-item-status');
-    const episodicOnly=[...statusSelect.options].filter(option=>['Em Andamento','Finalizado'].includes(option.value));
-    episodicOnly.forEach(option=>{option.hidden=isMovie;option.disabled=isMovie;});
-    if(isMovie && ['Em Andamento','Finalizado'].includes(statusSelect.value))statusSelect.value='';
+    [...statusSelect.options].forEach(option=>{
+      if(!option.value)return;
+      const visible=option.value==='Na Fila'||option.value==='Está na Fila'
+        ? true
+        : option.value==='Em Andamento'||option.value==='Finalizado'
+          ? isEpisodic
+          : option.value==='Já Assistido'
+            ? isMovie
+            : true;
+      option.hidden=!visible;
+      option.disabled=!visible;
+    });
+    if((isMovie&&['Em Andamento','Finalizado'].includes(statusSelect.value))||
+       (isEpisodic&&statusSelect.value==='Já Assistido')||
+       (!isMovie&&!isEpisodic&&['Em Andamento','Já Assistido','Finalizado'].includes(statusSelect.value))){
+      statusSelect.value='';
+    }
     const isWatching=statusSelect.value==='Em Andamento';
-    const isFinished=['Já Assistido','Finalizado'].includes(statusSelect.value);
+    const isFinished=statusSelect.value==='Finalizado';
     $('catalog-season-wrap').classList.toggle('hidden',isMovie);
     $('catalog-item-season').required=!isMovie;
     $('catalog-episode-wrap').classList.toggle('hidden',isMovie||!isWatching);
