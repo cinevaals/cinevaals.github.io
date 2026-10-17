@@ -105,8 +105,9 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 <div id="catalogModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:16px;">
   <section role="dialog" aria-modal="true" aria-labelledby="catalogTitle" style="position:relative;width:100%;max-width:1000px;max-height:90vh;overflow:auto;padding:26px 20px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #65bfff;border-radius:16px;box-shadow:0 0 24px #087bff55;color:#eaf5ff;">
     <button type="button" id="closeCatalog" aria-label="Fechar catálogo" style="position:sticky;float:right;top:0;z-index:2;background:#102846;border:1px solid #65bfff;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;">✕ Fechar</button>
-    <h2 id="catalogTitle" style="margin:0 100px 16px 0;color:#65bfff;">Catálogo</h2>
-    <div id="catalogStatusFilters" class="catalog-status-filters" aria-label="Filtrar por status" style="display:none;gap:8px;flex-wrap:wrap;margin:0 0 14px;"></div>
+    <h2 id="catalogTitle" style="margin:0 100px 16px 0;color:#65bfff;">♡ Patrocinados</h2>
+    <div id="catalogCategoryFilters" class="catalog-status-filters" aria-label="Filtrar por categoria" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;"></div>
+    <div id="catalogStatusFilters" class="catalog-status-filters" aria-label="Filtrar por status" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;"></div>
     <label for="catalogSearch" style="display:block;margin-bottom:12px;">
       <span style="display:block;margin-bottom:6px;">🔎 Pesquisar pelo título</span>
       <input id="catalogSearch" type="search" placeholder="Digite o título..." aria-label="Pesquisar pelo título" style="width:100%;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #37618b;background:#071326;color:#fff;font:inherit;">
@@ -254,6 +255,7 @@ const catalogTitle=document.getElementById('catalogTitle');
 const catalogSearch=document.getElementById('catalogSearch');
 const catalogGrid=document.getElementById('catalogGrid');
 const catalogEmpty=document.getElementById('catalogEmpty');
+const catalogCategoryFilters=document.getElementById('catalogCategoryFilters');
 const catalogStatusFilters=document.getElementById('catalogStatusFilters');
 let catalogCategory='Todos';
 let catalogStatus='Todos';
@@ -270,11 +272,23 @@ const catalogStatusesByCategory={
 function normalizedCatalogStatus(status){return status==='Assistindo'?'Em Andamento':status==='Está na Fila'?'Na Fila':(status||'Na Fila');}
 function ratingForCatalogId(id){return contentRatings.find(entry=>Number(entry.catalog_id)===Number(id))||null;}
 function ratingForScheduleItem(item){const entry=catalogTitles.find(c=>normalizeCatalogTitle(c.title)===normalizeCatalogTitle(item?.title)&&c.category===item?.category);return entry?ratingForCatalogId(entry.id):null;}
+function renderCatalogCategoryFilters(){
+  const categories=[
+    {value:'Todos',label:'✨ Todos'},
+    {value:'Filme',label:'🎬 Filmes'},
+    {value:'Série',label:'📺 Séries'},
+    {value:'Animação',label:'🐰 Animações'},
+    {value:'Dorama',label:'💗 Doramas'},
+    {value:'Anime',label:'⛩️ Animes'}
+  ];
+  catalogCategoryFilters.innerHTML=categories.map(category=>`<button type="button" class="catalog-status-filter${catalogCategory===category.value?' active':''}" data-catalog-category="${category.value}">${category.label}</button>`).join('');
+}
 function renderCatalogStatusFilters(){
-  const statuses=catalogStatusesByCategory[catalogCategory];
-  if(!statuses){catalogStatusFilters.style.display='none';catalogStatusFilters.innerHTML='';return;}
-  catalogStatusFilters.style.display='flex';
+  const statuses=catalogCategory==='Todos'
+    ? ['Em Andamento','Na Fila','Já Assistido','Finalizado']
+    : (catalogStatusesByCategory[catalogCategory]||[]);
   const options=['Todos',...statuses];
+  catalogStatusFilters.style.display='flex';
   catalogStatusFilters.innerHTML=options.map(status=>`<button type="button" class="catalog-status-filter${catalogStatus===status?' active':''}" data-catalog-status="${status}">${status==='Todos'?'✨ Todos':status==='Em Andamento'?'⏳ Em Andamento':status==='Na Fila'?'🔖 Na Fila':status==='Já Assistido'?'✓ Já Assistido':'🏁 Finalizado'}</button>`).join('');
 }
 async function loadCatalog(){
@@ -323,12 +337,13 @@ function renderCatalog(){
   }).join('');
   catalogEmpty.textContent=catalogStatus==='Todos'?'Nenhum conteúdo encontrado nessa categoria.':`Nenhum conteúdo com status "${catalogStatus}" encontrado.`;
   catalogEmpty.style.display=filtered.length?'none':'block';
+  renderCatalogCategoryFilters();
   renderCatalogStatusFilters();
 }
 function openCatalog(category){
   catalogCategory=category;
   catalogStatus='Todos';
-  catalogTitle.textContent=category==='Todos'?'♡ Patrocinados':({Filme:'🎬 Filmes',Série:'📺 Séries',Animação:'🐰 Animações',Dorama:'💗 Doramas',Anime:'⛩️ Animes'}[category]||category);
+  catalogTitle.textContent='♡ Patrocinados';
   catalogSearch.value='';
   renderCatalog();
   catalogModal.style.display='flex';
@@ -336,6 +351,13 @@ function openCatalog(category){
 }
 document.getElementById('sponsoredLink').addEventListener('click',()=>openCatalog('Todos'));
 catalogSearch.addEventListener('input',renderCatalog);
+catalogCategoryFilters.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-catalog-category]');
+  if(!b)return;
+  catalogCategory=b.dataset.catalogCategory;
+  catalogStatus='Todos';
+  renderCatalog();
+});
 catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('button[data-catalog-status]');if(!b)return;catalogStatus=b.dataset.catalogStatus;renderCatalog();});
 document.getElementById('closeCatalog').addEventListener('click',()=>{catalogModal.style.display='none';});
 catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)catalogModal.style.display='none';});
