@@ -268,7 +268,7 @@ function renderCatalog(){
 function openCatalog(category){
   catalogCategory=category;
   catalogStatus='Todos';
-  catalogTitle.textContent=category==='Todos'?'✨ Todos os conteúdos':({Filme:'🎬 Filmes',Série:'📺 Séries',Animação:'🎨 Animações',Dorama:'💗 Doramas',Anime:'⛩️ Animes'}[category]||category);
+  catalogTitle.textContent=category==='Todos'?'✨ Todos os conteúdos':({Filme:'🎬 Filmes',Série:'📺 Séries',Animação:'🐰 Animações',Dorama:'💗 Doramas',Anime:'⛩️ Animes'}[category]||category);
   catalogSearch.value='';
   renderCatalog();
   catalogModal.style.display='flex';
