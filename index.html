@@ -559,16 +559,10 @@ function renderDetailGenres(genres){
 function renderDetailTags(category,status,certification,year){
   const tags=[];
   if(category)tags.push(category);
-  if(['Série','Dorama','Anime','Animação'].includes(category)&&status)tags.push(normalizedCatalogStatus(status));
-  if(certification)tags.push(String(certification));
   if(year)tags.push(String(year));
+  if(certification)tags.push(String(certification));
+  if(['Série','Dorama','Anime','Animação'].includes(category)&&status)tags.push(normalizedCatalogStatus(status));
   return tags.map(value=>'<span class="detail-tag">'+escapeHtml(value)+'</span>').join('');
-}
-function renderCatalogProgressTag(entry){
-  if(!entry||entry.category==='Filme'||normalizedCatalogStatus(entry.status)!=='Em Andamento'||(!entry.season&&!entry.episode))return '';
-  const season=entry.season?(/temporada/i.test(String(entry.season))?String(entry.season):'Temporada '+String(entry.season)):'';
-  const episode=entry.episode?(/epis[oó]dio/i.test(String(entry.episode))?String(entry.episode):'Episódio '+String(entry.episode)):'';
-  return '<span class="detail-tag">'+escapeHtml('Progresso: '+[season,episode].filter(Boolean).join(' - '))+'</span>';
 }
 function catalogDetailsFor(item){
   const normalize=value=>String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
@@ -582,7 +576,7 @@ async function openContentDetails(item){
   hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.08),rgba(5,11,22,.18) 45%,#050b16 100%),radial-gradient(ellipse at 50% 20%,#16416a,#07101f 75%)';
   $detail('detailTitle').textContent=title;
   const catalogEntry=catalogDetailsFor(item);
-  $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,'',item.date?String(item.date).slice(0,4):'')+renderCatalogProgressTag(catalogEntry);
+  $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,'',item.date?String(item.date).slice(0,4):'');
   const scheduleDescription=/^Episódios para assistir: \d+$/.test(String(item.description||''))?'':(item.description||'');
   const catalogDescription=/^Episódios para assistir: \d+$/.test(String(catalogEntry?.description||''))?'':(catalogEntry?.description||'');
   const fallbackDescription=scheduleDescription||catalogDescription;
@@ -612,7 +606,7 @@ async function openContentDetails(item){
     $detail('detailDescription').textContent=description;
     const certification=(Array.isArray(d.release_dates?.results)?d.release_dates.results.find(country=>country.iso_3166_1==='BR')?.release_dates?.find(release=>release.certification)?.certification:'')||(Array.isArray(d.content_ratings?.results)?d.content_ratings.results.find(country=>country.iso_3166_1==='BR'&&country.rating)?.rating:'');
     const releaseYear=String(d.release_date||d.first_air_date||'').slice(0,4)||String(item.date||'').slice(0,4);
-    $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,certification,releaseYear)+renderCatalogProgressTag(catalogEntry);
+    $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,certification,releaseYear);
     if(info)info.innerHTML=`<div class="detail-facts"><div><span>🎭 Gêneros</span><strong>${escapeHtml(genres)}</strong></div><div><span>⏱️ ${isTv?'Duração':'Duração'}</span><strong>${escapeHtml(runtime)}</strong></div>${isTv?`<div><span>📺 Temporadas</span><strong>${escapeHtml(detailText(seasons))}</strong></div><div><span>🎞️ Episódios</span><strong>${escapeHtml(detailText(episodes))}</strong></div>`:''}<div class="detail-cast"><span>🎬 Elenco principal</span><strong>${escapeHtml(cast)}</strong></div></div>`;
     if(d.poster_path){wrap.innerHTML=`<img class="detail-poster" src="https://image.tmdb.org/t/p/w500${escapeHtml(d.poster_path)}" alt="Capa de ${escapeHtml(title)}">`;}
   }catch(error){
