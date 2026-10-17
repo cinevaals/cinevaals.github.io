@@ -182,7 +182,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 #contentDetailModal .detail-layout{display:grid;grid-template-columns:minmax(120px,185px) minmax(0,1fr);gap:23px;align-items:start}
 #contentDetailModal .detail-poster{width:100%;aspect-ratio:2/3;object-fit:cover;background:#081426;border-radius:12px;border:1px solid #4a81b7;box-shadow:0 12px 30px #0009;display:block}
 #contentDetailModal h2{margin:78px 42px 8px 0;color:#f4f8ff;font-size:clamp(23px,4.2vw,34px);line-height:1.12;letter-spacing:-.5px}
-#contentDetailModal .detail-meta{color:#a9c7e7;font-size:12px;line-height:1.8;margin-bottom:17px}
+#contentDetailModal .detail-meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:17px}#contentDetailModal .detail-meta .detail-tag{display:inline-flex;align-items:center;padding:5px 10px;border:1px solid #37618b;border-radius:8px;background:linear-gradient(145deg,#102846,#071326);color:#cce7ff;font-size:11px;font-weight:700;line-height:1.4;letter-spacing:.2px}
 #contentDetailModal .detail-description-title{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#65bfff;margin:20px 0 8px}
 #contentDetailModal .detail-description{color:#d3dfef;font-size:14px;line-height:1.8;white-space:pre-line}
 #contentDetailModal .detail-extra{margin-top:20px}
@@ -557,6 +557,14 @@ function renderDetailCredits(people){
 function renderDetailGenres(genres){
   return Array.isArray(genres)&&genres.length?genres.map(g=>g.name).join(', '):'Não informado';
 }
+function renderDetailTags(category,status,certification,year){
+  const tags=[];
+  if(category)tags.push(['Categoria',category]);
+  if(['Série','Dorama','Anime','Animação'].includes(category)&&status)tags.push(['Status',normalizedCatalogStatus(status)]);
+  if(certification)tags.push(['Classificação',certification]);
+  if(year)tags.push(['Lançamento',String(year)]);
+  return tags.map(([label,value])=>'<span class="detail-tag">'+escapeHtml(label+': '+value)+'</span>').join('');
+}
 function catalogDetailsFor(item){
   const normalize=value=>String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   return catalogTitles.find(entry=>normalize(entry.title)===normalize(item?.title)&&entry.category===item?.category)||null;
@@ -568,9 +576,9 @@ async function openContentDetails(item){
   const hero=$detail('detailHero');
   hero.style.backgroundImage=item.image? 'linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("'+String(item.image).replace(/["\\]/g,'')+'")' : 'linear-gradient(180deg,rgba(5,11,22,.08),#050b16),radial-gradient(ellipse at 50% 20%,#16416a,#07101f 75%)';
   $detail('detailTitle').textContent=title;
-  $detail('detailMeta').textContent=[item.category,item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'',item.time?'Horário: '+item.time:''].filter(Boolean).join('  •  ');
-  const scheduleDescription=/^Episódios para assistir: \d+$/.test(String(item.description||''))?'':(item.description||'');
   const catalogEntry=catalogDetailsFor(item);
+  $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,'',item.date?String(item.date).slice(0,4):'');
+  const scheduleDescription=/^Episódios para assistir: \d+$/.test(String(item.description||''))?'':(item.description||'');
   const catalogDescription=/^Episódios para assistir: \d+$/.test(String(catalogEntry?.description||''))?'':(catalogEntry?.description||'');
   const fallbackDescription=scheduleDescription||catalogDescription;
   $detail('detailDescription').textContent=fallbackDescription||'Carregando a sinopse…';
@@ -597,8 +605,9 @@ async function openContentDetails(item){
     const genres=renderDetailGenres(d.genres);
     const description=d.overview||fallbackDescription||'Sinopse não disponível.';
     $detail('detailDescription').textContent=description;
-    const meta=[item.category,item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'',item.time?'Horário: '+item.time:''].filter(Boolean).join(' · ');
-    $detail('detailMeta').textContent=meta;
+    const certification=(Array.isArray(d.release_dates?.results)?d.release_dates.results.find(country=>country.iso_3166_1==='BR')?.release_dates?.find(release=>release.certification)?.certification:'')||(Array.isArray(d.content_ratings?.results)?d.content_ratings.results.find(country=>country.iso_3166_1==='BR'&&country.rating)?.rating:'');
+    const releaseYear=String(d.release_date||d.first_air_date||'').slice(0,4)||String(item.date||'').slice(0,4);
+    $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,certification,releaseYear);
     if(info)info.innerHTML=`<div class="detail-facts"><div><span>🎭 Gêneros</span><strong>${escapeHtml(genres)}</strong></div><div><span>⏱️ ${isTv?'Duração':'Duração'}</span><strong>${escapeHtml(runtime)}</strong></div>${isTv?`<div><span>📺 Temporadas</span><strong>${escapeHtml(detailText(seasons))}</strong></div><div><span>🎞️ Episódios</span><strong>${escapeHtml(detailText(episodes))}</strong></div>`:''}<div class="detail-cast"><span>🎬 Elenco principal</span><strong>${escapeHtml(cast)}</strong></div></div>`;
     if(d.poster_path){wrap.innerHTML=`<img class="detail-poster" src="https://image.tmdb.org/t/p/w500${escapeHtml(d.poster_path)}" alt="Capa de ${escapeHtml(title)}">`;}
   }catch(error){
