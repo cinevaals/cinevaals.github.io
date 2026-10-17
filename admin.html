@@ -45,6 +45,12 @@
     #status{overflow-wrap:anywhere;color:#65bfff;min-height:1.2em;margin:14px 0 0}.hidden{display:none!important}
     @media(max-width:700px){#editor{padding:12px}.editor-card{margin:0 auto 20px;padding:15px}.search-row{flex-direction:column}.search-row button{margin-top:0}.catalog-results{max-height:38vh}}
     @media(max-width:700px){.catalog-top-actions{width:100%;min-width:0}.catalog-admin-grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}#catalog-library,#catalog-manager{padding:10px!important}.catalog-admin-card-actions button{padding:7px 6px}main{padding:20px 12px 30px}header{margin:0 -12px 20px;padding:8px 12px}h1{font-size:20px}.days{grid-template-columns:repeat(7,minmax(155px,1fr));min-width:1160px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.week-controls{display:flex;gap:7px}.week-controls>#prev-week,.week-controls>#next-week{order:0}.week-center{order:0;flex-direction:column;gap:8px}.week-controls button{font-size:.78rem;padding:9px 8px}.week-title{min-width:0}.toolbar{align-items:flex-start}}
+
+    #rating-editor:not(.hidden){display:flex!important}.rating-display-stars{display:inline-flex;gap:1px;white-space:nowrap;line-height:1}.rating-display-star{font-size:12px;color:#465a73}.rating-display-star.full{color:#ffd166}.rating-display-star.half{background:linear-gradient(90deg,#ffd166 50%,#465a73 50%);background-clip:text;-webkit-background-clip:text;color:transparent}
+    .rating-editor-content{display:grid;grid-template-columns:130px minmax(0,1fr);gap:18px;align-items:start;margin-top:12px}.rating-editor-image,.rating-editor-fallback{width:130px;aspect-ratio:2/3;object-fit:cover;border-radius:9px;border:1px solid #204b79;background:#071326}.rating-editor-fallback{display:none;align-items:center;justify-content:center;font-size:38px;color:#65bfff}.rating-editor-details h3{margin:0 0 8px;font-size:20px}.rating-editor-details p{color:#a8b7cf;font-size:12px;line-height:1.5}
+    .rating-star-picker{display:flex;flex-wrap:wrap;gap:2px;margin:12px 0}.rating-star-control{position:relative;display:inline-flex;width:31px;height:38px;align-items:center;justify-content:center}.rating-star-control .star-glyph{font-size:31px;line-height:1;color:#465a73;pointer-events:none}.rating-star-control.full .star-glyph{color:#ffd166}.rating-star-control.half .star-glyph{background:linear-gradient(90deg,#ffd166 50%,#465a73 50%);background-clip:text;-webkit-background-clip:text;color:transparent}.rating-half-hit{position:absolute;top:0;bottom:0;width:50%;opacity:0;padding:0;border:0;background:transparent;min-width:0;border-radius:0}.rating-half-hit.left{left:0}.rating-half-hit.right{right:0}.rating-editor-score{display:flex;align-items:baseline;gap:5px;margin-top:6px}.rating-editor-score strong{font-size:25px;color:#ffe2a0}.rating-editor-score span{color:#a8b7cf}.rating-admin-card{cursor:pointer}.rating-admin-card .rating-card-mini{font-size:12px;color:#ffe2a0;margin:7px 0}
+    @media(max-width:600px){.rating-editor-content{grid-template-columns:90px minmax(0,1fr);gap:12px}.rating-editor-image,.rating-editor-fallback{width:90px}.rating-star-control{width:27px}.rating-star-control .star-glyph{font-size:27px}.rating-editor-card{padding:16px!important}}
+
   </style>
 </head>
 <body>
@@ -66,7 +72,7 @@
   <section id="admin-area">
     <div class="toolbar">
       <div><h2 style="margin-bottom:5px">✧ Cronograma Semanal</h2><p class="subtitle" style="margin-bottom:0">Gerencie a programação do CineVaals por aqui.</p></div>
-      <div class="catalog-top-actions"><button id="new-content" class="secondary" type="button">＋ Adicionar Catálogo</button><button id="open-catalog-library" class="secondary" type="button">▦ Gerenciar Catálogo</button></div>
+      <div class="catalog-top-actions"><button id="open-ratings-manager" class="secondary" type="button">⭐ Avaliações</button><button id="new-content" class="secondary" type="button">＋ Adicionar Catálogo</button><button id="open-catalog-library" class="secondary" type="button">▦ Gerenciar Catálogo</button></div>
     </div>
     <div class="week-controls">
       <button id="prev-week" class="secondary" type="button">← Semana anterior</button>
@@ -105,6 +111,18 @@
         <div id="catalog-admin-list" class="catalog-admin-grid"></div>
       </div>
     </section>
+
+    <section id="ratings-manager" class="hidden" aria-modal="true" role="dialog" aria-labelledby="ratings-manager-title" style="position:fixed;inset:0;z-index:1200;overflow-y:auto;padding:20px;background:rgba(1,5,13,.9);backdrop-filter:blur(5px)">
+      <div class="editor-card" style="max-width:1100px"><div class="toolbar"><div><h2 id="ratings-manager-title">⭐ Avaliações</h2><p class="subtitle">Avalie os conteúdos já assistidos ou finalizados do catálogo.</p></div><button id="close-ratings-manager" class="secondary" type="button">Fechar</button></div>
+      <div class="catalog-admin-filters" id="rating-category-filters"><button type="button" class="catalog-admin-filter active" data-rating-admin-category="Filme">🎬 Já assistidos · Filmes</button><button type="button" class="catalog-admin-filter" data-rating-admin-category="Finalizados">🏁 Finalizados · Séries e animações</button></div>
+      <div class="toolbar" style="margin-top:12px"><input id="rating-admin-search" type="search" placeholder="Buscar título..." style="max-width:420px;margin-top:0"></div><p id="rating-manager-status" class="subtitle" role="status"></p><div id="rating-admin-grid" class="catalog-admin-grid"></div></div>
+      <section id="rating-editor" class="hidden" aria-modal="true" role="dialog" aria-labelledby="rating-editor-title" style="position:fixed;inset:0;z-index:1210;overflow-y:auto;padding:20px;background:rgba(1,5,13,.92);align-items:center;justify-content:center">
+        <div class="editor-card rating-editor-card" style="width:min(100%,650px);margin:auto"><div class="toolbar"><div><h2 id="rating-editor-title">Avaliar conteúdo</h2><p id="rating-editor-meta" class="subtitle"></p></div><button id="close-rating-editor" class="secondary" type="button">Fechar</button></div>
+        <div class="rating-editor-content"><img id="rating-editor-image" alt="" class="rating-editor-image"><div id="rating-editor-fallback" class="rating-editor-fallback">🎬</div><div class="rating-editor-details"><h3 id="rating-editor-name"></h3><p>Escolha de meia em meia estrela.</p><div id="rating-star-picker" class="rating-star-picker" aria-label="Escolher nota de 0,5 a 10"></div><div class="rating-editor-score"><strong id="rating-editor-score">Sem nota</strong><span>/ 10</span></div><p class="subtitle">Clique na metade esquerda para meia estrela ou na direita para a estrela inteira.</p></div></div>
+        <div class="toolbar" style="justify-content:flex-start;margin-top:18px"><button id="save-rating" class="primary" type="button">Salvar avaliação</button><button id="remove-rating" class="danger" type="button">Remover nota</button></div><p id="rating-editor-status" class="subtitle" role="status"></p></div>
+      </section>
+    </section>
+
     <section id="editor" class="hidden" aria-modal="true" role="dialog" aria-labelledby="editor-title">
       <div class="editor-card">
       <h2 id="editor-title">Adicionar conteúdo</h2>
@@ -153,6 +171,10 @@
   let catalogSearchTimer = null;
   let catalogSearchSequence = 0;
   let catalogItems = [];
+  let ratingRecords = [];
+  let ratingAdminCategory = 'Filme';
+  let selectedRatingItem = null;
+  let draftRating = 0;
   let editingCatalogId = null;
   let managerSearchTimer = null;
   let managerSearchSequence = 0;
@@ -229,7 +251,9 @@
     if(event.target===$('editor'))closeEditor();
   });
   document.addEventListener('keydown',event=>{
-    if(event.key==='Escape' && !$('editor').classList.contains('hidden'))closeEditor();
+    if(event.key==='Escape' && !$('rating-editor').classList.contains('hidden'))$('rating-editor').classList.add('hidden');
+    else if(event.key==='Escape' && !$('ratings-manager').classList.contains('hidden'))$('ratings-manager').classList.add('hidden');
+    else if(event.key==='Escape' && !$('editor').classList.contains('hidden'))closeEditor();
   });
 
   $('login-form').addEventListener('submit',async event=>{
@@ -498,6 +522,34 @@
     renderCatalogCategoryFilters();renderCatalogStatusFilters();
     $('catalog-library-status').textContent=`${list.length} de ${catalogItems.length} título(s) exibido(s).`;
   }
+
+  function eligibleForRating(item){const category=item.category||'',st=normalizedAdminCatalogStatus(item.status);if(category==='Filme')return st==='Já Assistido';return ['Série','Animação','Dorama','Anime'].includes(category)&&st==='Finalizado';}
+  function ratingRecordFor(item){return ratingRecords.find(record=>Number(record.catalog_id)===Number(item.id))||null;}
+  function renderRatingAdminGrid(){
+    const query=$('rating-admin-search').value.trim().toLocaleLowerCase('pt-BR');
+    const list=catalogItems.filter(item=>eligibleForRating(item)&&(ratingAdminCategory==='Filme'?item.category==='Filme':item.category!=='Filme')&&String(item.title||'').toLocaleLowerCase('pt-BR').includes(query));
+    $('rating-admin-grid').innerHTML=list.map(item=>{const rating=ratingRecordFor(item);const image=item.image?'<img src="'+escapeHtml(item.image)+'" alt="Capa de '+escapeHtml(item.title)+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'';return '<article class="catalog-admin-card rating-admin-card" role="button" tabindex="0" data-rate-item="'+escapeHtml(item.id)+'">'+image+'<div class="catalog-admin-poster" style="'+(item.image?'display:none;':'')+'">🎬</div><h3>'+escapeHtml(item.title||'Sem título')+'</h3><div class="catalog-admin-meta">'+escapeHtml(item.category||'')+'</div>'+(rating?'<div class="rating-card-mini">★ '+String(rating.rating).replace('.',',')+' / 10</div>':'<div class="rating-card-mini">Ainda não avaliado</div>')+'</article>';}).join('')||'<p class="subtitle">Nenhum conteúdo elegível encontrado. Filmes precisam estar como “Já Assistido”; séries, animes, doramas e animações precisam estar como “Finalizado”.</p>';
+    $('rating-manager-status').textContent=list.length+' conteúdo(s) disponível(is) para avaliação.';document.querySelectorAll('[data-rating-admin-category]').forEach(button=>button.classList.toggle('active',button.dataset.ratingAdminCategory===ratingAdminCategory));
+  }
+  async function loadAdminRatings(){
+    $('rating-manager-status').textContent='Carregando avaliações...';const {data,error}=await supabase.from('content_ratings').select('catalog_id,rating,updated_at');
+    if(error){ratingRecords=[];$('rating-manager-status').textContent='A tabela de avaliações ainda não está disponível. Execute supabase/content-ratings.sql no SQL Editor do Supabase e tente novamente.';renderRatingAdminGrid();return;}
+    ratingRecords=data||[];renderRatingAdminGrid();
+  }
+  async function openRatingsManager(){$('ratings-manager').classList.remove('hidden');$('rating-editor').classList.add('hidden');ratingAdminCategory='Filme';$('rating-admin-search').value='';if(!catalogItems.length)await loadCatalogAdmin();await loadAdminRatings();}
+  function openRatingEditor(item){
+    selectedRatingItem=item;const record=ratingRecordFor(item);draftRating=record?Number(record.rating):0;$('rating-editor-title').textContent='Avaliar conteúdo';$('rating-editor-meta').textContent=item.category==='Filme'?'Já assistido · Filme':'Finalizado · '+item.category;$('rating-editor-name').textContent=item.title||'Sem título';
+    $('rating-editor-image').src=item.image||'';$('rating-editor-image').style.display=item.image?'block':'none';$('rating-editor-fallback').style.display=item.image?'none':'flex';$('rating-editor-status').textContent='';$('remove-rating').style.display=record?'inline-block':'none';$('remove-rating').disabled=false;renderRatingEditor();$('rating-editor').classList.remove('hidden');$('rating-editor').querySelector('.editor-card').scrollTop=0;
+  }
+  function renderRatingEditor(){$('rating-star-picker').innerHTML=Array.from({length:10},(_,i)=>{const state=draftRating>=i+1?'full':draftRating>=i+.5?'half':'empty';return '<span class="rating-star-control '+state+'"><span class="star-glyph">★</span><button type="button" class="rating-half-hit left" data-rating-value="'+(i+.5)+'" aria-label="Nota '+(i+.5)+' de 10"></button><button type="button" class="rating-half-hit right" data-rating-value="'+(i+1)+'" aria-label="Nota '+(i+1)+' de 10"></button></span>';}).join('');$('rating-editor-score').textContent=draftRating?String(draftRating).replace('.',','):'Sem nota';$('save-rating').disabled=!draftRating;}
+  async function saveAdminRating(){
+    if(!selectedRatingItem||!draftRating)return;$('save-rating').disabled=true;$('rating-editor-status').textContent='Salvando avaliação...';const payload={catalog_id:selectedRatingItem.id,rating:draftRating,updated_at:new Date().toISOString()};
+    const {data,error}=await supabase.from('content_ratings').upsert(payload,{onConflict:'catalog_id'}).select('catalog_id,rating,updated_at').single();
+    if(error){$('rating-editor-status').textContent='Não foi possível salvar. Confira se o SQL de avaliações foi executado: '+error.message;$('save-rating').disabled=false;return;}
+    ratingRecords=ratingRecords.filter(record=>Number(record.catalog_id)!==Number(selectedRatingItem.id));ratingRecords.push(data||payload);$('rating-editor-status').textContent='Avaliação salva com sucesso!';$('remove-rating').style.display='inline-block';renderRatingAdminGrid();renderRatingEditor();
+  }
+  async function removeAdminRating(){if(!selectedRatingItem)return;if(!confirm('Remover a avaliação de "'+selectedRatingItem.title+'"?'))return;$('remove-rating').disabled=true;$('rating-editor-status').textContent='Removendo avaliação...';const {error}=await supabase.from('content_ratings').delete().eq('catalog_id',selectedRatingItem.id);$('remove-rating').disabled=false;if(error){$('rating-editor-status').textContent='Não foi possível remover a nota: '+error.message;return;}ratingRecords=ratingRecords.filter(record=>Number(record.catalog_id)!==Number(selectedRatingItem.id));draftRating=0;$('rating-editor').classList.add('hidden');renderRatingAdminGrid();}
+
   async function loadCatalogAdmin(){
     $('catalog-library-status').textContent='Carregando catálogo...';
     $('catalog-admin-status').textContent='Carregando catálogo...';
@@ -627,6 +679,16 @@
       await loadCatalogAdmin();$('catalog-library-status').textContent='Título excluído do catálogo.';
     }
   });
+
+
+  $('open-ratings-manager').addEventListener('click',openRatingsManager);
+  $('close-ratings-manager').addEventListener('click',()=>{$('ratings-manager').classList.add('hidden');$('rating-editor').classList.add('hidden');});
+  $('rating-admin-search').addEventListener('input',renderRatingAdminGrid);
+  $('rating-category-filters').addEventListener('click',event=>{const button=event.target.closest('[data-rating-admin-category]');if(!button)return;ratingAdminCategory=button.dataset.ratingAdminCategory;renderRatingAdminGrid();});
+  $('rating-admin-grid').addEventListener('click',event=>{const card=event.target.closest('[data-rate-item]');if(!card)return;const item=catalogItems.find(entry=>String(entry.id)===card.dataset.rateItem);if(item)openRatingEditor(item);});
+  $('rating-admin-grid').addEventListener('keydown',event=>{if((event.key==='Enter'||event.key===' ')&&event.target.matches('[data-rate-item]')){event.preventDefault();const item=catalogItems.find(entry=>String(entry.id)===event.target.dataset.rateItem);if(item)openRatingEditor(item);}});
+  $('rating-star-picker').addEventListener('click',event=>{const button=event.target.closest('[data-rating-value]');if(!button)return;draftRating=Number(button.dataset.ratingValue);renderRatingEditor();});
+  $('save-rating').addEventListener('click',saveAdminRating);$('remove-rating').addEventListener('click',removeAdminRating);$('close-rating-editor').addEventListener('click',()=>$('rating-editor').classList.add('hidden'));$('rating-editor').addEventListener('click',event=>{if(event.target===$('rating-editor'))$('rating-editor').classList.add('hidden');});
 
   $('cancel-edit').addEventListener('click',closeEditor);
   $('prev-week').addEventListener('click',()=>{weekStart.setDate(weekStart.getDate()-7);render();});
