@@ -83,15 +83,18 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 </head>
 <body>
 <div class="banner" role="img" aria-label="Banner do CineVaals com Gotham à noite, lua, personagem ruiva cacheada, Chicken Little e margaridas"></div>
-<div class="topnav"><div class="nav-inner"><div class="brand">✦ CineVaals</div><a class="nav-link" href="#schedule">🗓️ Cronograma</a><a class="nav-link" href="https://incentive.gg/a_valzinha" target="_blank" rel="noopener noreferrer">🐮 Vaquinhas</a>
-<div class="nav-dropdown"><button class="nav-link nav-dropdown-btn" type="button">🌐 Social ▾</button><div class="nav-dropdown-menu"><a href="https://instagram.com/a_vaalzinha" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://www.tiktok.com/@a_vaalzinha" target="_blank" rel="noopener noreferrer">TikTok</a></div></div><a class="nav-link" href="https://cinefy.gg/a_valzinha" target="_blank" rel="noopener noreferrer">🎬 Cinefy</a>
+<div class="topnav"><div class="nav-inner"><div class="brand">✦ CineVaals</div><a class="nav-link" href="#schedule">🗓️ Cronograma</a>
+<button class="nav-link" type="button" id="sponsoredLink" style="font-family:inherit;background:transparent;border:0;cursor:pointer;">♡ Patrocinados</button>
+<a class="nav-link" href="https://incentive.gg/a_valzinha" target="_blank" rel="noopener noreferrer">🐮 Vaquinhas</a>
+<a class="nav-link" href="https://cinefy.gg/a_valzinha" target="_blank" rel="noopener noreferrer">🎬 Cinefy</a>
 <button class="nav-link" type="button" id="ratingsLink" style="font-family:inherit;background:transparent;border:0;cursor:pointer;">⭐ Avaliações</button>
+<div class="nav-dropdown"><button class="nav-link nav-dropdown-btn" type="button">🌐 Sociais ▾</button><div class="nav-dropdown-menu"><a href="https://instagram.com/a_vaalzinha" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://www.tiktok.com/@a_vaalzinha" target="_blank" rel="noopener noreferrer">TikTok</a></div></div>
 <button class="nav-link" type="button" id="aboutLink" style="font-family:inherit;background:transparent;border:0;cursor:pointer;">ℹ️ Sobre</button>
 <div class="nav-spacer"></div></div></div>
 <main id="cronograma">
  <div class="intro">
    <div class="heading"><h1>✧ Cronograma Semanal</h1><p>Aqui você encontra todos os conteúdos que vão virar reação por aqui! 💙</p></div>
-   <div class="filters" id="filters" aria-label="Abrir catálogo por categoria"><button class="filter-btn" data-filter="Filme">🎬 Filmes</button><button class="filter-btn" data-filter="Série">📺 Séries</button><button class="filter-btn" data-filter="Animação">🐰 Animações</button><button class="filter-btn" data-filter="Dorama">💗 Doramas</button><button class="filter-btn" data-filter="Anime">⛩️ Animes</button><button class="filter-btn" data-filter="Todos">✨ Todos</button></div>
+
  </div>
  <div class="controls"><button class="week-btn" id="prevWeek">← Semana anterior</button><div class="week-label" id="weekLabel">Carregando semana...<small>✦ SEMANA ATUAL ✦</small></div><button class="week-btn" id="nextWeek">Próxima semana →</button></div>
  <div class="days-wrap"><section class="days" id="schedule" aria-live="polite"></section></div>
@@ -325,13 +328,13 @@ function renderCatalog(){
 function openCatalog(category){
   catalogCategory=category;
   catalogStatus='Todos';
-  catalogTitle.textContent=category==='Todos'?'✨ Todos os conteúdos':({Filme:'🎬 Filmes',Série:'📺 Séries',Animação:'🐰 Animações',Dorama:'💗 Doramas',Anime:'⛩️ Animes'}[category]||category);
+  catalogTitle.textContent=category==='Todos'?'♡ Patrocinados':({Filme:'🎬 Filmes',Série:'📺 Séries',Animação:'🐰 Animações',Dorama:'💗 Doramas',Anime:'⛩️ Animes'}[category]||category);
   catalogSearch.value='';
   renderCatalog();
   catalogModal.style.display='flex';
   catalogSearch.focus();
 }
-document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(b)openCatalog(b.dataset.filter);});
+document.getElementById('sponsoredLink').addEventListener('click',()=>openCatalog('Todos'));
 catalogSearch.addEventListener('input',renderCatalog);
 catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('button[data-catalog-status]');if(!b)return;catalogStatus=b.dataset.catalogStatus;renderCatalog();});
 document.getElementById('closeCatalog').addEventListener('click',()=>{catalogModal.style.display='none';});
