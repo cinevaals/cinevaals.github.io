@@ -303,6 +303,10 @@ function renderDetailCredits(people){
 function renderDetailGenres(genres){
   return Array.isArray(genres)&&genres.length?genres.map(g=>g.name).join(', '):'Não informado';
 }
+function catalogDetailsFor(item){
+  const normalize=value=>String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+  return catalogTitles.find(entry=>normalize(entry.title)===normalize(item?.title)&&entry.category===item?.category)||null;
+}
 async function openContentDetails(item){
   if(!item)return;
   const title=item.title||'Sem título';
@@ -310,7 +314,10 @@ async function openContentDetails(item){
   $detail('detailTitle').textContent=title;
   $detail('detailMeta').textContent=[item.category,item.date?new Date(item.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):'',item.time?'Horário: '+item.time:''].filter(Boolean).join(' · ');
   const scheduleDescription=/^Episódios para assistir: \d+$/.test(String(item.description||''))?'':(item.description||'');
-  $detail('detailDescription').textContent=scheduleDescription||'Carregando informações do TMDB…';
+  const catalogEntry=catalogDetailsFor(item);
+  const catalogDescription=/^Episódios para assistir: \d+$/.test(String(catalogEntry?.description||''))?'':(catalogEntry?.description||'');
+  const fallbackDescription=scheduleDescription||catalogDescription;
+  $detail('detailDescription').textContent=fallbackDescription||'Carregando informações do TMDB…';
   const wrap=$detail('detailPosterWrap');
   wrap.innerHTML=item.image?`<img class="detail-poster" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(title)}">`:'<div class="detail-poster" style="display:grid;place-items:center;color:#65bfff">🎬</div>';
   const info=$detail('detailExtra');
@@ -336,8 +343,8 @@ async function openContentDetails(item){
     if(d.poster_path){wrap.innerHTML=`<img class="detail-poster" src="https://image.tmdb.org/t/p/w500${escapeHtml(d.poster_path)}" alt="Capa de ${escapeHtml(title)}">`;}
   }catch(error){
     console.error('Não foi possível carregar os detalhes do TMDB:',error);
-    if(info)info.innerHTML='<p class="detail-loading">Não foi possível carregar os detalhes completos agora. A sinopse cadastrada continua disponível.</p>';
-    $detail('detailDescription').textContent=scheduleDescription||'Sinopse não disponível para este conteúdo.';
+    if(info)info.innerHTML='<p class="detail-loading">Não foi possível carregar os detalhes completos agora. A descrição cadastrada no catálogo continua disponível, quando houver.</p>';
+    $detail('detailDescription').textContent=fallbackDescription||'Sinopse não disponível para este conteúdo.';
   }
 }
 function closeContentDetails(){contentDetailModal.style.display='none';document.body.style.overflow='';}
