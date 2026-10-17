@@ -374,7 +374,6 @@
     if(pickEdit){const item=contents.find(x=>String(x.id)===pickEdit.dataset.pickEdit);document.getElementById('edit-picker')?.classList.add('hidden');document.body.style.overflow='';if(item)openEditor(item);return;}
     if(event.target.closest('[data-close-picker]')){document.getElementById('edit-picker')?.classList.add('hidden');document.body.style.overflow='';return;}
     if(markOff){
-      if(!confirm('Marcar este dia como Folguinha?'))return;
       const {error}=await supabase.from('contents').insert({title:'Folguinha',category:'Folguinha',date:markOff.dataset.markOff,description:'Hoje é dia de descanso! 💤',sort_order:0});
       if(error){status.textContent='Erro ao marcar folguinha: '+error.message;return;}
       await loadContents();status.textContent='Folguinha marcada!';return;
@@ -383,7 +382,6 @@
     if(edit){const item=contents.find(x=>String(x.id)===edit.dataset.edit);if(item)openEditor(item);return;}
     if(del){
       const item=contents.find(x=>String(x.id)===del.dataset.delete); if(!item)return;
-      if(!confirm(`Excluir "${item.title}" do cronograma?`))return;
       status.textContent='Excluindo conteúdo...';
       const {error}=await supabase.from('contents').delete().eq('id',item.id);
       if(error){status.textContent='Erro ao excluir: '+error.message;return;}
