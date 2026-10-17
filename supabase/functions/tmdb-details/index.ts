@@ -56,7 +56,7 @@ serve(async (req) => {
       return Response.json({ error: "Título não encontrado no TMDB." }, { status: 404, headers: corsHeaders });
     }
 
-    const normalized = (value: string) => value.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+    const normalized = (value: string) => value.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
     const best = results.find((item: any) => normalized(item.title || item.name || "") === normalized(title)) || results[0];
 
     const detailsUrl = new URL(`https://api.themoviedb.org/3/${type}/${best.id}`);
