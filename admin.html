@@ -671,7 +671,7 @@
       $('catalog-manager-title').textContent='✧ Editar Conteúdo do Catálogo';$('save-catalog-item').textContent='Salvar alterações';$('catalog-item-title').focus();return;
     }
     if(del){
-      const item=catalogItems.find(x=>String(x.id)===del.dataset.catalogDelete);if(!item||!confirm(`Excluir "${item.title}" do catálogo? Isso não altera o cronograma.`))return;
+      const item=catalogItems.find(x=>String(x.id)===del.dataset.catalogDelete);if(!item)return;
       const {error}=await supabase.from('catalog').delete().eq('id',item.id);
       if(error){$('catalog-library-status').textContent='Erro ao excluir: '+error.message;return;}
       await loadCatalogAdmin();$('catalog-library-status').textContent='Título excluído do catálogo.';
