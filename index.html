@@ -194,6 +194,89 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 #contentDetailModal .detail-facts strong{font-size:12px;color:#eaf5ff;line-height:1.6;font-weight:500}
 #contentDetailModal .detail-facts .detail-cast{grid-column:1/-1}
 @media(max-width:520px){#contentDetailModal{padding:8px}#contentDetailModal .detail-card{max-height:94vh;border-radius:16px}#contentDetailModal .detail-hero{height:185px}#contentDetailModal .detail-body{margin-top:-55px;padding:0 15px 20px}#contentDetailModal .detail-layout{grid-template-columns:94px minmax(0,1fr);gap:13px}#contentDetailModal h2{font-size:22px;margin-top:61px;margin-right:25px}#contentDetailModal .detail-meta{font-size:11px;margin-bottom:10px}#contentDetailModal .detail-description-title{margin-top:17px}#contentDetailModal .detail-description{font-size:13px;line-height:1.7}#contentDetailModal .detail-facts{grid-template-columns:1fr 1fr;gap:7px}#contentDetailModal .detail-facts>div{padding:9px}#contentDetailModal .detail-facts strong{font-size:11px}}
+
+/* Identidade visual compartilhada pelos modais do site — baseada no modal de detalhes da programação */
+#catalogModal,#catalogDetailModal,#ratingsModal,#aboutModal{
+  background:rgba(0,3,10,.82)!important;
+  -webkit-backdrop-filter:blur(9px)!important;
+  backdrop-filter:blur(9px)!important;
+}
+#catalogModal>section,#ratingsModal>section,#aboutModal>div,#catalogDetailModal>section{
+  background:#050b16!important;
+  border:1px solid #24466d!important;
+  border-radius:20px!important;
+  box-shadow:0 24px 90px #000b,0 0 35px #087bff20!important;
+  color:#eaf5ff!important;
+}
+#catalogModal>section,#ratingsModal>section{
+  padding:26px!important;
+}
+#catalogModal h2,#ratingsModal h2,#aboutModal h2{
+  color:#f4f8ff!important;
+  text-shadow:none!important;
+  letter-spacing:-.3px;
+}
+#catalogModal button#closeCatalog,#ratingsModal button#closeRatings{
+  width:38px!important;height:38px!important;
+  display:grid!important;place-items:center!important;
+  border:1px solid #7dbfff55!important;border-radius:50%!important;
+  background:rgba(4,12,25,.9)!important;color:#eaf5ff!important;
+  padding:0!important;font-size:0!important;line-height:1!important;
+}
+#catalogModal button#closeCatalog::after,#ratingsModal button#closeRatings::after{
+  content:"×";font-size:25px;line-height:1;
+}
+#aboutModal>div{
+  max-width:480px!important;padding:32px 28px!important;
+  text-align:left!important;
+}
+#aboutModal button#closeAbout,#catalogDetailModal button#closeCatalogDetail{
+  width:38px!important;height:38px!important;
+  display:grid!important;place-items:center!important;
+  top:12px!important;right:12px!important;
+  border:1px solid #7dbfff55!important;border-radius:50%!important;
+  background:rgba(4,12,25,.9)!important;color:#eaf5ff!important;
+  font-size:25px!important;line-height:1!important;padding:0!important;
+}
+#catalogDetailModal>section{
+  max-width:480px!important;padding:22px!important;
+}
+#catalogDetailModal>section>div:first-of-type{
+  gap:16px!important;
+}
+#catalogDetailPoster,#catalogDetailPosterFallback{
+  border-radius:10px!important;border-color:#24466d!important;
+}
+#catalogDetailStatus,#catalogDetailProgress{
+  border-color:#24466d!important;border-radius:9px!important;
+}
+#catalogModal input,#ratingsModal input,#ratingsModal select{
+  border-color:#24466d!important;border-radius:10px!important;
+  background:#081426!important;color:#f4f8ff!important;
+}
+#catalogModal input:focus,#ratingsModal input:focus,#ratingsModal select:focus{
+  outline:2px solid #65bfff!important;outline-offset:2px;
+}
+#catalogModal .catalog-status-filters,#ratingsModal .public-ratings-categories{
+  gap:8px;
+}
+#catalogModal button,#ratingsModal button{
+  transition:border-color .18s ease,background .18s ease,transform .18s ease;
+}
+#catalogModal button:focus-visible,#ratingsModal button:focus-visible,#aboutModal button:focus-visible,#catalogDetailModal button:focus-visible{
+  outline:2px solid #65bfff;outline-offset:3px;
+}
+@media(max-width:600px){
+  #catalogModal,#ratingsModal{padding:9px!important}
+  #catalogModal>section,#ratingsModal>section{
+    max-height:94vh!important;padding:20px 14px!important;border-radius:16px!important;
+  }
+  #aboutModal{padding:12px!important}
+  #aboutModal>div{max-height:92vh!important;overflow:auto!important;padding:28px 20px!important;border-radius:16px!important}
+  #catalogDetailModal{padding:9px!important}
+  #catalogDetailModal>section{max-height:92vh!important;padding:18px 14px!important;border-radius:16px!important}
+}
+
 </style>
 
 <div id="contentDetailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
