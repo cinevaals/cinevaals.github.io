@@ -122,20 +122,19 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 
 
 <div id="catalogDetailModal" role="dialog" aria-modal="true" aria-labelledby="catalogDetailTitle" style="display:none;position:fixed;inset:0;z-index:10010;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:10px;">
-  <section style="position:relative;width:100%;max-width:410px;max-height:82vh;overflow:auto;padding:14px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #37618b;border-radius:13px;box-shadow:0 12px 36px #0009;color:#eaf5ff;">
-    <button type="button" id="closeCatalogDetail" aria-label="Fechar detalhes" style="position:absolute;top:4px;right:5px;border:0;background:transparent;color:#65bfff;font-size:24px;cursor:pointer;padding:3px 7px;line-height:1;">×</button>
-    <div style="display:grid;grid-template-columns:92px minmax(0,1fr);gap:13px;align-items:start;">
-      <img id="catalogDetailPoster" alt="" style="display:none;width:92px;aspect-ratio:2/3;object-fit:cover;background:#071326;border:1px solid #21466e;border-radius:8px;">
-      <div id="catalogDetailPosterFallback" style="display:flex;width:92px;aspect-ratio:2/3;align-items:center;justify-content:center;background:#071326;border:1px solid #21466e;border-radius:8px;color:#65bfff;font-size:30px;">🎬</div>
-      <div style="min-width:0;padding:5px 22px 0 0;">
-        <div style="color:#65bfff;font-size:10px;letter-spacing:1.3px;font-weight:700;margin-bottom:5px;">♡ PATROCINADOS</div>
-        <h2 id="catalogDetailTitle" style="margin:0 0 7px;color:#f2f8ff;font-size:clamp(17px,4vw,21px);line-height:1.25;overflow-wrap:anywhere;"></h2>
-        <div id="catalogDetailCategory" style="color:#a8d8ff;font-size:12px;margin-bottom:9px;"></div>
-        <div id="catalogDetailStatus" style="display:inline-flex;align-items:center;padding:5px 8px;border:1px solid #37618b;border-radius:20px;background:#0a1b30;color:#eaf5ff;font-size:11px;font-weight:600;"></div>
+  <section style="position:relative;width:100%;max-width:390px;overflow:auto;padding:12px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #37618b;border-radius:12px;box-shadow:0 12px 36px #0009;color:#eaf5ff;">
+    <button type="button" id="closeCatalogDetail" aria-label="Fechar detalhes" style="position:absolute;top:3px;right:4px;border:0;background:transparent;color:#65bfff;font-size:23px;cursor:pointer;padding:3px 7px;line-height:1;">×</button>
+    <div style="display:grid;grid-template-columns:88px minmax(0,1fr);gap:12px;align-items:start;">
+      <img id="catalogDetailPoster" alt="" style="display:none;width:88px;aspect-ratio:2/3;object-fit:cover;background:#071326;border:1px solid #21466e;border-radius:7px;">
+      <div id="catalogDetailPosterFallback" style="display:flex;width:88px;aspect-ratio:2/3;align-items:center;justify-content:center;background:#071326;border:1px solid #21466e;border-radius:7px;color:#65bfff;font-size:28px;">🎬</div>
+      <div style="min-width:0;padding:5px 20px 0 0;">
+        <div id="catalogDetailCategory" style="color:#65bfff;font-size:10px;letter-spacing:.5px;margin-bottom:5px;"></div>
+        <h2 id="catalogDetailTitle" style="margin:0 0 8px;color:#f2f8ff;font-size:clamp(16px,4vw,20px);line-height:1.25;overflow-wrap:anywhere;"></h2>
+        <div id="catalogDetailStatus" style="display:inline-flex;align-items:center;padding:5px 8px;border:1px solid #37618b;border-radius:7px;background:#0a1b30;color:#eaf5ff;font-size:11px;font-weight:600;"></div>
+        <div id="catalogDetailProgress" style="display:none;margin-top:9px;padding:7px 9px;border-left:2px solid #65bfff;border-radius:3px;background:#0a1b30;color:#bfe4ff;line-height:1.4;font-size:11px;"></div>
+        <p id="catalogDetailNote" style="display:none;margin:7px 0 0;color:#9fb8d4;font-size:10px;line-height:1.4;"></p>
       </div>
     </div>
-    <div id="catalogDetailProgress" style="display:none;margin-top:13px;padding:9px 11px;border-left:3px solid #65bfff;border-radius:5px;background:#0a1b30;color:#eaf5ff;line-height:1.45;font-size:12px;"></div>
-    <p id="catalogDetailNote" style="margin:8px 0 0;color:#9fb8d4;font-size:11px;line-height:1.45;"></p>
   </section>
 </div>
 
@@ -406,20 +405,24 @@ function openCatalogDetail(item){
   poster.alt='Capa de '+title;
   if(item.image){poster.src=item.image;}else{poster.removeAttribute('src');poster.style.display='none';fallback.style.display='flex';}
   document.getElementById('catalogDetailTitle').textContent=title;
-  document.getElementById('catalogDetailCategory').textContent=item.category||'Conteúdo';
+  document.getElementById('catalogDetailCategory').textContent=(item.category||'Conteúdo').toLocaleUpperCase('pt-BR');
   const statusLabel=status==='Em Andamento'?'⏳ Em andamento':status==='Na Fila'?'🔖 Na fila':status==='Já Assistido'?'✓ Já assistido':status==='Finalizado'?'🏁 Finalizado':status;
   document.getElementById('catalogDetailStatus').textContent=statusLabel;
   const progress=document.getElementById('catalogDetailProgress');
   const note=document.getElementById('catalogDetailNote');
   if(inProgress){
-    const parts=[item.season?String(item.season):'',item.episode?'Episódio '+String(item.episode):''].filter(Boolean);
+    const season= item.season ? (/temporada/i.test(String(item.season)) ? String(item.season) : 'Temporada '+String(item.season)) : '';
+    const episode= item.episode ? (/epis[oó]dio/i.test(String(item.episode)) ? String(item.episode) : 'Episódio '+String(item.episode)) : '';
+    const parts=[season,episode].filter(Boolean);
     progress.style.display='block';
-    progress.innerHTML='<strong>📺 Onde a Vaal parou</strong><br>'+ (parts.length?escapeHtml(parts.join(' · ')):'Temporada e episódio ainda não informados.');
-    note.textContent='Este é o ponto em que ela está na série no momento.';
+    progress.textContent=parts.length?parts.join(' - '):'Temporada e episódio ainda não informados.';
+    note.style.display='none';
+    note.textContent='';
   }else{
     progress.style.display='none';
     progress.textContent='';
-    note.textContent=status==='Finalizado'?'Conteúdo finalizado.':status==='Já Assistido'?'Filme já assistido.':status==='Na Fila'?'Conteúdo na fila para assistir.':'';
+    note.style.display='none';
+    note.textContent='';
   }
   catalogDetailModal.style.display='flex';
 }
