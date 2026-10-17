@@ -120,6 +120,24 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   </section>
 </div>
 
+
+<div id="catalogDetailModal" role="dialog" aria-modal="true" aria-labelledby="catalogDetailTitle" style="display:none;position:fixed;inset:0;z-index:10010;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:16px;">
+  <section style="position:relative;width:100%;max-width:620px;max-height:90vh;overflow:auto;padding:22px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #65bfff;border-radius:16px;box-shadow:0 0 28px #087bff44;color:#eaf5ff;">
+    <button type="button" id="closeCatalogDetail" aria-label="Fechar detalhes" style="position:absolute;top:8px;right:10px;border:0;background:transparent;color:#65bfff;font-size:28px;cursor:pointer;padding:4px 10px;">×</button>
+    <div style="display:grid;grid-template-columns:minmax(100px,170px) minmax(0,1fr);gap:20px;align-items:start;">
+      <img id="catalogDetailPoster" alt="" style="display:none;width:100%;aspect-ratio:2/3;object-fit:cover;background:#071326;border:1px solid #21466e;border-radius:10px;">
+      <div id="catalogDetailPosterFallback" style="display:flex;aspect-ratio:2/3;align-items:center;justify-content:center;background:#071326;border:1px solid #21466e;border-radius:10px;color:#65bfff;font-size:38px;">🎬</div>
+      <div style="min-width:0;padding-top:8px;">
+        <h2 id="catalogDetailTitle" style="margin:0 28px 12px 0;color:#65bfff;font-size:clamp(20px,4vw,28px);overflow-wrap:anywhere;"></h2>
+        <div id="catalogDetailCategory" style="color:#a8d8ff;font-size:13px;margin-bottom:12px;"></div>
+        <div id="catalogDetailStatus" style="display:inline-flex;align-items:center;padding:7px 10px;border:1px solid #37618b;border-radius:8px;background:#071326;color:#eaf5ff;font-size:13px;font-weight:600;"></div>
+        <div id="catalogDetailProgress" style="display:none;margin-top:14px;padding:12px;border:1px solid #24734b;border-radius:10px;background:#092a20;color:#b8f5d0;line-height:1.6;"></div>
+        <p id="catalogDetailNote" style="margin:12px 0 0;color:#c6d8ef;font-size:13px;line-height:1.6;"></p>
+      </div>
+    </div>
+  </section>
+</div>
+
 <div id="ratingsModal" style="display:none;position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,.84);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:16px;">
 <section role="dialog" aria-modal="true" aria-labelledby="ratingsTitle" style="position:relative;width:100%;max-width:1100px;max-height:92vh;overflow:auto;padding:24px 20px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #65bfff;border-radius:16px;box-shadow:0 0 24px #087bff55;color:#eaf5ff;">
 <button type="button" id="closeRatings" aria-label="Fechar avaliações" style="position:sticky;float:right;top:0;z-index:2;background:#102846;border:1px solid #65bfff;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;">✕ Fechar</button>
@@ -344,7 +362,7 @@ function renderCatalog(){
     const image=item.image?`<img class="catalog-cover" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
     const isInProgress=item.category!=='Filme'&&normalizedCatalogStatus(item.status)==='Em Andamento';
     const progress=isInProgress&&(item.season||item.episode)?`<div class="catalog-progress">${item.season?escapeHtml(item.season):''}${item.season&&item.episode?' · ':''}${item.episode?'Episódio '+escapeHtml(item.episode):''}</div>`:'';
-    return `<article class="catalog-card" aria-label="${escapeHtml(item.title||'Conteúdo')}" title="${escapeHtml(item.title||'Conteúdo')}">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div></article>`;
+    return `<article class="catalog-card" data-catalog-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Ver detalhes de ${escapeHtml(item.title||'Conteúdo')}" title="Clique para ver detalhes">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div></article>`;
   }).join('');
   catalogEmpty.textContent=catalogStatus==='Todos'?'Nenhum conteúdo encontrado nessa categoria.':`Nenhum conteúdo com status "${catalogStatus}" encontrado.`;
   catalogEmpty.style.display=filtered.length?'none':'block';
@@ -372,9 +390,58 @@ catalogCategoryFilters.addEventListener('click',e=>{
 });
 catalogStatusToggle.addEventListener('click',()=>{catalogStatusPanelOpen=!catalogStatusPanelOpen;renderCatalogStatusFilters();});
 catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('button[data-catalog-status]');if(!b)return;catalogStatus=catalogStatus===b.dataset.catalogStatus?'Todos':b.dataset.catalogStatus;catalogStatusPanelOpen=false;renderCatalog();});
+
+const catalogDetailModal=document.getElementById('catalogDetailModal');
+function closeCatalogDetail(){catalogDetailModal.style.display='none';}
+function openCatalogDetail(item){
+  if(!item)return;
+  const title=item.title||'Conteúdo';
+  const status=normalizedCatalogStatus(item.status);
+  const inProgress=item.category!=='Filme'&&status==='Em Andamento';
+  const poster=document.getElementById('catalogDetailPoster');
+  const fallback=document.getElementById('catalogDetailPosterFallback');
+  poster.onerror=()=>{poster.style.display='none';fallback.style.display='flex';};
+  poster.onload=()=>{poster.style.display='block';fallback.style.display='none';};
+  poster.alt='Capa de '+title;
+  if(item.image){poster.src=item.image;}else{poster.removeAttribute('src');poster.style.display='none';fallback.style.display='flex';}
+  document.getElementById('catalogDetailTitle').textContent=title;
+  document.getElementById('catalogDetailCategory').textContent=item.category||'Conteúdo';
+  const statusLabel=status==='Em Andamento'?'⏳ Em andamento':status==='Na Fila'?'🔖 Na fila':status==='Já Assistido'?'✓ Já assistido':status==='Finalizado'?'🏁 Finalizado':status;
+  document.getElementById('catalogDetailStatus').textContent=statusLabel;
+  const progress=document.getElementById('catalogDetailProgress');
+  const note=document.getElementById('catalogDetailNote');
+  if(inProgress){
+    const parts=[item.season?String(item.season):'',item.episode?'Episódio '+String(item.episode):''].filter(Boolean);
+    progress.style.display='block';
+    progress.innerHTML='<strong>📺 Onde a Vaal parou</strong><br>'+ (parts.length?escapeHtml(parts.join(' · ')):'Temporada e episódio ainda não informados.');
+    note.textContent='Este é o ponto em que ela está na série no momento.';
+  }else{
+    progress.style.display='none';
+    progress.textContent='';
+    note.textContent=status==='Finalizado'?'Conteúdo finalizado.':status==='Já Assistido'?'Filme já assistido.':status==='Na Fila'?'Conteúdo na fila para assistir.':'';
+  }
+  catalogDetailModal.style.display='flex';
+}
+catalogGrid.addEventListener('click',event=>{
+  const card=event.target.closest('[data-catalog-id]');
+  if(!card)return;
+  const item=catalogTitles.find(entry=>String(entry.id)===card.dataset.catalogId);
+  openCatalogDetail(item);
+});
+catalogGrid.addEventListener('keydown',event=>{
+  if(event.key!=='Enter'&&event.key!==' ')return;
+  const card=event.target.closest('[data-catalog-id]');
+  if(!card)return;
+  event.preventDefault();
+  const item=catalogTitles.find(entry=>String(entry.id)===card.dataset.catalogId);
+  openCatalogDetail(item);
+});
+document.getElementById('closeCatalogDetail').addEventListener('click',closeCatalogDetail);
+catalogDetailModal.addEventListener('click',event=>{if(event.target===catalogDetailModal)closeCatalogDetail();});
+
 document.getElementById('closeCatalog').addEventListener('click',()=>{catalogModal.style.display='none';});
 catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)catalogModal.style.display='none';});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){catalogModal.style.display='none';if(ratingsModal&&ratingsModal.style.display==='flex'){ratingsModal.style.display='none';document.body.style.overflow='';}}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){catalogModal.style.display='none';if(catalogDetailModal&&catalogDetailModal.style.display==='flex')closeCatalogDetail();if(ratingsModal&&ratingsModal.style.display==='flex'){ratingsModal.style.display='none';document.body.style.overflow='';}}});
 document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
 const aboutModal = document.getElementById('aboutModal');
 document.getElementById('aboutLink').addEventListener('click', () => {
