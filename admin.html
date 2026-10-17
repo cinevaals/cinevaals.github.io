@@ -29,9 +29,22 @@
     .editor-card{max-width:850px;margin:2vh auto 5vh;padding:22px;background:linear-gradient(180deg,#09172a,#060d19);border:1px solid #2c5f91;border-radius:14px;box-shadow:0 20px 70px #0009}
     .search-box{margin-bottom:16px;padding:14px;background:#071326;border:1px solid #21466e;border-radius:10px}.search-row{display:flex;gap:8px;align-items:stretch}.search-row input{min-width:0;flex:1}.search-row button{margin-top:6px;white-space:nowrap}
     .catalog-results{display:grid;gap:8px;margin-top:10px;max-height:42vh;overflow-y:auto}.catalog-result{display:flex;align-items:center;gap:10px;text-align:left;width:100%;background:#0b1c33;border:1px solid #21466e}.catalog-result img{width:42px;height:62px;object-fit:cover;border-radius:4px;background:#15243a;flex-shrink:0}.catalog-result span{display:block}.catalog-result .result-title{font-size:14px;color:#f4f7ff}.catalog-result .result-meta{font-size:11px;color:#9bc9f4;margin-top:4px}.catalog-message{font-size:13px;color:#9bc9f4;margin:10px 0 0}
+    .catalog-top-actions{display:flex;flex-direction:column;gap:9px;min-width:220px}
+    .catalog-admin-filters{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 10px}
+    .catalog-admin-filter{background:linear-gradient(180deg,#0b1c33,#071225);border:1px solid #204b79;color:#dceeff;border-radius:10px;padding:9px 13px;font-size:12px;cursor:pointer;white-space:nowrap}
+    .catalog-admin-filter:hover{border-color:#4cb5ff}
+    .catalog-admin-filter.active{background:linear-gradient(135deg,#1454d9,#087bdc);border-color:#4db8ff;color:white;box-shadow:0 0 15px #087bdb35}
+    .catalog-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-top:14px}
+    .catalog-admin-card{display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #204b79;border-radius:12px;background:linear-gradient(180deg,#0b1b30,#071326);height:100%}
+    .catalog-admin-card img,.catalog-admin-poster{display:flex;width:100%;aspect-ratio:2/3;flex:0 0 auto;object-fit:contain;align-items:center;justify-content:center;background:#050b16;color:#65bfff;font-size:36px}
+    .catalog-admin-card h3{font-size:13px;line-height:1.35;text-align:center;margin:0;padding:10px 9px 6px;min-height:3.55em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+    .catalog-admin-meta{padding:0 9px 8px;text-align:center;color:#a8d8ff;font-size:11px;line-height:1.4}
+    .catalog-admin-status-pill{align-self:center;margin:0 8px 8px;padding:5px 8px;border:1px solid #204b79;border-radius:999px;background:#102846;color:#cde8ff;font-size:10px;font-weight:700;text-align:center}
+    .catalog-admin-card-actions{display:flex;gap:6px;flex-wrap:wrap;padding:0 8px 10px;margin-top:auto;justify-content:center}
+    .catalog-admin-card-actions button{font-size:11px;padding:7px 9px}
     #status{overflow-wrap:anywhere;color:#65bfff;min-height:1.2em;margin:14px 0 0}.hidden{display:none!important}
     @media(max-width:700px){#editor{padding:12px}.editor-card{margin:0 auto 20px;padding:15px}.search-row{flex-direction:column}.search-row button{margin-top:0}.catalog-results{max-height:38vh}}
-    @media(max-width:700px){main{padding:20px 12px 30px}header{margin:0 -12px 20px;padding:8px 12px}h1{font-size:20px}.days{grid-template-columns:repeat(7,minmax(155px,1fr));min-width:1160px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.week-controls{display:flex;gap:7px}.week-controls>#prev-week,.week-controls>#next-week{order:0}.week-center{order:0;flex-direction:column;gap:8px}.week-controls button{font-size:.78rem;padding:9px 8px}.week-title{min-width:0}.toolbar{align-items:flex-start}}
+    @media(max-width:700px){.catalog-top-actions{width:100%;min-width:0}.catalog-admin-grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}#catalog-library,#catalog-manager{padding:10px!important}.catalog-admin-card-actions button{padding:7px 6px}main{padding:20px 12px 30px}header{margin:0 -12px 20px;padding:8px 12px}h1{font-size:20px}.days{grid-template-columns:repeat(7,minmax(155px,1fr));min-width:1160px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.week-controls{display:flex;gap:7px}.week-controls>#prev-week,.week-controls>#next-week{order:0}.week-center{order:0;flex-direction:column;gap:8px}.week-controls button{font-size:.78rem;padding:9px 8px}.week-title{min-width:0}.toolbar{align-items:flex-start}}
   </style>
 </head>
 <body>
@@ -53,7 +66,7 @@
   <section id="admin-area">
     <div class="toolbar">
       <div><h2 style="margin-bottom:5px">✧ Cronograma Semanal</h2><p class="subtitle" style="margin-bottom:0">Gerencie a programação do CineVaals por aqui.</p></div>
-      <button id="new-content" class="primary" type="button">＋ Adicionar Catálogo</button>
+      <div class="catalog-top-actions"><button id="new-content" class="primary" type="button">＋ Adicionar Catálogo</button><button id="open-catalog-library" class="secondary" type="button">▦ Catálogo Cadastrado</button></div>
     </div>
     <div class="week-controls">
       <button id="prev-week" class="secondary" type="button">← Semana anterior</button>
@@ -79,10 +92,17 @@
           </div>
           <div class="toolbar" style="margin-top:15px;justify-content:flex-start"><button id="save-catalog-item" class="primary" type="submit">Salvar no catálogo</button><button id="cancel-catalog-item" class="secondary" type="button">Limpar formulário</button></div>
         </form>
-        <hr style="border-color:#19385b;margin:24px 0">
-        <div class="toolbar"><h3 style="margin:0">Títulos cadastrados</h3><input id="catalog-admin-search" type="search" placeholder="Buscar título..." style="max-width:320px;margin-top:0"></div>
         <p id="catalog-admin-status" class="subtitle" role="status"></p>
-        <div id="catalog-admin-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:14px"></div>
+      </div>
+    </section>
+    <section id="catalog-library" class="hidden" aria-modal="true" role="dialog" aria-labelledby="catalog-library-title" style="position:fixed;inset:0;z-index:1050;overflow-y:auto;padding:20px;background:rgba(1,5,13,.88);backdrop-filter:blur(5px)">
+      <div class="editor-card" style="max-width:1100px">
+        <div class="toolbar"><div><h2 id="catalog-library-title">▦ Catálogo Cadastrado</h2><p class="subtitle">Filtre por categoria e status para atualizar seu progresso.</p></div><button id="close-catalog-library" class="secondary" type="button">Fechar</button></div>
+        <div id="catalog-category-filters" class="catalog-admin-filters" aria-label="Filtrar por categoria"></div>
+        <div id="catalog-status-filters" class="catalog-admin-filters" aria-label="Filtrar por status"></div>
+        <div class="toolbar" style="margin-top:12px"><input id="catalog-admin-search" type="search" placeholder="Buscar título..." style="max-width:420px;margin-top:0"></div>
+        <p id="catalog-library-status" class="subtitle" role="status"></p>
+        <div id="catalog-admin-list" class="catalog-admin-grid"></div>
       </div>
     </section>
     <section id="editor" class="hidden" aria-modal="true" role="dialog" aria-labelledby="editor-title">
@@ -448,28 +468,70 @@
     else if(isFinished){$('catalog-item-season').value='Todas as temporadas';$('catalog-item-episode').value='';}
     else if(!isWatching){$('catalog-item-episode').value='';}
   }
+  let catalogCategoryFilter='Todos';
+  let catalogStatusFilter='Todos';
+  let catalogReturnToLibrary=false;
+  const catalogCategoryOptions=[['Todos','✨ Todos'],['Filme','🎬 Filmes'],['Série','📺 Séries'],['Animação','🐰 Animações'],['Dorama','💗 Doramas'],['Anime','⛩️ Animes']];
+  function normalizedAdminCatalogStatus(value){return value==='Assistindo'?'Em Andamento':value==='Está na Fila'?'Na Fila':(value||'Na Fila');}
   function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
+  function renderCatalogCategoryFilters(){
+    $('catalog-category-filters').innerHTML=catalogCategoryOptions.map(([value,label])=>`<button type="button" class="catalog-admin-filter${catalogCategoryFilter===value?' active':''}" data-catalog-category-filter="${value}">${label}</button>`).join('');
+  }
+  function renderCatalogStatusFilters(){
+    const options=catalogCategoryFilter==='Todos'?['Todos','Em Andamento','Na Fila','Já Assistido','Finalizado']:catalogCategoryFilter==='Filme'?['Todos','Na Fila','Já Assistido']:['Todos','Em Andamento','Na Fila','Finalizado'];
+    const labels={'Todos':'✨ Todos','Em Andamento':'⏳ Em Andamento','Na Fila':'🔖 Na Fila','Já Assistido':'✓ Já Assistido','Finalizado':'🏁 Finalizado'};
+    $('catalog-status-filters').innerHTML=options.map(value=>`<button type="button" class="catalog-admin-filter${catalogStatusFilter===value?' active':''}" data-catalog-status-filter="${value}">${labels[value]}</button>`).join('');
+  }
   function renderCatalogAdmin(){
     const term=$('catalog-admin-search').value.trim().toLocaleLowerCase('pt-BR');
-    const list=catalogItems.filter(item=>String(item.title||'').toLocaleLowerCase('pt-BR').includes(term));
-    $('catalog-admin-list').innerHTML=list.map(item=>`<article style="display:flex;gap:10px;padding:10px;border:1px solid #19385b;border-radius:9px;background:#071326;min-width:0">${item.image?`<img src="${escapeHtml(item.image)}" alt="" style="width:54px;height:80px;object-fit:cover;border-radius:5px" onerror="this.style.display='none'">`:''}<div style="min-width:0;flex:1"><strong style="display:block;overflow-wrap:anywhere">${escapeHtml(item.title)}</strong><small style="display:block;color:#9bc9f4;margin:5px 0">${escapeHtml(item.category)}</small><span style="${item.status==='Em Andamento'?'color:#d8b4fe;background:#2e1065;border-color:#9333ea':['Já Assistido','Finalizado'].includes(item.status)?'color:#bbf7d0;background:#052e16;border-color:#15803d':'color:#bfdbfe;background:#172554;border-color:#2563eb'};display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border:1px solid;border-radius:999px;font-size:11px;font-weight:700">${item.status==='Em Andamento'?'⏳':item.status==='Finalizado'?'🏁':item.status==='Já Assistido'?'✓':'🔖'} ${item.status==='Em Andamento'?'Em Andamento':item.status==='Finalizado'?'Finalizado':item.status==='Já Assistido'?'Assistido':'Na fila'}</span><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px"><button type="button" class="small" data-catalog-edit="${item.id}">Editar</button><button type="button" class="small danger" data-catalog-delete="${item.id}">Excluir</button></div></div></article>`).join('')||'<p class="subtitle">Nenhum título encontrado.</p>';
+    const list=catalogItems.filter(item=>(catalogCategoryFilter==='Todos'||item.category===catalogCategoryFilter)&&(catalogStatusFilter==='Todos'||normalizedAdminCatalogStatus(item.status)===catalogStatusFilter)&&String(item.title||'').toLocaleLowerCase('pt-BR').includes(term));
+    $('catalog-admin-list').innerHTML=list.map(item=>{
+      const category=item.category||'';
+      const inProgress=['Série','Animação','Dorama','Anime'].includes(category)&&normalizedAdminCatalogStatus(item.status)==='Em Andamento';
+      const progress=inProgress?[item.season,item.episode?'Episódio '+item.episode:''].filter(Boolean).join(' · '):'';
+      const statusValue=normalizedAdminCatalogStatus(item.status);
+      const statusLabel=statusValue==='Já Assistido'?'✓ Já Assistido':statusValue==='Finalizado'?'🏁 Finalizado':statusValue==='Em Andamento'?'⏳ Em Andamento':'🔖 Na Fila';
+      const statusClass=statusValue==='Em Andamento'?'border-color:#4382bd;background:#102846;color:#b8e0ff':statusValue==='Finalizado'||statusValue==='Já Assistido'?'border-color:#24734b;background:#092a20;color:#b8f5d0':'border-color:#204b79;background:#102846;color:#cde8ff';
+      const image=item.image?`<img src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
+      return `<article class="catalog-admin-card">${image}<div class="catalog-admin-poster" style="${item.image?'display:none;':''}">🎬</div><h3>${escapeHtml(item.title||'Sem título')}</h3><div class="catalog-admin-meta">${escapeHtml(category)}${progress?'<br>'+escapeHtml(progress):''}</div><span class="catalog-admin-status-pill" style="${statusClass}">${statusLabel}</span><div class="catalog-admin-card-actions"><button type="button" data-catalog-edit="${escapeHtml(item.id)}">Editar</button><button type="button" class="danger" data-catalog-delete="${escapeHtml(item.id)}">Excluir</button></div></article>`;
+    }).join('')||'<p class="subtitle">Nenhum conteúdo encontrado nessa categoria e status.</p>';
+    renderCatalogCategoryFilters();renderCatalogStatusFilters();
+    $('catalog-library-status').textContent=`${list.length} de ${catalogItems.length} título(s) exibido(s).`;
   }
   async function loadCatalogAdmin(){
+    $('catalog-library-status').textContent='Carregando catálogo...';
     $('catalog-admin-status').textContent='Carregando catálogo...';
     const {data,error}=await supabase.from('catalog').select('*').order('sort_order',{ascending:true}).order('title',{ascending:true});
-    if(error){$('catalog-admin-status').textContent='Erro ao carregar catálogo: '+error.message;return;}
+    if(error){$('catalog-library-status').textContent='Erro ao carregar catálogo: '+error.message;$('catalog-admin-status').textContent='Erro ao carregar catálogo: '+error.message;return;}
     catalogItems=data||[];renderCatalogAdmin();$('catalog-admin-status').textContent=`${catalogItems.length} título(s) no catálogo.`;
   }
   async function openCatalogManager(){
+    catalogReturnToLibrary=false;
     $('catalog-manager').classList.remove('hidden');
     resetCatalogForm();
+    $('catalog-manager-title').textContent='✧ Adicionar Catálogo';
     $('catalog-manager-query').value='';
     $('catalog-manager-results').innerHTML='';
     $('catalog-manager-results').dataset.results='[]';
-    await loadCatalogAdmin();
+    $('catalog-admin-status').textContent='';
     $('catalog-manager-query').focus();
   }
+  async function openCatalogLibrary(){
+    catalogCategoryFilter='Todos';catalogStatusFilter='Todos';
+    $('catalog-admin-search').value='';
+    $('catalog-library').classList.remove('hidden');
+    await loadCatalogAdmin();
+  }
   $('new-content').addEventListener('click',openCatalogManager);
+  $('open-catalog-library').addEventListener('click',openCatalogLibrary);
+  $('catalog-category-filters').addEventListener('click',event=>{
+    const button=event.target.closest('[data-catalog-category-filter]');if(!button)return;
+    catalogCategoryFilter=button.dataset.catalogCategoryFilter;catalogStatusFilter='Todos';renderCatalogAdmin();
+  });
+  $('catalog-status-filters').addEventListener('click',event=>{
+    const button=event.target.closest('[data-catalog-status-filter]');if(!button)return;
+    catalogStatusFilter=button.dataset.catalogStatusFilter;renderCatalogAdmin();
+  });
   $('catalog-item-category').addEventListener('change',updateCatalogSeasonField);
   $('catalog-item-status').addEventListener('change',()=>{
     updateCatalogSeasonField();
@@ -530,7 +592,11 @@
     $('catalog-item-title').focus();
   });
 
-  $('close-catalog-manager').addEventListener('click',()=>$('catalog-manager').classList.add('hidden'));
+  $('close-catalog-manager').addEventListener('click',()=>{
+    $('catalog-manager').classList.add('hidden');
+    if(catalogReturnToLibrary){catalogReturnToLibrary=false;$('catalog-library').classList.remove('hidden');}
+  });
+  $('close-catalog-library').addEventListener('click',()=>$('catalog-library').classList.add('hidden'));
   $('cancel-catalog-item').addEventListener('click',resetCatalogForm);
   $('catalog-admin-search').addEventListener('input',renderCatalogAdmin);
   populateCatalogProgressOptions();
@@ -540,12 +606,26 @@
     const result=editingCatalogId?await supabase.from('catalog').update(item).eq('id',editingCatalogId):await supabase.from('catalog').insert(item);
     $('save-catalog-item').disabled=false;
     if(result.error){$('catalog-admin-status').textContent='Erro ao salvar: '+result.error.message;return;}
+    const wasEditing=Boolean(editingCatalogId);
     resetCatalogForm();await loadCatalogAdmin();$('catalog-admin-status').textContent='Título salvo com sucesso. '+catalogItems.length+' título(s) no catálogo.';
+    if(catalogReturnToLibrary){$('catalog-manager').classList.add('hidden');catalogReturnToLibrary=false;$('catalog-library').classList.remove('hidden');}
+    else if(wasEditing){$('catalog-manager-title').textContent='✧ Adicionar Catálogo';}
   });
   $('catalog-admin-list').addEventListener('click',async event=>{
     const edit=event.target.closest('[data-catalog-edit]'),del=event.target.closest('[data-catalog-delete]');
-    if(edit){const item=catalogItems.find(x=>String(x.id)===edit.dataset.catalogEdit);if(!item)return;editingCatalogId=item.id;$('catalog-id').value=item.id;$('catalog-item-title').value=item.title||'';$('catalog-item-category').value=item.category||'Filme';$('catalog-item-status').value=item.status||'Está na Fila';$('catalog-item-image').value=item.image||'';$('catalog-item-description').value=item.description||'';$('catalog-item-season').value=item.season||'';$('catalog-item-episode').value=item.episode||'';updateCatalogSeasonField();$('save-catalog-item').textContent='Salvar alterações';$('catalog-item-title').focus();return;}
-    if(del){const item=catalogItems.find(x=>String(x.id)===del.dataset.catalogDelete);if(!item||!confirm(`Excluir "${item.title}" do catálogo? Isso não altera o cronograma.`))return;const {error}=await supabase.from('catalog').delete().eq('id',item.id);if(error){$('catalog-admin-status').textContent='Erro ao excluir: '+error.message;return;}await loadCatalogAdmin();$('catalog-admin-status').textContent='Título excluído do catálogo.';}
+    if(edit){
+      const item=catalogItems.find(x=>String(x.id)===edit.dataset.catalogEdit);if(!item)return;
+      catalogReturnToLibrary=true;$('catalog-library').classList.add('hidden');$('catalog-manager').classList.remove('hidden');
+      resetCatalogForm();editingCatalogId=item.id;$('catalog-id').value=item.id;$('catalog-item-title').value=item.title||'';$('catalog-item-category').value=item.category||'Filme';$('catalog-item-status').value=normalizedAdminCatalogStatus(item.status);$('catalog-item-image').value=item.image||'';$('catalog-item-description').value=item.description||'';$('catalog-item-season').value=item.season||'';$('catalog-item-episode').value=item.episode||'';updateCatalogSeasonField();
+      if(['Já Assistido','Finalizado'].includes($('catalog-item-status').value)&&$('catalog-item-category').value!=='Filme')$('catalog-item-season').value='Todas as temporadas';
+      $('catalog-manager-title').textContent='✧ Editar Conteúdo do Catálogo';$('save-catalog-item').textContent='Salvar alterações';$('catalog-item-title').focus();return;
+    }
+    if(del){
+      const item=catalogItems.find(x=>String(x.id)===del.dataset.catalogDelete);if(!item||!confirm(`Excluir "${item.title}" do catálogo? Isso não altera o cronograma.`))return;
+      const {error}=await supabase.from('catalog').delete().eq('id',item.id);
+      if(error){$('catalog-library-status').textContent='Erro ao excluir: '+error.message;return;}
+      await loadCatalogAdmin();$('catalog-library-status').textContent='Título excluído do catálogo.';
+    }
   });
 
   $('cancel-edit').addEventListener('click',closeEditor);
