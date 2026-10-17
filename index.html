@@ -568,7 +568,7 @@ function renderCatalogProgressTag(entry){
   if(!entry||entry.category==='Filme'||normalizedCatalogStatus(entry.status)!=='Em Andamento'||(!entry.season&&!entry.episode))return '';
   const season=entry.season?(/temporada/i.test(String(entry.season))?String(entry.season):'Temporada '+String(entry.season)):'';
   const episode=entry.episode?(/epis[oó]dio/i.test(String(entry.episode))?String(entry.episode):'Episódio '+String(entry.episode)):'';
-  return '<span class="detail-tag">'+escapeHtml([season,episode].filter(Boolean).join(' · '))+'</span>';
+  return '<span class="detail-tag">'+escapeHtml('Progresso: '+[season,episode].filter(Boolean).join(' - '))+'</span>';
 }
 function catalogDetailsFor(item){
   const normalize=value=>String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
