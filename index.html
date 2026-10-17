@@ -294,13 +294,13 @@ function renderCatalogStatusFilters(){
   const statuses=catalogCategory==='Todos'
     ? ['Em Andamento','Na Fila','Já Assistido','Finalizado']
     : (catalogStatusesByCategory[catalogCategory]||[]);
-  const options=['Todos',...statuses];
+  const options=statuses;
   catalogStatusFilters.style.display=catalogStatusPanelOpen?'flex':'none';
   catalogStatusToggle.setAttribute('aria-expanded',String(catalogStatusPanelOpen));
   catalogStatusToggle.textContent=catalogStatus==='Todos'?'☷ Filtrar':`☷ ${catalogStatus}`;
   catalogStatusToggle.style.borderColor=catalogStatus==='Todos'?'#37618b':'#65bfff';
   catalogStatusToggle.style.color=catalogStatus==='Todos'?'#eaf5ff':'#65bfff';
-  catalogStatusFilters.innerHTML=options.map(status=>`<button type="button" class="catalog-status-filter${catalogStatus===status?' active':''}" data-catalog-status="${status}">${status==='Todos'?'✨ Todos':status==='Em Andamento'?'⏳ Em Andamento':status==='Na Fila'?'🔖 Na Fila':status==='Já Assistido'?'✓ Já Assistido':'🏁 Finalizado'}</button>`).join('');
+  catalogStatusFilters.innerHTML=options.map(status=>`<button type="button" class="catalog-status-filter${catalogStatus===status?' active':''}" data-catalog-status="${status}">${status==='Em Andamento'?'⏳ Em Andamento':status==='Na Fila'?'🔖 Na Fila':status==='Já Assistido'?'✓ Já Assistido':'🏁 Finalizado'}</button>`).join('');
 }
 async function loadCatalog(){
   const {data,error}=await supabaseClient.from('catalog').select('id,title,category,status,season,episode,image,description,sort_order').order('sort_order',{ascending:true}).order('title',{ascending:true});
@@ -371,7 +371,7 @@ catalogCategoryFilters.addEventListener('click',e=>{
   renderCatalog();
 });
 catalogStatusToggle.addEventListener('click',()=>{catalogStatusPanelOpen=!catalogStatusPanelOpen;renderCatalogStatusFilters();});
-catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('button[data-catalog-status]');if(!b)return;catalogStatus=b.dataset.catalogStatus;catalogStatusPanelOpen=false;renderCatalog();});
+catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('button[data-catalog-status]');if(!b)return;catalogStatus=catalogStatus===b.dataset.catalogStatus?'Todos':b.dataset.catalogStatus;catalogStatusPanelOpen=false;renderCatalog();});
 document.getElementById('closeCatalog').addEventListener('click',()=>{catalogModal.style.display='none';});
 catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)catalogModal.style.display='none';});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){catalogModal.style.display='none';if(ratingsModal&&ratingsModal.style.display==='flex'){ratingsModal.style.display='none';document.body.style.overflow='';}}});
