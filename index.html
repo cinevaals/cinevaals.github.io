@@ -107,11 +107,14 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
     <button type="button" id="closeCatalog" aria-label="Fechar catálogo" style="position:sticky;float:right;top:0;z-index:2;background:#102846;border:1px solid #65bfff;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;">✕ Fechar</button>
     <h2 id="catalogTitle" style="margin:0 100px 16px 0;color:#65bfff;">♡ Patrocinados</h2>
     <div id="catalogCategoryFilters" class="catalog-status-filters" aria-label="Filtrar por categoria" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;"></div>
-    <div id="catalogStatusFilters" class="catalog-status-filters" aria-label="Filtrar por status" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px;"></div>
-    <label for="catalogSearch" style="display:block;margin-bottom:12px;">
-      <span style="display:block;margin-bottom:6px;">🔎 Pesquisar pelo título</span>
-      <input id="catalogSearch" type="search" placeholder="Digite o título..." aria-label="Pesquisar pelo título" style="width:100%;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #37618b;background:#071326;color:#fff;font:inherit;">
-    </label>
+    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin:0 0 12px;">
+      <label for="catalogSearch" style="display:block;flex:1 1 220px;min-width:0;margin:0;">
+        <span style="display:block;margin-bottom:6px;">🔎 Pesquisar pelo título</span>
+        <input id="catalogSearch" type="search" placeholder="Digite o título..." aria-label="Pesquisar pelo título" style="width:100%;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #37618b;background:#071326;color:#fff;font:inherit;">
+      </label>
+      <button type="button" id="catalogStatusToggle" aria-controls="catalogStatusFilters" aria-expanded="false" style="padding:12px 15px;border-radius:10px;border:1px solid #37618b;background:#071326;color:#eaf5ff;font:inherit;cursor:pointer;white-space:nowrap;">☷ Filtrar</button>
+    </div>
+    <div id="catalogStatusFilters" class="catalog-status-filters" aria-label="Filtrar por status" style="display:none;gap:8px;flex-wrap:wrap;margin:0 0 14px;padding:12px;border:1px solid #24496d;border-radius:10px;background:#091a2e;"></div>
     <div id="catalogGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:14px;"></div>
     <p id="catalogEmpty" style="display:none;text-align:center;color:#c6d8ef;padding:24px 0;">Nenhum conteúdo encontrado nessa categoria.</p>
   </section>
@@ -259,8 +262,10 @@ const catalogGrid=document.getElementById('catalogGrid');
 const catalogEmpty=document.getElementById('catalogEmpty');
 const catalogCategoryFilters=document.getElementById('catalogCategoryFilters');
 const catalogStatusFilters=document.getElementById('catalogStatusFilters');
+const catalogStatusToggle=document.getElementById('catalogStatusToggle');
 let catalogCategory='Todos';
 let catalogStatus='Todos';
+let catalogStatusPanelOpen=false;
 let catalogTitles=[];
 let contentRatings=[];
 let publicRatingCategory='Todos';
@@ -290,7 +295,11 @@ function renderCatalogStatusFilters(){
     ? ['Em Andamento','Na Fila','Já Assistido','Finalizado']
     : (catalogStatusesByCategory[catalogCategory]||[]);
   const options=['Todos',...statuses];
-  catalogStatusFilters.style.display='flex';
+  catalogStatusFilters.style.display=catalogStatusPanelOpen?'flex':'none';
+  catalogStatusToggle.setAttribute('aria-expanded',String(catalogStatusPanelOpen));
+  catalogStatusToggle.textContent=catalogStatus==='Todos'?'☷ Filtrar':`☷ ${catalogStatus}`;
+  catalogStatusToggle.style.borderColor=catalogStatus==='Todos'?'#37618b':'#65bfff';
+  catalogStatusToggle.style.color=catalogStatus==='Todos'?'#eaf5ff':'#65bfff';
   catalogStatusFilters.innerHTML=options.map(status=>`<button type="button" class="catalog-status-filter${catalogStatus===status?' active':''}" data-catalog-status="${status}">${status==='Todos'?'✨ Todos':status==='Em Andamento'?'⏳ Em Andamento':status==='Na Fila'?'🔖 Na Fila':status==='Já Assistido'?'✓ Já Assistido':'🏁 Finalizado'}</button>`).join('');
 }
 async function loadCatalog(){
@@ -345,6 +354,7 @@ function renderCatalog(){
 function openCatalog(category){
   catalogCategory=category;
   catalogStatus='Todos';
+  catalogStatusPanelOpen=false;
   catalogTitle.textContent='♡ Patrocinados';
   catalogSearch.value='';
   renderCatalog();
@@ -360,7 +370,8 @@ catalogCategoryFilters.addEventListener('click',e=>{
   catalogStatus='Todos';
   renderCatalog();
 });
-catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('button[data-catalog-status]');if(!b)return;catalogStatus=b.dataset.catalogStatus;renderCatalog();});
+catalogStatusToggle.addEventListener('click',()=>{catalogStatusPanelOpen=!catalogStatusPanelOpen;renderCatalogStatusFilters();});
+catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('button[data-catalog-status]');if(!b)return;catalogStatus=b.dataset.catalogStatus;catalogStatusPanelOpen=false;renderCatalog();});
 document.getElementById('closeCatalog').addEventListener('click',()=>{catalogModal.style.display='none';});
 catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)catalogModal.style.display='none';});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){catalogModal.style.display='none';if(ratingsModal&&ratingsModal.style.display==='flex'){ratingsModal.style.display='none';document.body.style.overflow='';}}});
