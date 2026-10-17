@@ -121,20 +121,21 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 </div>
 
 
-<div id="catalogDetailModal" role="dialog" aria-modal="true" aria-labelledby="catalogDetailTitle" style="display:none;position:fixed;inset:0;z-index:10010;background:rgba(0,0,0,.82);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:16px;">
-  <section style="position:relative;width:100%;max-width:620px;max-height:90vh;overflow:auto;padding:22px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #65bfff;border-radius:16px;box-shadow:0 0 28px #087bff44;color:#eaf5ff;">
-    <button type="button" id="closeCatalogDetail" aria-label="Fechar detalhes" style="position:absolute;top:8px;right:10px;border:0;background:transparent;color:#65bfff;font-size:28px;cursor:pointer;padding:4px 10px;">×</button>
-    <div style="display:grid;grid-template-columns:minmax(100px,170px) minmax(0,1fr);gap:20px;align-items:start;">
-      <img id="catalogDetailPoster" alt="" style="display:none;width:100%;aspect-ratio:2/3;object-fit:cover;background:#071326;border:1px solid #21466e;border-radius:10px;">
-      <div id="catalogDetailPosterFallback" style="display:flex;aspect-ratio:2/3;align-items:center;justify-content:center;background:#071326;border:1px solid #21466e;border-radius:10px;color:#65bfff;font-size:38px;">🎬</div>
-      <div style="min-width:0;padding-top:8px;">
-        <h2 id="catalogDetailTitle" style="margin:0 28px 12px 0;color:#65bfff;font-size:clamp(20px,4vw,28px);overflow-wrap:anywhere;"></h2>
-        <div id="catalogDetailCategory" style="color:#a8d8ff;font-size:13px;margin-bottom:12px;"></div>
-        <div id="catalogDetailStatus" style="display:inline-flex;align-items:center;padding:7px 10px;border:1px solid #37618b;border-radius:8px;background:#071326;color:#eaf5ff;font-size:13px;font-weight:600;"></div>
-        <div id="catalogDetailProgress" style="display:none;margin-top:14px;padding:12px;border:1px solid #24734b;border-radius:10px;background:#092a20;color:#b8f5d0;line-height:1.6;"></div>
-        <p id="catalogDetailNote" style="margin:12px 0 0;color:#c6d8ef;font-size:13px;line-height:1.6;"></p>
+<div id="catalogDetailModal" role="dialog" aria-modal="true" aria-labelledby="catalogDetailTitle" style="display:none;position:fixed;inset:0;z-index:10010;background:rgba(0,0,0,.78);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:10px;">
+  <section style="position:relative;width:100%;max-width:410px;max-height:82vh;overflow:auto;padding:14px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #37618b;border-radius:13px;box-shadow:0 12px 36px #0009;color:#eaf5ff;">
+    <button type="button" id="closeCatalogDetail" aria-label="Fechar detalhes" style="position:absolute;top:4px;right:5px;border:0;background:transparent;color:#65bfff;font-size:24px;cursor:pointer;padding:3px 7px;line-height:1;">×</button>
+    <div style="display:grid;grid-template-columns:92px minmax(0,1fr);gap:13px;align-items:start;">
+      <img id="catalogDetailPoster" alt="" style="display:none;width:92px;aspect-ratio:2/3;object-fit:cover;background:#071326;border:1px solid #21466e;border-radius:8px;">
+      <div id="catalogDetailPosterFallback" style="display:flex;width:92px;aspect-ratio:2/3;align-items:center;justify-content:center;background:#071326;border:1px solid #21466e;border-radius:8px;color:#65bfff;font-size:30px;">🎬</div>
+      <div style="min-width:0;padding:5px 22px 0 0;">
+        <div style="color:#65bfff;font-size:10px;letter-spacing:1.3px;font-weight:700;margin-bottom:5px;">♡ PATROCINADOS</div>
+        <h2 id="catalogDetailTitle" style="margin:0 0 7px;color:#f2f8ff;font-size:clamp(17px,4vw,21px);line-height:1.25;overflow-wrap:anywhere;"></h2>
+        <div id="catalogDetailCategory" style="color:#a8d8ff;font-size:12px;margin-bottom:9px;"></div>
+        <div id="catalogDetailStatus" style="display:inline-flex;align-items:center;padding:5px 8px;border:1px solid #37618b;border-radius:20px;background:#0a1b30;color:#eaf5ff;font-size:11px;font-weight:600;"></div>
       </div>
     </div>
+    <div id="catalogDetailProgress" style="display:none;margin-top:13px;padding:9px 11px;border-left:3px solid #65bfff;border-radius:5px;background:#0a1b30;color:#eaf5ff;line-height:1.45;font-size:12px;"></div>
+    <p id="catalogDetailNote" style="margin:8px 0 0;color:#9fb8d4;font-size:11px;line-height:1.45;"></p>
   </section>
 </div>
 
