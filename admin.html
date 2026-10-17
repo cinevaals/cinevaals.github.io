@@ -66,7 +66,7 @@
   <section id="admin-area">
     <div class="toolbar">
       <div><h2 style="margin-bottom:5px">✧ Cronograma Semanal</h2><p class="subtitle" style="margin-bottom:0">Gerencie a programação do CineVaals por aqui.</p></div>
-      <div class="catalog-top-actions"><button id="new-content" class="secondary" type="button">＋ Adicionar Catálogo</button><button id="open-catalog-library" class="secondary" type="button">▦ Catálogo Cadastrado</button></div>
+      <div class="catalog-top-actions"><button id="new-content" class="secondary" type="button">＋ Adicionar Catálogo</button><button id="open-catalog-library" class="secondary" type="button">▦ Gerenciar Catálogo</button></div>
     </div>
     <div class="week-controls">
       <button id="prev-week" class="secondary" type="button">← Semana anterior</button>
@@ -97,7 +97,7 @@
     </section>
     <section id="catalog-library" class="hidden" aria-modal="true" role="dialog" aria-labelledby="catalog-library-title" style="position:fixed;inset:0;z-index:1050;overflow-y:auto;padding:20px;background:rgba(1,5,13,.88);backdrop-filter:blur(5px)">
       <div class="editor-card" style="max-width:1100px">
-        <div class="toolbar"><div><h2 id="catalog-library-title">▦ Catálogo Cadastrado</h2><p class="subtitle">Filtre por categoria e status para atualizar seu progresso.</p></div><button id="close-catalog-library" class="secondary" type="button">Fechar</button></div>
+        <div class="toolbar"><div><h2 id="catalog-library-title">▦ Gerenciar Catálogo</h2><p class="subtitle">Filtre por categoria e status para atualizar seu progresso.</p></div><button id="close-catalog-library" class="secondary" type="button">Fechar</button></div>
         <div id="catalog-category-filters" class="catalog-admin-filters" aria-label="Filtrar por categoria"></div>
         <div id="catalog-status-filters" class="catalog-admin-filters" aria-label="Filtrar por status"></div>
         <div class="toolbar" style="margin-top:12px"><input id="catalog-admin-search" type="search" placeholder="Buscar título..." style="max-width:420px;margin-top:0"></div>
@@ -471,15 +471,15 @@
   let catalogCategoryFilter='Todos';
   let catalogStatusFilter='Todos';
   let catalogReturnToLibrary=false;
-  const catalogCategoryOptions=[['Todos','✨ Todos'],['Filme','🎬 Filmes'],['Série','📺 Séries'],['Animação','🐰 Animações'],['Dorama','💗 Doramas'],['Anime','⛩️ Animes']];
+  const catalogCategoryOptions=[['Filme','🎬 Filmes'],['Série','📺 Séries'],['Animação','🐰 Animações'],['Dorama','💗 Doramas'],['Anime','⛩️ Animes']];
   function normalizedAdminCatalogStatus(value){return value==='Assistindo'?'Em Andamento':value==='Está na Fila'?'Na Fila':(value||'Na Fila');}
   function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
   function renderCatalogCategoryFilters(){
     $('catalog-category-filters').innerHTML=catalogCategoryOptions.map(([value,label])=>`<button type="button" class="catalog-admin-filter${catalogCategoryFilter===value?' active':''}" data-catalog-category-filter="${value}">${label}</button>`).join('');
   }
   function renderCatalogStatusFilters(){
-    const options=catalogCategoryFilter==='Todos'?['Todos','Em Andamento','Na Fila','Já Assistido','Finalizado']:catalogCategoryFilter==='Filme'?['Todos','Na Fila','Já Assistido']:['Todos','Em Andamento','Na Fila','Finalizado'];
-    const labels={'Todos':'✨ Todos','Em Andamento':'⏳ Em Andamento','Na Fila':'🔖 Na Fila','Já Assistido':'✓ Já Assistido','Finalizado':'🏁 Finalizado'};
+    const options=catalogCategoryFilter==='Todos'?['Em Andamento','Na Fila','Já Assistido','Finalizado']:catalogCategoryFilter==='Filme'?['Na Fila','Já Assistido']:['Em Andamento','Na Fila','Finalizado'];
+    const labels={'Em Andamento':'⏳ Em Andamento','Na Fila':'🔖 Na Fila','Já Assistido':'✓ Já Assistido','Finalizado':'🏁 Finalizado'};
     $('catalog-status-filters').innerHTML=options.map(value=>`<button type="button" class="catalog-admin-filter${catalogStatusFilter===value?' active':''}" data-catalog-status-filter="${value}">${labels[value]}</button>`).join('');
   }
   function renderCatalogAdmin(){
@@ -526,11 +526,11 @@
   $('open-catalog-library').addEventListener('click',openCatalogLibrary);
   $('catalog-category-filters').addEventListener('click',event=>{
     const button=event.target.closest('[data-catalog-category-filter]');if(!button)return;
-    catalogCategoryFilter=button.dataset.catalogCategoryFilter;catalogStatusFilter='Todos';renderCatalogAdmin();
+    const selected=button.dataset.catalogCategoryFilter;catalogCategoryFilter=catalogCategoryFilter===selected?'Todos':selected;catalogStatusFilter='Todos';renderCatalogAdmin();
   });
   $('catalog-status-filters').addEventListener('click',event=>{
     const button=event.target.closest('[data-catalog-status-filter]');if(!button)return;
-    catalogStatusFilter=button.dataset.catalogStatusFilter;renderCatalogAdmin();
+    const selected=button.dataset.catalogStatusFilter;catalogStatusFilter=catalogStatusFilter===selected?'Todos':selected;renderCatalogAdmin();
   });
   $('catalog-item-category').addEventListener('change',updateCatalogSeasonField);
   $('catalog-item-status').addEventListener('change',()=>{
