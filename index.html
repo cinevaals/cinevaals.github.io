@@ -95,6 +95,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   <section role="dialog" aria-modal="true" aria-labelledby="catalogTitle" style="position:relative;width:100%;max-width:1000px;max-height:90vh;overflow:auto;padding:26px 20px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #65bfff;border-radius:16px;box-shadow:0 0 24px #087bff55;color:#eaf5ff;">
     <button type="button" id="closeCatalog" aria-label="Fechar catálogo" style="position:sticky;float:right;top:0;z-index:2;background:#102846;border:1px solid #65bfff;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;">✕ Fechar</button>
     <h2 id="catalogTitle" style="margin:0 100px 16px 0;color:#65bfff;">Catálogo</h2>
+    <div id="catalogStatusFilters" class="catalog-status-filters" aria-label="Filtrar por status" style="display:none;gap:8px;flex-wrap:wrap;margin:0 0 14px;"></div>
     <label for="catalogSearch" style="display:block;margin-bottom:12px;">
       <span style="display:block;margin-bottom:6px;">🔎 Pesquisar pelo título</span>
       <input id="catalogSearch" type="search" placeholder="Digite o título..." aria-label="Pesquisar pelo título" style="width:100%;box-sizing:border-box;padding:12px;border-radius:10px;border:1px solid #37618b;background:#071326;color:#fff;font:inherit;">
@@ -104,6 +105,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   </section>
 </div>
 <style>
+  .catalog-status-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}.catalog-status-filter{background:linear-gradient(180deg,#0b1c33,#071225);border:1px solid #204b79;color:#dceeff;border-radius:10px;padding:9px 12px;font-size:12px;cursor:pointer;white-space:nowrap}.catalog-status-filter:hover{border-color:#4cb5ff}.catalog-status-filter.active{background:linear-gradient(135deg,#1454d9,#087bdc);border-color:#4db8ff;color:white;box-shadow:0 0 15px #087bdb35}
   .catalog-card{overflow:hidden;border:1px solid #204b79;border-radius:12px;background:#09172a;}
   .catalog-card img,.catalog-poster{display:flex;width:100%;aspect-ratio:2/3;object-fit:cover;align-items:center;justify-content:center;background:#102846;color:#65bfff;font-size:42px;}
   .catalog-card h3{font-size:14px;line-height:1.4;margin:0;padding:10px;color:#eaf5ff;overflow-wrap:anywhere;}
@@ -216,8 +218,25 @@ const catalogTitle=document.getElementById('catalogTitle');
 const catalogSearch=document.getElementById('catalogSearch');
 const catalogGrid=document.getElementById('catalogGrid');
 const catalogEmpty=document.getElementById('catalogEmpty');
+const catalogStatusFilters=document.getElementById('catalogStatusFilters');
 let catalogCategory='Todos';
+let catalogStatus='Todos';
 let catalogTitles=[];
+const catalogStatusesByCategory={
+  Filme:['Já Assistido','Na Fila'],
+  Série:['Em Andamento','Na Fila','Finalizado'],
+  Dorama:['Em Andamento','Na Fila','Finalizado'],
+  Anime:['Em Andamento','Na Fila','Finalizado'],
+  Animação:['Em Andamento','Na Fila','Finalizado']
+};
+function normalizedCatalogStatus(status){return status==='Assistindo'?'Em Andamento':status==='Está na Fila'?'Na Fila':(status||'Na Fila');}
+function renderCatalogStatusFilters(){
+  const statuses=catalogStatusesByCategory[catalogCategory];
+  if(!statuses){catalogStatusFilters.style.display='none';catalogStatusFilters.innerHTML='';return;}
+  catalogStatusFilters.style.display='flex';
+  const options=['Todos',...statuses];
+  catalogStatusFilters.innerHTML=options.map(status=>`<button type="button" class="catalog-status-filter${catalogStatus===status?' active':''}" data-catalog-status="${status}">${status==='Todos'?'✨ Todos':status==='Em Andamento'?'⏳ Em Andamento':status==='Na Fila'?'🔖 Na Fila':status==='Já Assistido'?'✓ Já Assistido':'🏁 Finalizado'}</button>`).join('');
+}
 async function loadCatalog(){
   const {data,error}=await supabaseClient.from('catalog').select('id,title,category,status,season,episode,image,description,sort_order').order('sort_order',{ascending:true}).order('title',{ascending:true});
   if(error){console.error('Erro ao carregar catálogo:',error);catalogTitles=[];if(catalogModal&&catalogModal.style.display==='flex')renderCatalog();return;}
@@ -226,18 +245,20 @@ async function loadCatalog(){
 }
 function renderCatalog(){
   const term=catalogSearch.value.trim().toLocaleLowerCase('pt-BR');
-  const filtered=catalogTitles.filter(item=>(catalogCategory==='Todos'||item.category===catalogCategory)&&String(item.title||'').toLocaleLowerCase('pt-BR').includes(term));
+  const filtered=catalogTitles.filter(item=>(catalogCategory==='Todos'||item.category===catalogCategory)&&(catalogStatus==='Todos'||normalizedCatalogStatus(item.status)===catalogStatus)&&String(item.title||'').toLocaleLowerCase('pt-BR').includes(term));
   catalogGrid.innerHTML=filtered.map(item=>{
     const image=item.image?`<img src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:'';
-    const rawStatus=item.status==='Assistindo'?'Em Andamento':(item.status||'Está na Fila'); const statusInfo=rawStatus==='Em Andamento'?{label:'Em Andamento',icon:'⏳',color:'#fed7aa',bg:'#431407',border:'#f97316'}:rawStatus==='Finalizado'?{label:'Finalizado',icon:'🏁',color:'#bbf7d0',bg:'#052e16',border:'#15803d'}:rawStatus==='Já Assistido'?{label:'Já Assistido',icon:'✓',color:'#bbf7d0',bg:'#052e16',border:'#15803d'}:{label:'Na Fila',icon:'🔖',color:'#bfdbfe',bg:'#172554',border:'#2563eb'};
-    const season=item.category!=='Filme'&&item.season?`<p style="margin:5px 8px 0;color:#a8d8ff;font-size:12px;text-align:center">${escapeHtml(item.season)}${item.status==='Em Andamento'&&item.episode?' · Episódio '+escapeHtml(item.episode):''}</p>`:'';
-    return `<article class="catalog-card">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><h3>${escapeHtml(item.title||'Sem título')}</h3><p class="catalog-status" style="margin:7px 0 0;padding:5px 8px;border:1px solid ${statusInfo.border};border-radius:999px;color:${statusInfo.color};font-size:12px;text-align:center;background:${statusInfo.bg};font-weight:700">${statusInfo.icon} ${statusInfo.label}</p>${season}</article>`;
+    const season=item.category!=='Filme'&&item.season?`<p style="margin:5px 8px 8px;color:#a8d8ff;font-size:12px;text-align:center">${escapeHtml(item.season)}${normalizedCatalogStatus(item.status)==='Em Andamento'&&item.episode?' · Episódio '+escapeHtml(item.episode):''}</p>`:'';
+    return `<article class="catalog-card">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><h3>${escapeHtml(item.title||'Sem título')}</h3>${season}</article>`;
   }).join('');
+  catalogEmpty.textContent=catalogStatus==='Todos'?'Nenhum conteúdo encontrado nessa categoria.':`Nenhum conteúdo com status "${catalogStatus}" encontrado.`;
   catalogEmpty.style.display=filtered.length?'none':'block';
+  renderCatalogStatusFilters();
 }
 function openCatalog(category){
   catalogCategory=category;
-  catalogTitle.textContent=category==='Todos'?'✨ Todos os conteúdos':({Filme:'🎬 Filmes',Série:'📺 Séries',Animação:'🐰 Animações',Dorama:'💗 Doramas',Anime:'⛩️ Animes'}[category]||category);
+  catalogStatus='Todos';
+  catalogTitle.textContent=category==='Todos'?'✨ Todos os conteúdos':({Filme:'🎬 Filmes',Série:'📺 Séries',Animação:'🎨 Animações',Dorama:'💗 Doramas',Anime:'⛩️ Animes'}[category]||category);
   catalogSearch.value='';
   renderCatalog();
   catalogModal.style.display='flex';
@@ -245,6 +266,7 @@ function openCatalog(category){
 }
 document.getElementById('filters').addEventListener('click',e=>{const b=e.target.closest('button[data-filter]');if(b)openCatalog(b.dataset.filter);});
 catalogSearch.addEventListener('input',renderCatalog);
+catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('button[data-catalog-status]');if(!b)return;catalogStatus=b.dataset.catalogStatus;renderCatalog();});
 document.getElementById('closeCatalog').addEventListener('click',()=>{catalogModal.style.display='none';});
 catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)catalogModal.style.display='none';});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')catalogModal.style.display='none';});
