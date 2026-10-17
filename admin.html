@@ -35,13 +35,13 @@
     .catalog-admin-filter:hover{border-color:#4cb5ff}
     .catalog-admin-filter.active{background:linear-gradient(135deg,#1454d9,#087bdc);border-color:#4db8ff;color:white;box-shadow:0 0 15px #087bdb35}
     .catalog-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-top:14px}
-    .catalog-admin-card{display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #204b79;border-radius:12px;background:linear-gradient(180deg,#0b1b30,#071326);height:100%}
-    .catalog-admin-card img,.catalog-admin-poster{display:flex;width:100%;aspect-ratio:2/3;flex:0 0 auto;object-fit:contain;align-items:center;justify-content:center;background:#050b16;color:#65bfff;font-size:36px}
-    .catalog-admin-card h3{font-size:13px;line-height:1.35;text-align:center;margin:0;padding:10px 9px 6px;min-height:3.55em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
-    .catalog-admin-meta{padding:0 9px 8px;text-align:center;color:#a8d8ff;font-size:11px;line-height:1.4}
-    .catalog-admin-status-pill{align-self:center;margin:0 8px 8px;padding:5px 8px;border:1px solid #204b79;border-radius:999px;background:#102846;color:#cde8ff;font-size:10px;font-weight:700;text-align:center}
-    .catalog-admin-card-actions{display:flex;gap:6px;flex-wrap:wrap;padding:0 8px 10px;margin-top:auto;justify-content:center}
-    .catalog-admin-card-actions button{font-size:11px;padding:7px 9px}
+    .catalog-admin-card{position:relative;display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #204b79;border-radius:12px;background:#050b16;height:100%;aspect-ratio:2/3}
+    .catalog-admin-card img,.catalog-admin-poster{display:flex;width:100%;height:100%;aspect-ratio:2/3;flex:1 1 auto;object-fit:cover;align-items:center;justify-content:center;background:#050b16;color:#65bfff;font-size:36px}
+    .catalog-admin-card h3,.catalog-admin-meta,.catalog-admin-status-pill{display:none}
+    .catalog-admin-card-actions{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:wrap;padding:44px 8px 12px;margin:0;background:linear-gradient(180deg,transparent 35%,rgba(3,9,20,.86));opacity:0;transition:opacity .18s ease}
+    .catalog-admin-card:hover .catalog-admin-card-actions,.catalog-admin-card:focus-within .catalog-admin-card-actions{opacity:1}
+    .catalog-admin-card-actions button{font-size:11px;padding:8px 10px;box-shadow:0 2px 8px #0008}
+    @media(max-width:700px){.catalog-admin-card-actions{opacity:1;padding:34px 5px 8px;gap:5px}.catalog-admin-card-actions button{font-size:10px;padding:7px 8px}}
     #status{overflow-wrap:anywhere;color:#65bfff;min-height:1.2em;margin:14px 0 0}.hidden{display:none!important}
     @media(max-width:700px){#editor{padding:12px}.editor-card{margin:0 auto 20px;padding:15px}.search-row{flex-direction:column}.search-row button{margin-top:0}.catalog-results{max-height:38vh}}
     @media(max-width:700px){.catalog-top-actions{width:100%;min-width:0}.catalog-admin-grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px}#catalog-library,#catalog-manager{padding:10px!important}.catalog-admin-card-actions button{padding:7px 6px}main{padding:20px 12px 30px}header{margin:0 -12px 20px;padding:8px 12px}h1{font-size:20px}.days{grid-template-columns:repeat(7,minmax(155px,1fr));min-width:1160px}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.week-controls{display:flex;gap:7px}.week-controls>#prev-week,.week-controls>#next-week{order:0}.week-center{order:0;flex-direction:column;gap:8px}.week-controls button{font-size:.78rem;padding:9px 8px}.week-title{min-width:0}.toolbar{align-items:flex-start}}
