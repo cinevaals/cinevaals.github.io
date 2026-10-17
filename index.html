@@ -574,7 +574,7 @@ async function openContentDetails(item){
   const title=item.title||'Sem título';
   const $detail=id=>document.getElementById(id);
   const hero=$detail('detailHero');
-  hero.style.backgroundImage=item.image? 'linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("'+String(item.image).replace(/["\\]/g,'')+'")' : 'linear-gradient(180deg,rgba(5,11,22,.08),#050b16),radial-gradient(ellipse at 50% 20%,#16416a,#07101f 75%)';
+  hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.08),rgba(5,11,22,.18) 45%,#050b16 100%),radial-gradient(ellipse at 50% 20%,#16416a,#07101f 75%)';
   $detail('detailTitle').textContent=title;
   const catalogEntry=catalogDetailsFor(item);
   $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,'',item.date?String(item.date).slice(0,4):'');
