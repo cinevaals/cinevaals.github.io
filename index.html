@@ -80,6 +80,56 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 }
 
 
+
+/* Identidade visual das janelas: alinhada aos detalhes do cronograma */
+#catalogModal,#ratingsModal,#aboutModal{
+  background:rgba(0,0,0,.76);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+#catalogModal>section,#ratingsModal>section,#aboutModal>div{
+  background:#050b16;
+  border:1px solid #24466d;
+  border-radius:20px;
+  box-shadow:0 24px 90px #000b,0 0 35px #087bff20;
+  color:#eaf5ff;
+}
+#catalogModal h2,#ratingsModal h2,#aboutModal h2{
+  color:#f4f8ff!important;
+  letter-spacing:-.35px;
+}
+#catalogModal #closeCatalog,#ratingsModal #closeRatings{
+  width:38px;
+  height:38px;
+  padding:0;
+  border:1px solid #7dbfff55;
+  border-radius:50%;
+  background:rgba(4,12,25,.82);
+  color:#eaf5ff;
+  font-size:0;
+  display:grid;
+  place-items:center;
+}
+#catalogModal #closeCatalog::after,#ratingsModal #closeRatings::after{
+  content:"×";
+  font-size:26px;
+  line-height:1;
+}
+#catalogModal input,#catalogModal select,#ratingsModal input,#ratingsModal select{
+  border-color:#24466d;
+  border-radius:10px;
+  background:#081426;
+  color:#eaf5ff;
+}
+#catalogModal input:focus,#catalogModal select:focus,#ratingsModal input:focus,#ratingsModal select:focus{
+  outline:2px solid #65bfff66;
+  outline-offset:1px;
+}
+@media(max-width:600px){
+  #catalogModal,#ratingsModal,#aboutModal{padding:9px}
+  #catalogModal>section,#ratingsModal>section{max-height:94vh;padding:20px 14px}
+}
+
 /* Ajustes responsivos: cabeçalho, banner e cronograma */
 .banner{background-size:cover;background-position:center 48%}
 .nav-inner{width:100%;min-width:0;flex-wrap:wrap;justify-content:center;gap:8px 12px}
