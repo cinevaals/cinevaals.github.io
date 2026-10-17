@@ -585,6 +585,10 @@ async function openContentDetails(item){
     if(error)throw error;
     const d=data?.details||data;
     if(!d||!d.id)throw new Error('Detalhes não encontrados');
+    const alternateBackdrop=d.images?.backdrops?.find(image=>image.file_path)?.file_path||d.backdrop_path;
+    const alternatePoster=d.images?.posters?.find(image=>image.file_path&&image.file_path!==d.poster_path)?.file_path;
+    const heroImage=alternateBackdrop||alternatePoster;
+    if(heroImage)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+heroImage+'")';
     const isTv=Boolean(d.name||d.number_of_seasons!==undefined);
     const runtime=isTv?(Array.isArray(d.episode_run_time)&&d.episode_run_time.length?d.episode_run_time[0]+' min por episódio':'Não informado'):(d.runtime?d.runtime+' min':'Não informado');
     const seasons=isTv?d.number_of_seasons:'';
