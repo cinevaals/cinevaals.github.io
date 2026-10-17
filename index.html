@@ -217,7 +217,7 @@ function shortDate(d){return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'
 function longDate(d){return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long'});}
 let weekStart=mondayOf(new Date());
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function normalizeCatalogTitle(value){return String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]/g,'');}
+function normalizeCatalogTitle(value){return String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');}
 function formatRating(value){return Number(value).toLocaleString('pt-BR',{minimumFractionDigits:Number(value)%1?1:0,maximumFractionDigits:1});}
 function ratingStarsDisplay(value){const n=Number(value)||0;return '<span class="rating-display-stars" aria-label="'+formatRating(n)+' de 10">'+Array.from({length:10},(_,i)=>'<span class="rating-display-star '+(n>=i+1?'full':n>=i+.5?'half':'empty')+'">★</span>').join('')+'</span>';}
 function episodeCountFromDescription(description=''){const match=String(description).match(/^Episódios para assistir: (\d+)$/);return match?match[1]:'';}
