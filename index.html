@@ -172,6 +172,9 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 .poster-trigger{position:absolute;inset:0;display:block;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:pointer;text-align:inherit;border-radius:8px;line-height:0}
 .poster-trigger:focus-visible{outline:2px solid #65bfff;outline-offset:3px}
 .poster-hover-title{position:absolute;right:0;bottom:0;left:0;z-index:2;padding:24px 8px 9px;background:linear-gradient(transparent,rgba(0,0,0,.9));color:#fff;font-size:13px;font-weight:700;line-height:1.3;text-align:center;overflow-wrap:anywhere;opacity:0;transition:opacity .2s;pointer-events:none}
+.catalog-hover-title,.public-rating-hover-title{position:absolute;right:0;bottom:0;left:0;z-index:3;padding:24px 8px 9px;background:linear-gradient(transparent,rgba(0,0,0,.9));color:#fff;font-size:13px;font-weight:700;line-height:1.3;text-align:center;overflow-wrap:anywhere;opacity:0;transition:opacity .2s;pointer-events:none}
+@media(hover:hover) and (pointer:fine){.catalog-card:hover .catalog-hover-title,.public-rating-card:hover .public-rating-hover-title{opacity:1}}
+@media(hover:none),(pointer:coarse){.catalog-hover-title,.public-rating-hover-title{display:none}}
 @media(hover:hover) and (pointer:fine){.poster-trigger:hover .poster-hover-title{opacity:1}}
 @media(hover:none),(pointer:coarse){.poster-hover-title{display:none}}
 .poster-trigger:focus-visible{outline:2px solid #65bfff;outline-offset:3px}.public-catalog-progress{position:absolute;z-index:4;margin:0;padding:4px 6px;text-align:center;border:1px solid #24734b;border-radius:7px;background:rgba(9,42,32,.95);color:#b8f5d0;font-size:11px;font-weight:800;box-shadow:0 2px 8px #0008;pointer-events:none;left:5px;right:5px;bottom:5px}.public-episode-count+.public-catalog-progress{bottom:5px}.event{display:block;padding:0;background:transparent;border:0;border-radius:0;min-width:0;transition:transform .15s}
@@ -435,7 +438,7 @@ function renderPublicRatings(){
  let filtered=rated.filter(({item})=>(publicRatingCategory==='Todos'||item.category===publicRatingCategory)&&String(item.title||'').toLocaleLowerCase('pt-BR').includes(query));
  const sort=publicRatingsSort.value;
  filtered.sort((a,b)=>{const difference=Number(a.rating.rating)-Number(b.rating.rating);return (sort==='rating-asc'?difference:-difference)||String(a.item.title||'').localeCompare(String(b.item.title||''),'pt-BR');});
- publicRatingsGrid.innerHTML=filtered.map(({item,rating})=>{const cover=item.image?'<img class="public-rating-cover" src="'+escapeHtml(item.image)+'" alt="Capa de '+escapeHtml(item.title)+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'';return '<article class="public-rating-card"><div class="public-rating-cover-wrap">'+cover+'<div class="public-rating-fallback" style="'+(item.image?'display:none;':'')+'">🎬</div><div class="public-rating-badge" aria-label="Avaliação '+formatRating(rating.rating)+' de 10">★ '+formatRating(rating.rating)+'</div></div></article>';}).join('');
+ publicRatingsGrid.innerHTML=filtered.map(({item,rating})=>{const cover=item.image?'<img class="public-rating-cover" src="'+escapeHtml(item.image)+'" alt="Capa de '+escapeHtml(item.title)+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">':'';return '<article class="public-rating-card"><div class="public-rating-cover-wrap">'+cover+'<div class="public-rating-fallback" style="'+(item.image?'display:none;':'')+'">🎬</div><div class="public-rating-badge" aria-label="Avaliação '+formatRating(rating.rating)+' de 10">★ '+formatRating(rating.rating)+'</div></div><div class="public-rating-hover-title">' + escapeHtml(item.title||'') + '</div></article>';}).join('');
  publicRatingsEmpty.style.display=filtered.length?'none':'block';publicRatingsEmpty.textContent=rated.length?'Nenhuma avaliação corresponde à sua pesquisa.':'Ainda não há avaliações publicadas.';
 }
 async function loadContentRatings(){
@@ -458,7 +461,7 @@ function renderCatalog(){
     const progress=isInProgress&&(item.season||item.episode)?`<div class="catalog-progress">${item.season?escapeHtml(item.season):''}${item.season&&item.episode?' · ':''}${item.episode?'Episódio '+escapeHtml(item.episode):''}</div>`:'';
     const count=episodeCountFromDescription(item.description);
     const episodeBadge=count?`<div class="catalog-episode-count">${escapeHtml(count)} ${Number(count)===1?'EP':'EPS'}</div>`:'';
-    return `<article class="catalog-card" data-catalog-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Ver detalhes de ${escapeHtml(item.title||'Conteúdo')}" title="Clique para ver detalhes">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div>${episodeBadge}</article>`;
+    return `<article class="catalog-card" data-catalog-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Ver detalhes de ${escapeHtml(item.title||'Conteúdo')}" title="Clique para ver detalhes">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><div class="catalog-hover-title">${escapeHtml(item.title||'')}</div>${episodeBadge}</article>`;
   }).join('');
   catalogEmpty.textContent=catalogStatus==='Todos'?'Nenhum conteúdo encontrado nessa categoria.':`Nenhum conteúdo com status "${catalogStatus}" encontrado.`;
   catalogEmpty.style.display=filtered.length?'none':'block';
