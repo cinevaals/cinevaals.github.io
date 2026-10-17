@@ -558,11 +558,11 @@ function renderDetailGenres(genres){
 }
 function renderDetailTags(category,status,certification,year){
   const tags=[];
-  if(category)tags.push(['Categoria',category]);
-  if(['Série','Dorama','Anime','Animação'].includes(category)&&status)tags.push(['Status',normalizedCatalogStatus(status)]);
-  if(certification)tags.push(['Classificação',certification]);
-  if(year)tags.push(['Lançamento',String(year)]);
-  return tags.map(([label,value])=>'<span class="detail-tag">'+escapeHtml(label+': '+value)+'</span>').join('');
+  if(category)tags.push(category);
+  if(['Série','Dorama','Anime','Animação'].includes(category)&&status)tags.push(normalizedCatalogStatus(status));
+  if(certification)tags.push(String(certification));
+  if(year)tags.push(String(year));
+  return tags.map(value=>'<span class="detail-tag">'+escapeHtml(value)+'</span>').join('');
 }
 function renderCatalogProgressTag(entry){
   if(!entry||entry.category==='Filme'||normalizedCatalogStatus(entry.status)!=='Em Andamento'||(!entry.season&&!entry.episode))return '';
