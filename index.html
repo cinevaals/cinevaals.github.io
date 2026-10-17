@@ -461,7 +461,7 @@ function renderCatalog(){
     const progress=isInProgress&&(item.season||item.episode)?`<div class="catalog-progress">${item.season?escapeHtml(item.season):''}${item.season&&item.episode?' · ':''}${item.episode?'Episódio '+escapeHtml(item.episode):''}</div>`:'';
     const count=episodeCountFromDescription(item.description);
     const episodeBadge=count?`<div class="catalog-episode-count">${escapeHtml(count)} ${Number(count)===1?'EP':'EPS'}</div>`:'';
-    return `<article class="catalog-card" data-catalog-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Ver detalhes de ${escapeHtml(item.title||'Conteúdo')}" title="Clique para ver detalhes">${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><div class="catalog-hover-title">${escapeHtml(item.title||'')}</div>${episodeBadge}</article>`;
+    return `<article class="catalog-card" data-catalog-id="${escapeHtml(item.id)}" role="button" tabindex="0" aria-label="Ver detalhes de ${escapeHtml(item.title||'Conteúdo')}" >${image}<div class="catalog-poster" style="${item.image?'display:none;':''}">🎬</div><div class="catalog-hover-title">${escapeHtml(item.title||'')}</div>${episodeBadge}</article>`;
   }).join('');
   catalogEmpty.textContent=catalogStatus==='Todos'?'Nenhum conteúdo encontrado nessa categoria.':`Nenhum conteúdo com status "${catalogStatus}" encontrado.`;
   catalogEmpty.style.display=filtered.length?'none':'block';
