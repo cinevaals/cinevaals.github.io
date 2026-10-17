@@ -61,7 +61,7 @@ serve(async (req) => {
 
     const detailsUrl = new URL(`https://api.themoviedb.org/3/${type}/${best.id}`);
     detailsUrl.searchParams.set("language", "pt-BR");
-    detailsUrl.searchParams.set("append_to_response", "credits,images");
+    detailsUrl.searchParams.set("append_to_response", type === "movie" ? "credits,images,release_dates" : "credits,images,content_ratings");
     detailsUrl.searchParams.set("include_image_language", "pt-BR,en,null");
     const detailResponse = await tmdbFetch(detailsUrl);
     if (!detailResponse.ok) throw new Error(`Falha ao carregar detalhes TMDB (${detailResponse.status}).`);
