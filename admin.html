@@ -499,13 +499,22 @@
   let catalogStatusFilterPanelOpen=false;
   const catalogCategoryOptions=[['Filme','🎬 Filmes'],['Série','📺 Séries'],['Animação','🐰 Animações'],['Dorama','💗 Doramas'],['Anime','⛩️ Animes']];
   function normalizedAdminCatalogStatus(value){return value==='Assistindo'?'Em Andamento':value==='Está na Fila'?'Na Fila':(value||'Na Fila');}
-  function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('catalog-item-backdrop').value='';$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent='';$('catalog-backdrop-picker').classList.add('hidden');$('catalog-tv-editor').classList.add('hidden');catalogTvData=null;catalogTvDataLoaded=false;catalogTvDataCustom=false;$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
+  function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('catalog-item-backdrop').value='';$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-options').classList.add('hidden');$('catalog-backdrop-search').textContent='Selecionar imagem de fundo';$('catalog-backdrop-status').textContent='';$('catalog-backdrop-picker').classList.add('hidden');$('catalog-tv-editor').classList.add('hidden');catalogTvData=null;catalogTvDataLoaded=false;catalogTvDataCustom=false;$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
   function splitCatalogDescription(value){const match=String(value||'').match(/\s*\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/);return {description:cleanCatalogDescription(value),backdrop:match?.[1]||'',tvData:parseCatalogTvData(value)};}
   function renderBackdropOptions(images){
     const box=$('catalog-backdrop-options'),selected=$('catalog-item-backdrop').value;
     box.innerHTML=images.map((path,index)=>'<button type="button" data-backdrop-path="'+escapeHtml(path)+'" aria-pressed="'+(path===selected?'true':'false')+'" style="padding:5px;border:2px solid '+(path===selected?'#65bfff':'transparent')+';background:#071326;border-radius:8px;cursor:pointer"><img src="https://image.tmdb.org/t/p/w300'+escapeHtml(path)+'" alt="Imagem de fundo '+(index+1)+'" loading="lazy" style="display:block;width:100%;max-width:240px;aspect-ratio:16/9;object-fit:cover;border-radius:5px"></button>').join('');
   }
   async function loadCatalogBackdrops(){
+    const options=$('catalog-backdrop-options');
+    // Se as imagens já foram carregadas, o botão apenas mostra/oculta a lista.
+    if(options.children.length){
+      const shouldShow=options.classList.contains('hidden');
+      options.classList.toggle('hidden',!shouldShow);
+      $('catalog-backdrop-status').textContent=shouldShow?'Escolha uma imagem para ver a prévia.':'Lista de imagens ocultada.';
+      $('catalog-backdrop-search').textContent=shouldShow?'Ocultar imagens':'Selecionar imagem de fundo';
+      return;
+    }
     const title=$('catalog-item-title').value.trim(),category=$('catalog-item-category').value;
     if(!title||!category){$('catalog-backdrop-status').textContent='Escolha primeiro o título e a categoria.';return;}
     $('catalog-backdrop-search').disabled=true;$('catalog-backdrop-status').textContent='Buscando imagens no TMDB...';
@@ -517,7 +526,9 @@
       if(d?.backdrop_path&&!images.includes(d.backdrop_path))images.unshift(d.backdrop_path);
       if(!images.length)throw new Error('O TMDB não retornou imagens de fundo para este título.');
       renderBackdropOptions(images.slice(0,24));
-      $('catalog-backdrop-status').textContent='';
+      options.classList.remove('hidden');
+      $('catalog-backdrop-search').textContent='Ocultar imagens';
+      $('catalog-backdrop-status').textContent='Escolha uma imagem para ver a prévia.';
     }catch(error){$('catalog-backdrop-status').textContent=error.message||'Não foi possível carregar as imagens.';}
     finally{$('catalog-backdrop-search').disabled=false;}
   }
