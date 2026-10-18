@@ -371,6 +371,7 @@ async function loadContents() {
   if (data && data.length > 0) {
     titles = data;
     render();
+    prefetchScheduleDetails();
     if (catalogModal && catalogModal.style.display === 'flex') renderCatalog();
   } else {
     console.log('A tabela contents está vazia. Mantendo os exemplos.');
@@ -649,6 +650,23 @@ function fetchContentDetails(item){
 function prefetchContentDetails(item){
   if(!item)return;
   fetchContentDetails(item).catch(()=>{});
+}
+function prefetchScheduleDetails(){
+  const seen=new Set();
+  const queue=titles.filter(item=>{
+    const key=contentDetailsKey(item);
+    if(seen.has(key))return false;
+    seen.add(key);
+    return true;
+  });
+  let nextIndex=0;
+  const worker=async()=>{
+    while(nextIndex<queue.length){
+      const item=queue[nextIndex++];
+      try{await fetchContentDetails(item);}catch(error){console.warn('Pré-carregamento dos detalhes não concluído:',item.title,error);}
+    }
+  };
+  Promise.all(Array.from({length:Math.min(3,queue.length)},()=>worker())).catch(()=>{});
 }
 function renderLoadedContentDetails(item,catalogEntry,d,fallbackDescription,selectedBackdrop){
   const $detail=id=>document.getElementById(id);
