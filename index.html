@@ -706,7 +706,8 @@ async function openContentDetails(item){
   renderSeasonProgress(item,catalogEntry);
   const selectedBackdrop=String(catalogEntry?.description||'').match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
   if(selectedBackdrop)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+selectedBackdrop+'")';
-  const scheduleDescription=/^Episódios para assistir: \d+$/.test(String(item.description||''))?'':(item.description||'');
+  const cleanScheduleDescription=String(item.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]+\]\]/g,'').trim();
+  const scheduleDescription=/^Episódios para assistir: \d+$/.test(cleanScheduleDescription)?'':cleanScheduleDescription;
   const cleanCatalogDescription=String(catalogEntry?.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').trim();
   const catalogDescription=/^Episódios para assistir: \d+$/.test(cleanCatalogDescription)?'':cleanCatalogDescription;
   const fallbackDescription=scheduleDescription||catalogDescription;
