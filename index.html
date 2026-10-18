@@ -516,7 +516,7 @@ function openCatalogDetail(item){
   const progressBar=document.getElementById('catalogDetailProgressBar');
   progress.style.display='none';progress.textContent='';
   progressBar.style.display='none';progressBar.innerHTML='';
-  const cleanDescription=String(item.description||'').replace(/\\s*\\[\\[CINEVAALS_BACKDROP:[^\\]]+\\]\\]/g,'').replace(/\\s*\\[\\[CINEVAALS_TV_DATA:[^\\]]+\\]\\]/g,'').trim();
+  const cleanDescription=String(item.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]+\]\]/g,'').trim();
   const oldSynopsis=document.getElementById('catalogDetailSynopsis');
   if(oldSynopsis)oldSynopsis.remove();
   if(cleanDescription){
