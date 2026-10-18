@@ -589,7 +589,7 @@ function renderSeasonProgress(item,catalogEntry,tvDetails=null){
   if(!box)return;
   box.style.display='none';box.innerHTML='';
   const category=String(catalogEntry?.category||item?.category||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
-  const supported=['serie','animacao','anime'].includes(category);
+  const supported=['serie','dorama','animacao','anime'].includes(category);
   if(!supported||normalizedCatalogStatus(catalogEntry?.status)!=='Em Andamento')return;
   const seasonMatch=String(catalogEntry?.season||'').match(/(\d+)/);
   const episode=Number(catalogEntry?.episode);
