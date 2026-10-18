@@ -569,7 +569,6 @@ function renderDetailTags(category,status,certification,year){
   if(category)tags.push(category);
   if(year)tags.push(String(year));
   if(certification)tags.push(String(certification));
-  if(['Série','Dorama','Anime','Animação'].includes(category)&&status)tags.push(normalizedCatalogStatus(status));
   return tags.map(value=>'<span class="detail-tag">'+escapeHtml(value)+'</span>').join('');
 }
 function catalogDetailsFor(item){
