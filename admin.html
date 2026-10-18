@@ -637,7 +637,7 @@
     let identified=0, failed=0;
     for(const item of pending){
       tmdbAutoIdentificationAttempted.add(String(item.id));
-      if(!['Filme','Série','Dorama','Anime'].includes(item.category)){failed++;continue;}
+      if(!['Filme','Série','Dorama','Anime','Animação'].includes(item.category)){failed++;continue;}
       try{
         const {data,error}=await supabase.functions.invoke('tmdb-search',{body:{query:item.title},headers:{Authorization:'Bearer '+token}});
         if(error){failed++;continue;}
