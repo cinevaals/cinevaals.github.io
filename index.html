@@ -588,7 +588,7 @@ function renderSeasonProgress(item,catalogEntry){
   const box=document.getElementById('detailSeasonProgress');
   if(!box)return;
   box.style.display='none';box.innerHTML='';
-  const category=String(catalogEntry?.category||item?.category||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'');
+  const category=String(catalogEntry?.category||item?.category||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   const supported=['serie','animacao','anime'].includes(category);
   if(!supported||normalizedCatalogStatus(catalogEntry?.status)!=='Em Andamento')return;
   const seasonMatch=String(catalogEntry?.season||'').match(/(\d+)/);
@@ -607,7 +607,10 @@ function renderSeasonProgress(item,catalogEntry){
 }
 function catalogDetailsFor(item){
   const normalize=value=>String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
-  return catalogTitles.find(entry=>normalize(entry.title)===normalize(item?.title)&&entry.category===item?.category)||null;
+  const title=normalize(item?.title);
+  const category=normalize(item?.category);
+  const matches=catalogTitles.filter(entry=>normalize(entry.title)===title);
+  return matches.find(entry=>normalize(entry.category)===category)||(matches.length===1?matches[0]:null)||null;
 }
 async function openContentDetails(item){
   if(!item)return;
