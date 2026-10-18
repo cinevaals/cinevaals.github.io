@@ -584,7 +584,7 @@ function catalogTvDataFromDescription(value){
   if(!match)return null;
   try{const data=JSON.parse(decodeURIComponent(match[1]));return Array.isArray(data.seasons)?data:null;}catch{return null;}
 }
-function renderSeasonProgress(item,catalogEntry){
+function renderSeasonProgress(item,catalogEntry,tvDetails=null){
   const box=document.getElementById('detailSeasonProgress');
   if(!box)return;
   box.style.display='none';box.innerHTML='';
@@ -596,7 +596,8 @@ function renderSeasonProgress(item,catalogEntry){
   if(!seasonMatch||!Number.isFinite(episode)||episode<1)return;
   const seasonNumber=Number(seasonMatch[1]);
   const tvData=catalogTvDataFromDescription(catalogEntry?.description);
-  const season=tvData?.seasons?.find(entry=>Number(entry.number)===seasonNumber);
+  const liveSeason=Array.isArray(tvDetails?.seasons)?tvDetails.seasons.find(entry=>Number(entry.season_number??entry.number)===seasonNumber):null;
+  const season=liveSeason?{number:seasonNumber,name:liveSeason.name||('Temporada '+seasonNumber),episodeCount:Number(liveSeason.episode_count??liveSeason.episodeCount)}:tvData?.seasons?.find(entry=>Number(entry.number)===seasonNumber);
   const total=Number(season?.episodeCount);
   if(!Number.isFinite(total)||total<1)return;
   const current=Math.min(Math.floor(episode),total);
@@ -647,6 +648,7 @@ async function openContentDetails(item){
     const alternatePoster=d.images?.posters?.find(image=>image.file_path&&image.file_path!==d.poster_path)?.file_path;
     const heroImage=alternateBackdrop||alternatePoster;
     if(!selectedBackdrop&&heroImage)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+heroImage+'")';
+    renderSeasonProgress(item,catalogEntry,d);
     const isTv=Boolean(d.name||d.number_of_seasons!==undefined);
     const formatRuntime=(minutes,suffix='')=>{const value=Number(minutes);if(!Number.isFinite(value)||value<=0)return 'Não informado';const hours=Math.floor(value/60),mins=value%60;const formatted=hours?`${hours}h${mins?` ${mins}min`:''}`:`${mins} min`;return formatted+suffix;};
      const runtime=isTv?(Array.isArray(d.episode_run_time)&&d.episode_run_time.length?formatRuntime(d.episode_run_time[0],' por episódio'):'Não informado'):formatRuntime(d.runtime);
