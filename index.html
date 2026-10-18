@@ -516,12 +516,14 @@ function openCatalogDetail(item){
   const progressBar=document.getElementById('catalogDetailProgressBar');
   progress.style.display='none';progress.textContent='';
   progressBar.style.display='none';progressBar.innerHTML='';
-  if(inProgress&&(item.season||item.episode)){
-    const seasonText=String(item.season||'').trim();
-    const episodeText=String(item.episode||'').trim();
+  const progressEntry=catalogDetailsFor(item)||item;
+  const progressStatus=normalizedCatalogStatus(progressEntry.status);
+  if(progressEntry.category!=='Filme'&&progressStatus==='Em Andamento'&&(progressEntry.season||progressEntry.episode)){
+    const seasonText=String(progressEntry.season||'').trim();
+    const episodeText=String(progressEntry.episode||'').trim();
     const parts=[];
-    if(seasonText)parts.push(/^temporada\\s/i.test(seasonText)?seasonText:'Temporada '+seasonText.replace(/^s(eason)?\\s*/i,''));
-    if(episodeText)parts.push(/^epis[oó]dio\\s/i.test(episodeText)?episodeText:'Episódio '+episodeText.replace(/^e(p(isode)?)?\\s*/i,''));
+    if(seasonText)parts.push(/^temporada\s/i.test(seasonText)?seasonText:'Temporada '+seasonText.replace(/^s(eason)?\s*/i,''));
+    if(episodeText)parts.push(/^epis[oó]dio\s/i.test(episodeText)?episodeText:'Episódio '+episodeText.replace(/^e(p(isode)?)?\s*/i,''));
     progress.textContent=parts.join('  ·  ');
     if(parts.length)progress.style.display='inline-flex';
   }
