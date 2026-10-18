@@ -522,9 +522,9 @@ function openCatalogDetail(item){
   if(cleanDescription){
     const synopsis=document.createElement('div');
     synopsis.id='catalogDetailSynopsis';
-    synopsis.style.cssText='margin-top:12px;padding-top:10px;border-top:1px solid #24466d;color:#c7d8ec;font-size:12px;line-height:1.6;white-space:pre-line';
-    const label=document.createElement('strong');label.textContent='Sinopse';label.style.cssText='display:block;color:#65bfff;font-size:11px;margin-bottom:5px';
-    const text=document.createElement('div');text.textContent=cleanDescription;
+    synopsis.style.cssText='margin-top:16px;padding-top:14px;border-top:1px solid #24466d;color:#d3dfef;font-size:14px;line-height:1.8;white-space:normal;text-align:left;overflow-wrap:anywhere;word-break:normal;max-width:100%';
+    const label=document.createElement('strong');label.textContent='Sinopse';label.style.cssText='display:block;color:#65bfff;font-size:12px;margin-bottom:8px;line-height:1.4';
+    const text=document.createElement('div');text.textContent=cleanDescription;text.style.cssText='margin:0;padding:0;text-align:left;white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.8;max-width:100%';
     synopsis.append(label,text);document.querySelector('#catalogDetailModal section').appendChild(synopsis);
   }
   catalogDetailModal.style.display='flex';
