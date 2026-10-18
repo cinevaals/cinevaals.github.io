@@ -723,7 +723,21 @@
   $('catalog-admin-search').addEventListener('input',renderCatalogAdmin);
   populateCatalogProgressOptions();
   $('catalog-form').addEventListener('submit',async event=>{
-    event.preventDefault();$('save-catalog-item').disabled=true;$('catalog-admin-status').textContent='Salvando título...';
+    event.preventDefault();
+    const titleToSave=$('catalog-item-title').value.trim();
+    const categoryToSave=$('catalog-item-category').value;
+    const normalizeCatalogTitle=value=>String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/\\s+/g,' ').trim().toLocaleLowerCase('pt-BR');
+    const duplicate=catalogItems.find(existing=>
+      String(existing.id)!==String(editingCatalogId||'') &&
+      existing.category===categoryToSave &&
+      normalizeCatalogTitle(existing.title)===normalizeCatalogTitle(titleToSave)
+    );
+    if(!editingCatalogId&&duplicate){
+      $('catalog-admin-status').textContent='Este título já existe no catálogo ('+duplicate.category+'). Abra a biblioteca para editar o conteúdo existente em vez de adicioná-lo novamente.';
+      $('save-catalog-item').disabled=false;
+      return;
+    }
+    $('save-catalog-item').disabled=true;$('catalog-admin-status').textContent='Salvando título...';
     const chosenBackdrop=$('catalog-item-backdrop').value.trim();
     const cleanDescription=cleanCatalogDescription($('catalog-item-description').value.trim());
     const storedDescription=(cleanDescription||'')+(chosenBackdrop?'\n\n[[CINEVAALS_BACKDROP:'+chosenBackdrop+']]':'')+(catalogTvDataLoaded&&catalogTvData?'\n\n[[CINEVAALS_TV_DATA:'+encodeURIComponent(JSON.stringify({...catalogTvData,custom:catalogTvDataCustom}))+']]':'');
