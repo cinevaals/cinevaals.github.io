@@ -627,40 +627,37 @@
   async function removeAdminRating(){if(!selectedRatingItem)return;$('remove-rating').disabled=true;$('rating-editor-status').textContent='Removendo avaliação...';const {error}=await supabase.from('content_ratings').delete().eq('catalog_id',selectedRatingItem.id);$('remove-rating').disabled=false;if(error){$('rating-editor-status').textContent='Não foi possível remover a nota: '+error.message;return;}ratingRecords=ratingRecords.filter(record=>Number(record.catalog_id)!==Number(selectedRatingItem.id));draftRating=0;$('rating-editor').classList.add('hidden');renderRatingAdminGrid();}
 
   const tmdbAutoIdentificationAttempted=new Set();
-  function normalizeTmdbMatchTitle(value){return String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^\\p{L}\\p{N}]+/gu,' ').trim().toLocaleLowerCase('pt-BR');}
+  function normalizeTmdbMatchTitle(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim().toLocaleLowerCase('pt-BR');}
   async function identifyLegacyCatalogIds(items){
     const pending=(items||[]).filter(item=>!parseCatalogTmdbId(item.description)&&!tmdbAutoIdentificationAttempted.has(String(item.id))&&String(item.title||'').trim().length>=2);
     if(!pending.length)return;
     const {data:sessionData}=await supabase.auth.getSession(),token=sessionData.session?.access_token;
-    if(!token)return;
-    let identified=0;
+    if(!token){$('catalog-library-status').textContent='Não foi possível identificar os conteúdos antigos: sessão administrativa não encontrada.';return;}
+    let identified=0, failed=0;
     for(const item of pending){
       tmdbAutoIdentificationAttempted.add(String(item.id));
-      // Sem uma categoria que determine filme ou série, não arriscamos associar a obra errada.
-      if(!['Filme','Série','Dorama','Anime'].includes(item.category))continue;
+      if(!['Filme','Série','Dorama','Anime'].includes(item.category)){failed++;continue;}
       try{
         const {data,error}=await supabase.functions.invoke('tmdb-search',{body:{query:item.title},headers:{Authorization:'Bearer '+token}});
-        if(error)continue;
+        if(error){failed++;continue;}
         const results=Array.isArray(data)?data:(data?.results||[]);
         const expectedType=item.category==='Filme'?'movie':'tv';
         const exact=results.filter(result=>{
           const resultType=result.media_type||(result.title?'movie':'tv');
           return resultType===expectedType&&normalizeTmdbMatchTitle(result.title||result.name)===normalizeTmdbMatchTitle(item.title);
         });
-        // Só preenche quando a busca retorna exatamente uma correspondência de título e tipo.
-        if(exact.length!==1||!exact[0].id)continue;
+        if(exact.length!==1||!exact[0].id){failed++;continue;}
         const id=String(exact[0].id).replace(/[^0-9]/g,'');
-        if(!id)continue;
+        if(!id){failed++;continue;}
         const description=String(item.description||'').trim();
-        const updatedDescription=(description?description+'\\n\\n':'')+'[[CINEVAALS_TMDB_ID:'+id+']]';
+        const updatedDescription=(description?description+'\n\n':'')+'[[CINEVAALS_TMDB_ID:'+id+']]';
         const {error:updateError}=await supabase.from('catalog').update({description:updatedDescription}).eq('id',item.id);
-        if(!updateError){item.description=updatedDescription;identified++;}
-      }catch(_error){/* A identificação automática nunca deve interromper o painel. */}
+        if(!updateError){item.description=updatedDescription;identified++;}else{failed++;}
+      }catch(_error){failed++;}
     }
-    if(identified){
-      renderCatalogAdmin();
-      $('catalog-admin-status').textContent+=` ${identified} conteúdo(s) antigo(s) identificado(s) automaticamente no TMDB.`;
-    }
+    if(identified)renderCatalogAdmin();
+    $('catalog-library-status').textContent='Identificação automática concluída: '+identified+' conteúdo(s) identificado(s); '+failed+' ficaram pendentes por falta de correspondência segura ou erro. Atualize a consulta no Supabase para conferir.';
+    $('catalog-admin-status').textContent=$('catalog-library-status').textContent;
   }
   async function loadCatalogAdmin(){
     $('catalog-library-status').textContent='Carregando catálogo...';
