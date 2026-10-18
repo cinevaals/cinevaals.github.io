@@ -61,6 +61,8 @@
     .rating-star-picker{display:flex;flex-wrap:wrap;gap:2px;margin:12px 0}.rating-star-control{position:relative;display:inline-flex;width:31px;height:38px;align-items:center;justify-content:center}.rating-star-control .star-glyph{font-size:31px;line-height:1;color:#465a73;pointer-events:none}.rating-star-control.full .star-glyph{color:#ffd166}.rating-star-control.half .star-glyph{background:linear-gradient(90deg,#ffd166 50%,#465a73 50%);background-clip:text;-webkit-background-clip:text;color:transparent}.rating-half-hit{position:absolute;top:0;bottom:0;width:50%;opacity:0;padding:0;border:0;background:transparent;min-width:0;border-radius:0}.rating-half-hit.left{left:0}.rating-half-hit.right{right:0}.rating-editor-score{display:flex;align-items:baseline;gap:5px;margin-top:6px}.rating-editor-score strong{font-size:25px;color:#ffe2a0}.rating-editor-score span{color:#a8b7cf}.rating-admin-card{cursor:default;align-items:stretch}.rating-admin-card img,.rating-admin-card .catalog-admin-poster{position:absolute;inset:0;width:100%;height:100%;aspect-ratio:2/3;object-fit:cover;object-position:center;flex:0 0 auto}.rating-admin-card h3,.rating-admin-card .rating-card-mini{display:none}
     @media(max-width:600px){.rating-editor-content{grid-template-columns:90px minmax(0,1fr);gap:12px}.rating-editor-image,.rating-editor-fallback{width:90px}.rating-star-control{width:27px}.rating-star-control .star-glyph{font-size:27px}.rating-editor-card{padding:16px!important}}
 
+
+    .backdrop-preview-overlay{position:fixed;inset:0;z-index:1400;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(1,5,13,.92);backdrop-filter:blur(6px);overflow-y:auto}.backdrop-preview-overlay.hidden{display:none!important}.backdrop-preview-card{width:min(100%,760px);max-height:92vh;overflow-y:auto;margin:auto;padding:20px;background:linear-gradient(180deg,#09172a,#060d19);border:1px solid #2c5f91;border-radius:14px;box-shadow:0 20px 70px #0009}.backdrop-preview-scene{position:relative;isolation:isolate;overflow:hidden;min-height:330px;border:1px solid #21466e;border-radius:12px;background:#071326}.backdrop-preview-scene:before{content:"";position:absolute;inset:0;z-index:-2;background-image:var(--preview-backdrop);background-size:cover;background-position:center;filter:brightness(.62)}.backdrop-preview-scene:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(3,8,18,.97) 0%,rgba(3,8,18,.78) 52%,rgba(3,8,18,.2) 100%),linear-gradient(0deg,rgba(3,8,18,.75),transparent 55%)}.backdrop-preview-content{display:grid;grid-template-columns:130px minmax(0,1fr);gap:20px;align-items:center;min-height:330px;padding:24px}.backdrop-preview-poster{width:100%;aspect-ratio:2/3;object-fit:cover;border:1px solid #8abfff66;border-radius:8px;box-shadow:0 8px 25px #0008;background:#091426}.backdrop-preview-copy h3{font-size:clamp(22px,4vw,32px);margin:0 0 8px;color:#fff;text-shadow:0 2px 12px #000}.backdrop-preview-meta{font-size:12px;color:#a9d8ff;margin-bottom:12px}.backdrop-preview-description{font-size:13px;line-height:1.65;color:#edf5ff;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}.backdrop-preview-label{display:inline-block;margin-bottom:12px;padding:5px 8px;border:1px solid #65bfff66;border-radius:5px;background:#071326aa;color:#a9d8ff;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.backdrop-preview-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.backdrop-preview-actions button{flex:1;min-width:150px}@media(max-width:560px){.backdrop-preview-card{padding:13px}.backdrop-preview-scene,.backdrop-preview-content{min-height:0}.backdrop-preview-content{grid-template-columns:88px minmax(0,1fr);gap:12px;padding:14px}.backdrop-preview-description{-webkit-line-clamp:4;font-size:12px}.backdrop-preview-poster{border-radius:6px}.backdrop-preview-actions{flex-direction:column}.backdrop-preview-actions button{width:100%}}
   </style>
 </head>
 <body>
@@ -110,6 +112,14 @@
           <div class="toolbar" style="margin-top:15px;justify-content:flex-start"><button id="save-catalog-item" class="primary" type="submit">Salvar no catálogo</button><button id="cancel-catalog-item" class="secondary" type="button">Limpar formulário</button></div>
         </form>
         <p id="catalog-admin-status" class="subtitle" role="status"></p>
+      </div>
+    </section>
+
+    <section id="backdrop-preview" class="backdrop-preview-overlay hidden" aria-modal="true" role="dialog" aria-labelledby="backdrop-preview-heading">
+      <div class="backdrop-preview-card">
+        <div class="toolbar"><div><h2 id="backdrop-preview-heading">Prévia do painel de descrição</h2><p class="subtitle">Veja como o conteúdo ficará no cronograma antes de confirmar.</p></div></div>
+        <div id="backdrop-preview-scene" class="backdrop-preview-scene"><div class="backdrop-preview-content"><img id="backdrop-preview-poster" class="backdrop-preview-poster" alt="Capa do conteúdo"><div class="backdrop-preview-copy"><span class="backdrop-preview-label">Prévia da descrição</span><h3 id="backdrop-preview-title"></h3><div id="backdrop-preview-meta" class="backdrop-preview-meta"></div><p id="backdrop-preview-description" class="backdrop-preview-description"></p></div></div></div>
+        <div class="backdrop-preview-actions"><button id="confirm-backdrop-preview" class="primary" type="button">Confirmar imagem</button><button id="choose-another-backdrop" class="secondary" type="button">Escolher outra capa</button></div>
       </div>
     </section>
     <section id="catalog-library" class="hidden" aria-modal="true" role="dialog" aria-labelledby="catalog-library-title" style="position:fixed;inset:0;z-index:1050;overflow-y:auto;padding:20px;background:rgba(1,5,13,.88);backdrop-filter:blur(5px)">
@@ -265,6 +275,7 @@
     if(event.target===$('editor'))closeEditor();
   });
   document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&!$('backdrop-preview').classList.contains('hidden')){closeBackdropPreview();return;}
     if(event.key!=='Escape')return;
     if(!$('rating-editor').classList.contains('hidden')){$('rating-editor').classList.add('hidden');return;}
     if(!$('ratings-manager').classList.contains('hidden')){$('ratings-manager').classList.add('hidden');return;}
@@ -466,6 +477,7 @@
 
 
   let catalogTvData=null,catalogTvDataLoaded=false,catalogTvDataCustom=false;
+  let pendingBackdropPath=null;
   function defaultTvData(d){const seasons=(Array.isArray(d?.seasons)?d.seasons:[]).filter(s=>Number(s.season_number)>0).map(s=>({number:Number(s.season_number),name:s.name||('Temporada '+s.season_number),episodeCount:Math.max(0,Number(s.episode_count)||0)})).sort((a,b)=>a.number-b.number);return {totalSeasons:Math.max(Number(d?.number_of_seasons)||0,seasons.length),seasons};}
   function parseCatalogTvData(v){const m=String(v||'').match(/\[\[CINEVAALS_TV_DATA:([^\]]+)\]\]/);if(!m)return null;try{const d=JSON.parse(decodeURIComponent(m[1]));return Array.isArray(d.seasons)?d:null;}catch{return null;}}
   function cleanCatalogDescription(v){return String(v||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]+\]\]/g,'').trim();}
@@ -510,12 +522,39 @@
     finally{$('catalog-backdrop-search').disabled=false;}
   }
   $('catalog-backdrop-search').addEventListener('click',loadCatalogBackdrops);
+  function openBackdropPreview(path){
+    pendingBackdropPath=path;
+    const title=$('catalog-item-title').value.trim()||'Título do conteúdo';
+    const category=$('catalog-item-category').selectedOptions[0]?.textContent||$('catalog-item-category').value||'Conteúdo';
+    const poster=$('catalog-item-image').value.trim();
+    const description=$('catalog-item-description').value.trim()||'A descrição deste conteúdo aparecerá aqui quando houver um texto cadastrado.';
+    $('backdrop-preview-title').textContent=title;
+    $('backdrop-preview-meta').textContent=category;
+    $('backdrop-preview-description').textContent=description;
+    $('backdrop-preview-poster').src=poster||'';
+    $('backdrop-preview-poster').style.visibility=poster?'visible':'hidden';
+    $('backdrop-preview-scene').style.setProperty('--preview-backdrop','url("https://image.tmdb.org/t/p/original'+path.replace(/["\\]/g,'')+'")');
+    $('backdrop-preview').classList.remove('hidden');
+    $('backdrop-preview').querySelector('.backdrop-preview-card').scrollTop=0;
+  }
+  function closeBackdropPreview(){ $('backdrop-preview').classList.add('hidden'); }
   $('catalog-backdrop-options').addEventListener('click',event=>{
     const button=event.target.closest('[data-backdrop-path]');if(!button)return;
-    $('catalog-item-backdrop').value=button.dataset.backdropPath;
-    [...$('catalog-backdrop-options').querySelectorAll('[data-backdrop-path]')].forEach(el=>{const active=el===button;el.setAttribute('aria-pressed',String(active));el.style.borderColor=active?'#65bfff':'transparent';});
-    $('catalog-backdrop-status').textContent='Imagem de fundo selecionada.';
+    openBackdropPreview(button.dataset.backdropPath);
   });
+  $('confirm-backdrop-preview').addEventListener('click',()=>{
+    if(!pendingBackdropPath)return;
+    $('catalog-item-backdrop').value=pendingBackdropPath;
+    [...$('catalog-backdrop-options').querySelectorAll('[data-backdrop-path]')].forEach(el=>{const active=el.dataset.backdropPath===pendingBackdropPath;el.setAttribute('aria-pressed',String(active));el.style.borderColor=active?'#65bfff':'transparent';});
+    $('catalog-backdrop-status').textContent='Imagem de fundo selecionada. Salve o formulário para aplicar a alteração.';
+    pendingBackdropPath=null;closeBackdropPreview();
+  });
+  $('choose-another-backdrop').addEventListener('click',()=>{
+    pendingBackdropPath=null;closeBackdropPreview();
+    $('catalog-backdrop-status').textContent='Escolha outra imagem ou selecione uma prévia diferente.';
+    $('catalog-backdrop-options').scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+  $('backdrop-preview').addEventListener('click',event=>{if(event.target===$('backdrop-preview'))closeBackdropPreview();});
   function renderCatalogCategoryFilters(){
     $('catalog-category-filters').innerHTML=catalogCategoryOptions.map(([value,label])=>`<button type="button" class="catalog-admin-filter${catalogCategoryFilter===value?' active':''}" data-catalog-category-filter="${value}">${label}</button>`).join('');
   }
