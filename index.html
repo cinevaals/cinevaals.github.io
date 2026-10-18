@@ -596,8 +596,9 @@ function renderSeasonProgress(item,catalogEntry,tvDetails=null){
   if(!seasonMatch||!Number.isFinite(episode)||episode<1)return;
   const seasonNumber=Number(seasonMatch[1]);
   const tvData=catalogTvDataFromDescription(catalogEntry?.description);
+  const savedSeason=tvData?.seasons?.find(entry=>Number(entry.number)===seasonNumber);
   const liveSeason=Array.isArray(tvDetails?.seasons)?tvDetails.seasons.find(entry=>Number(entry.season_number??entry.number)===seasonNumber):null;
-  const season=liveSeason?{number:seasonNumber,name:liveSeason.name||('Temporada '+seasonNumber),episodeCount:Number(liveSeason.episode_count??liveSeason.episodeCount)}:tvData?.seasons?.find(entry=>Number(entry.number)===seasonNumber);
+  const season=tvData?.custom?(savedSeason||null):(liveSeason?{number:seasonNumber,name:liveSeason.name||('Temporada '+seasonNumber),episodeCount:Number(liveSeason.episode_count??liveSeason.episodeCount)}:savedSeason);
   const total=Number(season?.episodeCount);
   if(!Number.isFinite(total)||total<1)return;
   const current=Math.min(Math.floor(episode),total);
