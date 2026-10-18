@@ -130,7 +130,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
       <div style="min-width:0;padding:0 20px 0 0;display:flex;flex-direction:column;justify-content:center;min-height:132px;box-sizing:border-box;">
         <div id="catalogDetailCategory" style="color:#65bfff;font-size:10px;letter-spacing:.5px;margin-bottom:5px;"></div>
         <h2 id="catalogDetailTitle" style="margin:0 0 8px;color:#f2f8ff;font-size:clamp(16px,4vw,20px);line-height:1.25;overflow-wrap:anywhere;"></h2>
-        <div id="catalogDetailProgress" style="display:none;margin-top:9px;padding:7px 9px;border-left:2px solid #65bfff;border-radius:3px;background:#0a1b30;color:#bfe4ff;line-height:1.4;font-size:11px;"></div>
+        <div id="catalogDetailProgress" style="display:none;align-self:flex-start;margin-top:2px;padding:6px 10px;border:1px solid #3679b8;border-radius:999px;background:linear-gradient(135deg,#12365a,#0a1b30);box-shadow:0 0 12px #168bff22;color:#cbe8ff;line-height:1.35;font-size:11px;font-weight:600;letter-spacing:.15px;"></div>
         <div id="catalogDetailProgressBar" style="display:none;margin-top:10px;padding:10px 11px;background:#081426;border:1px solid #24466d;border-radius:9px;color:#eaf5ff;font-size:11px;"></div>
       </div>
     </div>
@@ -516,6 +516,15 @@ function openCatalogDetail(item){
   const progressBar=document.getElementById('catalogDetailProgressBar');
   progress.style.display='none';progress.textContent='';
   progressBar.style.display='none';progressBar.innerHTML='';
+  if(inProgress){
+    const seasonMatch=String(item.season||'').match(/(\\d+)/);
+    const episode=Number(item.episode);
+    const seasonNumber=seasonMatch?Number(seasonMatch[1]):null;
+    if(seasonNumber&&Number.isFinite(episode)&&episode>0){
+      progress.textContent='Temporada '+seasonNumber+'  ·  Episódio '+Math.floor(episode);
+      progress.style.display='inline-flex';
+    }
+  }
   const cleanDescription=String(item.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]+\]\]/g,'').trim();
   const oldSynopsis=document.getElementById('catalogDetailSynopsis');
   if(oldSynopsis)oldSynopsis.remove();
