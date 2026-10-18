@@ -535,21 +535,8 @@ function openCatalogDetail(item){
       progressBar.style.display='block';
     }
   }
-  if(cleanDescription){
-    const synopsis=document.createElement('div');
-    synopsis.style.cssText='margin-top:12px;padding-top:10px;border-top:1px solid #24466d;color:#c7d8ec;font-size:12px;line-height:1.6;white-space:pre-line';
-    const label=document.createElement('strong');
-    label.textContent='Sinopse';
-    label.style.cssText='display:block;color:#65bfff;font-size:11px;margin-bottom:5px';
-    const text=document.createElement('div');
-    text.textContent=cleanDescription;
-    synopsis.append(label,text);
-    document.querySelector('#catalogDetailModal section').appendChild(synopsis);
-    synopsis.id='catalogDetailSynopsis';
-  }
   const oldSynopsis=document.getElementById('catalogDetailSynopsis');
-  if(oldSynopsis&&oldSynopsis.parentElement)oldSynopsis.remove();
-  // Add the synopsis once per opening, after clearing any previous one.
+  if(oldSynopsis)oldSynopsis.remove();
   if(cleanDescription){
     const synopsis=document.createElement('div');
     synopsis.id='catalogDetailSynopsis';
