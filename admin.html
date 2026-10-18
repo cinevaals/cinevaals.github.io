@@ -636,12 +636,12 @@
     if(!token){$('catalog-library-status').textContent='Não foi possível identificar os conteúdos antigos: sessão administrativa não encontrada.';return;}
     let identified=0, failed=0;
     const verifiedLegacyIds={
-      'dom|série':'123377',
-      'yellowstone|série':'73586',
+      'dom|serie':'123377',
+      'yellowstone|serie':'73586',
       'duna|filme':'438631',
-      'o pequeno príncipe|filme':'37627',
+      'o pequeno principe|filme':'37627',
       'motoqueiros selvagens|filme':'11199',
-      'missão quase impossível|filme':'23172'
+      'missao quase impossivel|filme':'23172'
     };
     for(const item of pending){
       tmdbAutoIdentificationAttempted.add(String(item.id));
