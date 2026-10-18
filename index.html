@@ -588,7 +588,8 @@ async function openContentDetails(item){
   const catalogEntry=catalogDetailsFor(item);
   $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,'',item.date?String(item.date).slice(0,4):'');
   const scheduleDescription=/^Episódios para assistir: \d+$/.test(String(item.description||''))?'':(item.description||'');
-  const catalogDescription=/^Episódios para assistir: \d+$/.test(String(catalogEntry?.description||''))?'':(catalogEntry?.description||'');
+  const cleanCatalogDescription=String(catalogEntry?.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').trim();
+  const catalogDescription=/^Episódios para assistir: \d+$/.test(cleanCatalogDescription)?'':cleanCatalogDescription;
   const fallbackDescription=scheduleDescription||catalogDescription;
   $detail('detailDescription').textContent=fallbackDescription||'Carregando a sinopse…';
   const wrap=$detail('detailPosterWrap');
@@ -605,7 +606,8 @@ async function openContentDetails(item){
     const alternateBackdrop=d.images?.backdrops?.find(image=>image.file_path)?.file_path||d.backdrop_path;
     const alternatePoster=d.images?.posters?.find(image=>image.file_path&&image.file_path!==d.poster_path)?.file_path;
     const heroImage=alternateBackdrop||alternatePoster;
-    if(heroImage)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+heroImage+'")';
+    const selectedBackdrop=String(catalogEntry?.description||'').match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
+    if(selectedBackdrop||heroImage)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+(selectedBackdrop||heroImage)+'")';
     const isTv=Boolean(d.name||d.number_of_seasons!==undefined);
     const runtime=isTv?(Array.isArray(d.episode_run_time)&&d.episode_run_time.length?d.episode_run_time[0]+' min por episódio':'Não informado'):(d.runtime?d.runtime+' min':'Não informado');
     const seasons=isTv?d.number_of_seasons:'';
