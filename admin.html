@@ -34,6 +34,7 @@
     .catalog-admin-filter{background:linear-gradient(180deg,#0b1c33,#071225);border:1px solid #204b79;color:#dceeff;border-radius:10px;padding:9px 13px;font-size:12px;cursor:pointer;white-space:nowrap}
     .catalog-admin-filter:hover{border-color:#4cb5ff}
     .catalog-admin-filter.active{background:linear-gradient(135deg,#1454d9,#087bdc);border-color:#4db8ff;color:white;box-shadow:0 0 15px #087bdb35}
+    .catalog-admin-status-filter-toggle{min-width:125px;text-align:left}
     .catalog-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-top:14px}
     .catalog-admin-card{position:relative;display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #204b79;border-radius:12px;background:#050b16;height:100%;aspect-ratio:2/3}
     .catalog-admin-card img,.catalog-admin-poster{display:flex;width:100%;height:100%;aspect-ratio:2/3;flex:1 1 auto;object-fit:cover;align-items:center;justify-content:center;background:#050b16;color:#65bfff;font-size:36px}
@@ -106,7 +107,7 @@
       <div class="editor-card" style="max-width:1100px">
         <div class="toolbar"><div><h2 id="catalog-library-title">▦ Gerenciar Catálogo</h2><p class="subtitle">Filtre por categoria e status para atualizar seu progresso.</p></div><button id="close-catalog-library" class="secondary" type="button">Fechar</button></div>
         <div id="catalog-category-filters" class="catalog-admin-filters" aria-label="Filtrar por categoria"></div>
-        <div id="catalog-status-filters" class="catalog-admin-filters" aria-label="Filtrar por status"></div>
+        <div style="margin:16px 0 10px"><button id="catalog-status-filter-toggle" class="catalog-admin-filter catalog-admin-status-filter-toggle" type="button" aria-expanded="false">☷ Filtrar</button><div id="catalog-status-filters" class="catalog-admin-filters hidden" aria-label="Filtrar por status"></div></div>
         <div class="toolbar" style="margin-top:12px"><input id="catalog-admin-search" type="search" placeholder="Buscar título..." style="max-width:420px;margin-top:0"></div>
         <p id="catalog-library-status" class="subtitle" role="status"></p>
         <div id="catalog-admin-list" class="catalog-admin-grid"></div>
@@ -467,7 +468,7 @@
   function updateCatalogSeasonField(){const category=$('catalog-item-category').value,isMovie=category==='Filme',episodic=['Série','Dorama','Anime','Animação'].includes(category),statusSelect=$('catalog-item-status');[...statusSelect.options].forEach(o=>{if(!o.value)return;const visible=o.value==='Na Fila'||o.value==='Está na Fila'?true:o.value==='Em Andamento'||o.value==='Finalizado'?episodic:o.value==='Já Assistido'?isMovie:true;o.hidden=!visible;o.disabled=!visible;});if((isMovie&&['Em Andamento','Finalizado'].includes(statusSelect.value))||(episodic&&statusSelect.value==='Já Assistido')||(!isMovie&&!episodic&&['Em Andamento','Já Assistido','Finalizado'].includes(statusSelect.value)))statusSelect.value='';const watching=statusSelect.value==='Em Andamento',finished=statusSelect.value==='Finalizado';$('catalog-season-wrap').classList.toggle('hidden',isMovie);$('catalog-item-season').required=!isMovie;$('catalog-episode-wrap').classList.toggle('hidden',isMovie||!watching);$('catalog-item-episode').required=!isMovie&&watching;if(isMovie){$('catalog-item-season').value='';$('catalog-item-episode').value='';}else if(finished){$('catalog-item-season').value='Todas as temporadas';$('catalog-item-episode').value='';}else if(!watching){$('catalog-item-episode').value='';if($('catalog-item-season').value==='Todas as temporadas')$('catalog-item-season').value='';}populateCatalogProgressOptions();}
   let catalogCategoryFilter='Todos';
   let catalogStatusFilter='Todos';
-  let catalogReturnToLibrary=false;
+  let catalogReturnToLibrary=false;\n  let catalogStatusFilterPanelOpen=false;
   const catalogCategoryOptions=[['Filme','🎬 Filmes'],['Série','📺 Séries'],['Animação','🐰 Animações'],['Dorama','💗 Doramas'],['Anime','⛩️ Animes']];
   function normalizedAdminCatalogStatus(value){return value==='Assistindo'?'Em Andamento':value==='Está na Fila'?'Na Fila':(value||'Na Fila');}
   function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('catalog-item-backdrop').value='';$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent='';$('catalog-backdrop-picker').classList.add('hidden');$('catalog-tv-editor').classList.add('hidden');catalogTvData=null;catalogTvDataLoaded=false;catalogTvDataCustom=false;$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
@@ -505,6 +506,11 @@
   function renderCatalogStatusFilters(){
     const options=catalogCategoryFilter==='Todos'?['Em Andamento','Na Fila','Já Assistido','Finalizado']:catalogCategoryFilter==='Filme'?['Na Fila','Já Assistido']:['Em Andamento','Na Fila','Finalizado'];
     const labels={'Em Andamento':'⏳ Em Andamento','Na Fila':'🔖 Na Fila','Já Assistido':'✓ Já Assistido','Finalizado':'🏁 Finalizado'};
+    const toggle=$('catalog-status-filter-toggle');
+    $('catalog-status-filters').classList.toggle('hidden',!catalogStatusFilterPanelOpen);
+    toggle.setAttribute('aria-expanded',String(catalogStatusFilterPanelOpen));
+    toggle.textContent=catalogStatusFilter==='Todos'?'☷ Filtrar':`☷ ${catalogStatusFilter}`;
+    toggle.classList.toggle('active',catalogStatusFilter!=='Todos');
     $('catalog-status-filters').innerHTML=options.map(value=>`<button type="button" class="catalog-admin-filter${catalogStatusFilter===value?' active':''}" data-catalog-status-filter="${value}">${labels[value]}</button>`).join('');
   }
   function renderCatalogAdmin(){
@@ -570,7 +576,7 @@
     $('catalog-manager-query').focus();
   }
   async function openCatalogLibrary(){
-    catalogCategoryFilter='Todos';catalogStatusFilter='Todos';
+    catalogCategoryFilter='Todos';catalogStatusFilter='Todos';catalogStatusFilterPanelOpen=false;
     $('catalog-admin-search').value='';
     $('catalog-library').classList.remove('hidden');
     await loadCatalogAdmin();
@@ -581,9 +587,10 @@
     const button=event.target.closest('[data-catalog-category-filter]');if(!button)return;
     const selected=button.dataset.catalogCategoryFilter;catalogCategoryFilter=catalogCategoryFilter===selected?'Todos':selected;catalogStatusFilter='Todos';renderCatalogAdmin();
   });
+  $('catalog-status-filter-toggle').addEventListener('click',()=>{catalogStatusFilterPanelOpen=!catalogStatusFilterPanelOpen;renderCatalogStatusFilters();});
   $('catalog-status-filters').addEventListener('click',event=>{
     const button=event.target.closest('[data-catalog-status-filter]');if(!button)return;
-    const selected=button.dataset.catalogStatusFilter;catalogStatusFilter=catalogStatusFilter===selected?'Todos':selected;renderCatalogAdmin();
+    const selected=button.dataset.catalogStatusFilter;catalogStatusFilter=catalogStatusFilter===selected?'Todos':selected;catalogStatusFilterPanelOpen=false;renderCatalogAdmin();
   });
   $('catalog-item-category').addEventListener('change',()=>{catalogTvData=null;catalogTvDataLoaded=false;catalogTvDataCustom=false;updateCatalogSeasonField();if(['Série','Dorama','Anime','Animação'].includes($('catalog-item-category').value))loadCatalogTvData(true);});
   $('catalog-item-status').addEventListener('change',()=>{updateCatalogSeasonField();$('catalog-item-season').value=$('catalog-item-status').value==='Finalizado'?'Todas as temporadas':'';populateCatalogProgressOptions();});
