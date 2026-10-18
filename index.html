@@ -131,7 +131,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
         <div id="catalogDetailCategory" style="color:#65bfff;font-size:10px;letter-spacing:.5px;margin-bottom:5px;"></div>
         <h2 id="catalogDetailTitle" style="margin:0 0 8px;color:#f2f8ff;font-size:clamp(16px,4vw,20px);line-height:1.25;overflow-wrap:anywhere;"></h2>
         <div id="catalogDetailProgress" style="display:none;margin-top:9px;padding:7px 9px;border-left:2px solid #65bfff;border-radius:3px;background:#0a1b30;color:#bfe4ff;line-height:1.4;font-size:11px;"></div>
-        <p id="catalogDetailNote" style="display:none;margin:7px 0 0;color:#9fb8d4;font-size:10px;line-height:1.4;"></p>
+        <div id="catalogDetailProgressBar" style="display:none;margin-top:10px;padding:10px 11px;background:#081426;border:1px solid #24466d;border-radius:9px;color:#eaf5ff;font-size:11px;"></div>
       </div>
     </div>
   </section>
@@ -512,22 +512,51 @@ function openCatalogDetail(item){
   if(item.image){poster.src=item.image;}else{poster.removeAttribute('src');poster.style.display='none';fallback.style.display='flex';}
   document.getElementById('catalogDetailTitle').textContent=title;
   document.getElementById('catalogDetailCategory').textContent=(item.category||'Conteúdo').toLocaleUpperCase('pt-BR');
-  const statusLabel=status==='Em Andamento'?'⏳ Em andamento':status==='Na Fila'?'🔖 Na fila':status==='Já Assistido'?'✓ Já assistido':status==='Finalizado'?'🏁 Finalizado':status;
   const progress=document.getElementById('catalogDetailProgress');
-  const note=document.getElementById('catalogDetailNote');
+  const progressBar=document.getElementById('catalogDetailProgressBar');
+  progress.style.display='none';progress.textContent='';
+  progressBar.style.display='none';progressBar.innerHTML='';
+  const cleanDescription=String(item.description||'').replace(/\\s*\\[\\[CINEVAALS_BACKDROP:[^\\]]+\\]\\]/g,'').replace(/\\s*\\[\\[CINEVAALS_TV_DATA:[^\\]]+\\]\\]/g,'').trim();
   if(inProgress){
-    const season= item.season ? (/temporada/i.test(String(item.season)) ? String(item.season) : 'Temporada '+String(item.season)) : '';
-    const episode= item.episode ? (/epis[oó]dio/i.test(String(item.episode)) ? String(item.episode) : 'Episódio '+String(item.episode)) : '';
-    const parts=[season,episode].filter(Boolean);
+    const seasonMatch=String(item.season||'').match(/(\\d+)/);
+    const episode=Number(item.episode);
+    const seasonNumber=seasonMatch?Number(seasonMatch[1]):null;
+    const seasonLabel=seasonNumber?'Temporada '+seasonNumber:(item.season||'Temporada não informada');
+    const episodeLabel=Number.isFinite(episode)&&episode>0?'Episódio '+episode:'Episódio não informado';
     progress.style.display='block';
-    progress.textContent=parts.length?parts.join(' - '):'Temporada e episódio ainda não informados.';
-    note.style.display='none';
-    note.textContent='';
-  }else{
-    progress.style.display='none';
-    progress.textContent='';
-    note.style.display='none';
-    note.textContent='';
+    progress.textContent=seasonLabel+' · '+episodeLabel;
+    const tvData=catalogTvDataFromDescription(item.description);
+    const seasonData=tvData?.seasons?.find(entry=>Number(entry.number)===seasonNumber);
+    const total=Number(seasonData?.episodeCount);
+    if(seasonNumber&&Number.isFinite(episode)&&episode>0&&Number.isFinite(total)&&total>0){
+      const current=Math.min(Math.floor(episode),total);
+      const percent=Math.round(current/total*100);
+      progressBar.innerHTML='<div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:7px"><strong style="color:#bfe4ff">Temporada '+seasonNumber+'</strong><span style="white-space:nowrap">'+current+' / '+total+' episódios</span></div><div role="progressbar" aria-label="Progresso da Temporada '+seasonNumber+'" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+current+'" style="height:8px;overflow:hidden;background:#172b43;border-radius:99px"><div style="height:100%;width:'+percent+'%;background:linear-gradient(90deg,#168bff,#65bfff);border-radius:99px;transition:width .3s ease"></div></div><div style="margin-top:6px;text-align:right;color:#9bc9f4">'+percent+'% concluído</div>';
+      progressBar.style.display='block';
+    }
+  }
+  if(cleanDescription){
+    const synopsis=document.createElement('div');
+    synopsis.style.cssText='margin-top:12px;padding-top:10px;border-top:1px solid #24466d;color:#c7d8ec;font-size:12px;line-height:1.6;white-space:pre-line';
+    const label=document.createElement('strong');
+    label.textContent='Sinopse';
+    label.style.cssText='display:block;color:#65bfff;font-size:11px;margin-bottom:5px';
+    const text=document.createElement('div');
+    text.textContent=cleanDescription;
+    synopsis.append(label,text);
+    document.querySelector('#catalogDetailModal section').appendChild(synopsis);
+    synopsis.id='catalogDetailSynopsis';
+  }
+  const oldSynopsis=document.getElementById('catalogDetailSynopsis');
+  if(oldSynopsis&&oldSynopsis.parentElement)oldSynopsis.remove();
+  // Add the synopsis once per opening, after clearing any previous one.
+  if(cleanDescription){
+    const synopsis=document.createElement('div');
+    synopsis.id='catalogDetailSynopsis';
+    synopsis.style.cssText='margin-top:12px;padding-top:10px;border-top:1px solid #24466d;color:#c7d8ec;font-size:12px;line-height:1.6;white-space:pre-line';
+    const label=document.createElement('strong');label.textContent='Sinopse';label.style.cssText='display:block;color:#65bfff;font-size:11px;margin-bottom:5px';
+    const text=document.createElement('div');text.textContent=cleanDescription;
+    synopsis.append(label,text);document.querySelector('#catalogDetailModal section').appendChild(synopsis);
   }
   catalogDetailModal.style.display='flex';
 }
