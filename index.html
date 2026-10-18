@@ -523,8 +523,8 @@ function openCatalogDetail(item){
     const seasonNumber=seasonMatch?Number(seasonMatch[1]):null;
     const seasonLabel=seasonNumber?'Temporada '+seasonNumber:(item.season||'Temporada não informada');
     const episodeLabel=Number.isFinite(episode)&&episode>0?'Episódio '+episode:'Episódio não informado';
-    progress.style.display='block';
-    progress.textContent=seasonLabel+' · '+episodeLabel;
+    progress.style.display='none';
+    progress.textContent='';
     const tvData=catalogTvDataFromDescription(item.description);
     const seasonData=tvData?.seasons?.find(entry=>Number(entry.number)===seasonNumber);
     const total=Number(seasonData?.episodeCount);
