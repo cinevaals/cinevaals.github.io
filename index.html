@@ -130,7 +130,6 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
       <div style="min-width:0;padding:5px 20px 0 0;">
         <div id="catalogDetailCategory" style="color:#65bfff;font-size:10px;letter-spacing:.5px;margin-bottom:5px;"></div>
         <h2 id="catalogDetailTitle" style="margin:0 0 8px;color:#f2f8ff;font-size:clamp(16px,4vw,20px);line-height:1.25;overflow-wrap:anywhere;"></h2>
-        <div id="catalogDetailStatus" style="display:inline-flex;align-items:center;padding:5px 8px;border:1px solid #37618b;border-radius:7px;background:#0a1b30;color:#eaf5ff;font-size:11px;font-weight:600;"></div>
         <div id="catalogDetailProgress" style="display:none;margin-top:9px;padding:7px 9px;border-left:2px solid #65bfff;border-radius:3px;background:#0a1b30;color:#bfe4ff;line-height:1.4;font-size:11px;"></div>
         <p id="catalogDetailNote" style="display:none;margin:7px 0 0;color:#9fb8d4;font-size:10px;line-height:1.4;"></p>
       </div>
@@ -506,7 +505,6 @@ function openCatalogDetail(item){
   document.getElementById('catalogDetailTitle').textContent=title;
   document.getElementById('catalogDetailCategory').textContent=(item.category||'Conteúdo').toLocaleUpperCase('pt-BR');
   const statusLabel=status==='Em Andamento'?'⏳ Em andamento':status==='Na Fila'?'🔖 Na fila':status==='Já Assistido'?'✓ Já assistido':status==='Finalizado'?'🏁 Finalizado':status;
-  document.getElementById('catalogDetailStatus').textContent=statusLabel;
   const progress=document.getElementById('catalogDetailProgress');
   const note=document.getElementById('catalogDetailNote');
   if(inProgress){
