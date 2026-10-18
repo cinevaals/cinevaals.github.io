@@ -609,7 +609,8 @@ async function openContentDetails(item){
     const selectedBackdrop=String(catalogEntry?.description||'').match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
     if(selectedBackdrop||heroImage)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+(selectedBackdrop||heroImage)+'")';
     const isTv=Boolean(d.name||d.number_of_seasons!==undefined);
-    const runtime=isTv?(Array.isArray(d.episode_run_time)&&d.episode_run_time.length?d.episode_run_time[0]+' min por episódio':'Não informado'):(d.runtime?d.runtime+' min':'Não informado');
+    const formatRuntime=(minutes,suffix='')=>{const value=Number(minutes);if(!Number.isFinite(value)||value<=0)return 'Não informado';const hours=Math.floor(value/60),mins=value%60;const formatted=hours?`${hours}h${mins?` ${mins}min`:''}`:`${mins} min`;return formatted+suffix;};
+     const runtime=isTv?(Array.isArray(d.episode_run_time)&&d.episode_run_time.length?formatRuntime(d.episode_run_time[0],' por episódio'):'Não informado'):formatRuntime(d.runtime);
     const seasons=isTv?d.number_of_seasons:'';
     const episodes=isTv?d.number_of_episodes:'';
     const cast=renderDetailCredits(d.credits?.cast);
