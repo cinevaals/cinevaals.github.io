@@ -94,6 +94,7 @@
             <div id="catalog-season-wrap" class="full hidden"><label for="catalog-item-season">Temporada *</label><select id="catalog-item-season"><option value="">Selecione a temporada</option></select></div>
             <div id="catalog-episode-wrap" class="full hidden"><label for="catalog-item-episode">Episódio atual *</label><select id="catalog-item-episode"><option value="">Selecione o episódio</option></select></div>
             <div class="full"><label for="catalog-item-image">URL da imagem</label><input id="catalog-item-image" type="url" placeholder="https://..."></div>
+            <div class="full"><label>Imagem de fundo da descrição (opcional)</label><p class="subtitle">Escolha uma imagem do TMDB para o fundo da janela de detalhes. A capa do catálogo não será alterada.</p><input id="catalog-item-backdrop" type="hidden"><button id="catalog-backdrop-search" class="secondary" type="button">Buscar imagens de fundo</button><p id="catalog-backdrop-status" class="subtitle" role="status"></p><div id="catalog-backdrop-options" class="catalog-admin-grid"></div></div>
             <div class="full"><label for="catalog-item-description">Descrição (opcional)</label><textarea id="catalog-item-description" rows="3"></textarea></div>
           </div>
           <div class="toolbar" style="margin-top:15px;justify-content:flex-start"><button id="save-catalog-item" class="primary" type="submit">Salvar no catálogo</button><button id="cancel-catalog-item" class="secondary" type="button">Limpar formulário</button></div>
@@ -495,7 +496,35 @@
   let catalogReturnToLibrary=false;
   const catalogCategoryOptions=[['Filme','🎬 Filmes'],['Série','📺 Séries'],['Animação','🐰 Animações'],['Dorama','💗 Doramas'],['Anime','⛩️ Animes']];
   function normalizedAdminCatalogStatus(value){return value==='Assistindo'?'Em Andamento':value==='Está na Fila'?'Na Fila':(value||'Na Fila');}
-  function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
+  function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('catalog-item-backdrop').value='';$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent='';$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
+  function splitCatalogDescription(value){const match=String(value||'').match(/\s*\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/);return {description:String(value||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').trim(),backdrop:match?.[1]||''};}
+  function renderBackdropOptions(images){
+    const box=$('catalog-backdrop-options'),selected=$('catalog-item-backdrop').value;
+    box.innerHTML=images.map((path,index)=>'<button type="button" data-backdrop-path="'+escapeHtml(path)+'" aria-pressed="'+(path===selected?'true':'false')+'" style="padding:5px;border:2px solid '+(path===selected?'#65bfff':'transparent')+';background:#071326;border-radius:8px;cursor:pointer"><img src="https://image.tmdb.org/t/p/w300'+escapeHtml(path)+'" alt="Imagem de fundo '+(index+1)+'" loading="lazy" style="display:block;width:100%;max-width:240px;aspect-ratio:16/9;object-fit:cover;border-radius:5px"></button>').join('');
+  }
+  async function loadCatalogBackdrops(){
+    const title=$('catalog-item-title').value.trim(),category=$('catalog-item-category').value;
+    if(!title||!category){$('catalog-backdrop-status').textContent='Escolha primeiro o título e a categoria.';return;}
+    $('catalog-backdrop-search').disabled=true;$('catalog-backdrop-status').textContent='Buscando imagens no TMDB...';
+    try{
+      const {data,error}=await supabase.functions.invoke('tmdb-details',{body:{title,category}});
+      if(error)throw error;
+      const d=data?.details||data;
+      const images=(d?.images?.backdrops||[]).map(x=>x.file_path).filter(Boolean);
+      if(d?.backdrop_path&&!images.includes(d.backdrop_path))images.unshift(d.backdrop_path);
+      if(!images.length)throw new Error('O TMDB não retornou imagens de fundo para este título.');
+      renderBackdropOptions(images.slice(0,24));
+      $('catalog-backdrop-status').textContent='Selecione uma imagem. A borda azul indica a escolhida.';
+    }catch(error){$('catalog-backdrop-status').textContent=error.message||'Não foi possível carregar as imagens.';}
+    finally{$('catalog-backdrop-search').disabled=false;}
+  }
+  $('catalog-backdrop-search').addEventListener('click',loadCatalogBackdrops);
+  $('catalog-backdrop-options').addEventListener('click',event=>{
+    const button=event.target.closest('[data-backdrop-path]');if(!button)return;
+    $('catalog-item-backdrop').value=button.dataset.backdropPath;
+    [...$('catalog-backdrop-options').querySelectorAll('[data-backdrop-path]')].forEach(el=>{const active=el===button;el.setAttribute('aria-pressed',String(active));el.style.borderColor=active?'#65bfff':'transparent';});
+    $('catalog-backdrop-status').textContent='Imagem de fundo selecionada.';
+  });
   function renderCatalogCategoryFilters(){
     $('catalog-category-filters').innerHTML=catalogCategoryOptions.map(([value,label])=>`<button type="button" class="catalog-admin-filter${catalogCategoryFilter===value?' active':''}" data-catalog-category-filter="${value}">${label}</button>`).join('');
   }
@@ -637,7 +666,9 @@
     $('catalog-item-category').value=type==='tv'?'Série':'Filme';
     $('catalog-item-image').value=item.poster_path?'https://image.tmdb.org/t/p/w500'+item.poster_path:'';
     $('catalog-item-description').value=item.overview||'';
+    $('catalog-item-backdrop').value='';$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent='';
     $('catalog-item-season').value='';updateCatalogSeasonField();
+    loadCatalogBackdrops();
     $('catalog-admin-status').textContent='Dados preenchidos. Selecione a temporada e salve no catálogo.';
     $('catalog-item-title').focus();
   });
@@ -652,7 +683,10 @@
   populateCatalogProgressOptions();
   $('catalog-form').addEventListener('submit',async event=>{
     event.preventDefault();$('save-catalog-item').disabled=true;$('catalog-admin-status').textContent='Salvando título...';
-    const item={title:$('catalog-item-title').value.trim(),category:$('catalog-item-category').value,status:$('catalog-item-status').value,season:$('catalog-item-category').value==='Filme'?null:($('catalog-item-season').value||null),episode:$('catalog-item-category').value!=='Filme'&&$('catalog-item-status').value==='Em Andamento'?Number($('catalog-item-episode').value):null,image:$('catalog-item-image').value.trim()||null,description:$('catalog-item-description').value.trim()||null};
+    const chosenBackdrop=$('catalog-item-backdrop').value.trim();
+    const cleanDescription=$('catalog-item-description').value.trim();
+    const storedDescription=(cleanDescription?cleanDescription.replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').trim():'')+(chosenBackdrop?'\n\n[[CINEVAALS_BACKDROP:'+chosenBackdrop+']]':'');
+    const item={title:$('catalog-item-title').value.trim(),category:$('catalog-item-category').value,status:$('catalog-item-status').value,season:$('catalog-item-category').value==='Filme'?null:($('catalog-item-season').value||null),episode:$('catalog-item-category').value!=='Filme'&&$('catalog-item-status').value==='Em Andamento'?Number($('catalog-item-episode').value):null,image:$('catalog-item-image').value.trim()||null,description:storedDescription||null};
     const result=editingCatalogId?await supabase.from('catalog').update(item).eq('id',editingCatalogId):await supabase.from('catalog').insert(item);
     $('save-catalog-item').disabled=false;
     if(result.error){$('catalog-admin-status').textContent='Erro ao salvar: '+result.error.message;return;}
@@ -666,7 +700,7 @@
     if(edit){
       const item=catalogItems.find(x=>String(x.id)===edit.dataset.catalogEdit);if(!item)return;
       catalogReturnToLibrary=true;$('catalog-library').classList.add('hidden');$('catalog-manager').classList.remove('hidden');
-      resetCatalogForm();editingCatalogId=item.id;$('catalog-id').value=item.id;$('catalog-item-title').value=item.title||'';$('catalog-item-category').value=item.category||'Filme';$('catalog-item-status').value=['Na Fila','Está na Fila'].includes(item.status)?'Está na Fila':item.status==='Assistindo'?'Em Andamento':(item.status||'Está na Fila');$('catalog-item-image').value=item.image||'';$('catalog-item-description').value=item.description||'';$('catalog-item-season').value=item.season||'';$('catalog-item-episode').value=item.episode||'';updateCatalogSeasonField();
+      resetCatalogForm();editingCatalogId=item.id;$('catalog-id').value=item.id;$('catalog-item-title').value=item.title||'';$('catalog-item-category').value=item.category||'Filme';$('catalog-item-status').value=['Na Fila','Está na Fila'].includes(item.status)?'Está na Fila':item.status==='Assistindo'?'Em Andamento':(item.status||'Está na Fila');$('catalog-item-image').value=item.image||'';const descriptionData=splitCatalogDescription(item.description);$('catalog-item-description').value=descriptionData.description;$('catalog-item-backdrop').value=descriptionData.backdrop;$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent=descriptionData.backdrop?'Imagem de fundo salva. Clique em “Buscar imagens de fundo” para ver outras opções.':'';$('catalog-item-season').value=item.season||'';$('catalog-item-episode').value=item.episode||'';updateCatalogSeasonField();
       if(['Já Assistido','Finalizado'].includes($('catalog-item-status').value)&&$('catalog-item-category').value!=='Filme')$('catalog-item-season').value='Todas as temporadas';
       $('catalog-manager-title').textContent='✧ Editar Conteúdo do Catálogo';$('save-catalog-item').textContent='Salvar alterações';$('catalog-item-title').focus();return;
     }
