@@ -354,6 +354,7 @@ function cleanInternalMarkers(value){
   return String(value??'')
     .replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]*\]\]/g,'')
     .replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]*\]\]/g,'')
+    .replace(/\s*\[\[CINEVAALS_TMDB_ID:\d+\]\]/g,'')
     .trim();
 }
 function normalizeCatalogTitle(value){return String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');}
