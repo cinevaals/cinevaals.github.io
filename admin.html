@@ -630,7 +630,8 @@
   function normalizeTmdbMatchTitle(value){return String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim().toLocaleLowerCase('pt-BR');}
   async function identifyLegacyCatalogIds(items){
     const pending=(items||[]).filter(item=>!parseCatalogTmdbId(item.description)&&!tmdbAutoIdentificationAttempted.has(String(item.id))&&String(item.title||'').trim().length>=2);
-    if(!pending.length)return;
+    if(!pending.length){$('catalog-library-status').textContent='Catálogo carregado. Não há conteúdos antigos pendentes de identificação automática.';return;}
+    $('catalog-library-status').textContent='Identificando automaticamente '+pending.length+' conteúdo(s) antigo(s). Isso pode levar alguns instantes...';
     const {data:sessionData}=await supabase.auth.getSession(),token=sessionData.session?.access_token;
     if(!token){$('catalog-library-status').textContent='Não foi possível identificar os conteúdos antigos: sessão administrativa não encontrada.';return;}
     let identified=0, failed=0;
