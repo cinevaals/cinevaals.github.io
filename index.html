@@ -584,6 +584,11 @@ async function openContentDetails(item){
   $detail('detailTitle').textContent=title;
   const catalogEntry=catalogDetailsFor(item);
   $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,'',item.date?String(item.date).slice(0,4):'');
+  const selectedBackdrop=String(catalogEntry?.description||'').match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
+  // Mostra o fundo escolhido assim que o painel abre, sem esperar a resposta do TMDB.
+  if(selectedBackdrop){
+    hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+selectedBackdrop+'")';
+  }
   const scheduleDescription=/^Episódios para assistir: \d+$/.test(String(item.description||''))?'':(item.description||'');
   const cleanCatalogDescription=String(catalogEntry?.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').trim();
   const catalogDescription=/^Episódios para assistir: \d+$/.test(cleanCatalogDescription)?'':cleanCatalogDescription;
@@ -603,8 +608,7 @@ async function openContentDetails(item){
     const alternateBackdrop=d.images?.backdrops?.find(image=>image.file_path)?.file_path||d.backdrop_path;
     const alternatePoster=d.images?.posters?.find(image=>image.file_path&&image.file_path!==d.poster_path)?.file_path;
     const heroImage=alternateBackdrop||alternatePoster;
-    const selectedBackdrop=String(catalogEntry?.description||'').match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
-    if(selectedBackdrop||heroImage)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+(selectedBackdrop||heroImage)+'")';
+    if(!selectedBackdrop&&heroImage)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+heroImage+'")';
     const isTv=Boolean(d.name||d.number_of_seasons!==undefined);
     const formatRuntime=(minutes,suffix='')=>{const value=Number(minutes);if(!Number.isFinite(value)||value<=0)return 'Não informado';const hours=Math.floor(value/60),mins=value%60;const formatted=hours?`${hours}h${mins?` ${mins}min`:''}`:`${mins} min`;return formatted+suffix;};
      const runtime=isTv?(Array.isArray(d.episode_run_time)&&d.episode_run_time.length?formatRuntime(d.episode_run_time[0],' por episódio'):'Não informado'):formatRuntime(d.runtime);
