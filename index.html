@@ -349,6 +349,12 @@ function shortDate(d){return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'
 function longDate(d){return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long'});}
 let weekStart=mondayOf(new Date());
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function cleanInternalMarkers(value){
+  return String(value??'')
+    .replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]*\]\]/g,'')
+    .replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]*\]\]/g,'')
+    .trim();
+}
 function normalizeCatalogTitle(value){return String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');}
 function formatRating(value){return Number(value).toLocaleString('pt-BR',{minimumFractionDigits:Number(value)%1?1:0,maximumFractionDigits:1});}
 function ratingStarsDisplay(value){const n=Number(value)||0;const full=Math.floor(n);const half=n-full>=.5;return '<span class="rating-display-stars" aria-label="'+formatRating(n)+' de 10">'+Array.from({length:full},()=>'<span class="rating-display-star full">★</span>').join('')+(half?'<span class="rating-display-star half">★</span>':'')+'</span>';}
@@ -528,7 +534,7 @@ function openCatalogDetail(item){
     progress.textContent=parts.join('  ·  ');
     if(parts.length)progress.style.display='inline-flex';
   }
-  const cleanDescription=String(item.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]+\]\]/g,'').trim();
+  const cleanDescription=cleanInternalMarkers(item.description);
   const oldSynopsis=document.getElementById('catalogDetailSynopsis');
   if(oldSynopsis)oldSynopsis.remove();
   if(cleanDescription){
@@ -706,9 +712,9 @@ async function openContentDetails(item){
   renderSeasonProgress(item,catalogEntry);
   const selectedBackdrop=String(catalogEntry?.description||'').match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
   if(selectedBackdrop)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+selectedBackdrop+'")';
-  const cleanScheduleDescription=String(item.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]+\]\]/g,'').trim();
+  const cleanScheduleDescription=cleanInternalMarkers(item.description);
   const scheduleDescription=/^Episódios para assistir: \d+$/.test(cleanScheduleDescription)?'':cleanScheduleDescription;
-  const cleanCatalogDescription=String(catalogEntry?.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').trim();
+  const cleanCatalogDescription=cleanInternalMarkers(catalogEntry?.description);
   const catalogDescription=/^Episódios para assistir: \d+$/.test(cleanCatalogDescription)?'':cleanCatalogDescription;
   const fallbackDescription=scheduleDescription||catalogDescription;
   $detail('detailDescription').textContent=fallbackDescription||'Carregando a sinopse…';
