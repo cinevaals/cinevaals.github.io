@@ -94,7 +94,7 @@
             <div id="catalog-season-wrap" class="full hidden"><label for="catalog-item-season">Temporada *</label><select id="catalog-item-season"><option value="">Selecione a temporada</option></select></div>
             <div id="catalog-episode-wrap" class="full hidden"><label for="catalog-item-episode">Episódio atual *</label><select id="catalog-item-episode"><option value="">Selecione o episódio</option></select></div>
             <div class="full"><label for="catalog-item-image">URL da imagem</label><input id="catalog-item-image" type="url" placeholder="https://..."></div>
-            <div class="full"><label>Imagem de fundo da descrição (opcional)</label><p class="subtitle">Escolha uma imagem do TMDB para o fundo da janela de detalhes. A capa do catálogo não será alterada.</p><input id="catalog-item-backdrop" type="hidden"><button id="catalog-backdrop-search" class="secondary" type="button">Buscar imagens de fundo</button><p id="catalog-backdrop-status" class="subtitle" role="status"></p><div id="catalog-backdrop-options" class="catalog-admin-grid"></div></div>
+            <div id="catalog-backdrop-picker" class="full hidden"><label>Imagem de fundo da descrição (opcional)</label><p class="subtitle">Escolha uma imagem do TMDB para o fundo da janela de detalhes. A capa do catálogo não será alterada.</p><input id="catalog-item-backdrop" type="hidden"><button id="catalog-backdrop-search" class="secondary" type="button">Escolher imagem de fundo</button><p id="catalog-backdrop-status" class="subtitle" role="status"></p><div id="catalog-backdrop-options" class="catalog-admin-grid"></div></div>
             <div class="full"><label for="catalog-item-description">Descrição (opcional)</label><textarea id="catalog-item-description" rows="3"></textarea></div>
           </div>
           <div class="toolbar" style="margin-top:15px;justify-content:flex-start"><button id="save-catalog-item" class="primary" type="submit">Salvar no catálogo</button><button id="cancel-catalog-item" class="secondary" type="button">Limpar formulário</button></div>
@@ -496,7 +496,7 @@
   let catalogReturnToLibrary=false;
   const catalogCategoryOptions=[['Filme','🎬 Filmes'],['Série','📺 Séries'],['Animação','🐰 Animações'],['Dorama','💗 Doramas'],['Anime','⛩️ Animes']];
   function normalizedAdminCatalogStatus(value){return value==='Assistindo'?'Em Andamento':value==='Está na Fila'?'Na Fila':(value||'Na Fila');}
-  function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('catalog-item-backdrop').value='';$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent='';$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
+  function resetCatalogForm(){editingCatalogId=null;$('catalog-id').value='';$('catalog-form').reset();$('catalog-item-category').value='';$('catalog-item-status').value='';$('catalog-item-backdrop').value='';$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent='';$('catalog-backdrop-picker').classList.add('hidden');$('save-catalog-item').textContent='Salvar no catálogo';updateCatalogSeasonField();}
   function splitCatalogDescription(value){const match=String(value||'').match(/\s*\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/);return {description:String(value||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').trim(),backdrop:match?.[1]||''};}
   function renderBackdropOptions(images){
     const box=$('catalog-backdrop-options'),selected=$('catalog-item-backdrop').value;
@@ -667,6 +667,7 @@
     $('catalog-item-image').value=item.poster_path?'https://image.tmdb.org/t/p/w500'+item.poster_path:'';
     $('catalog-item-description').value=item.overview||'';
     $('catalog-item-backdrop').value='';$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent='';
+    $('catalog-backdrop-picker').classList.remove('hidden');
     $('catalog-item-season').value='';updateCatalogSeasonField();
     loadCatalogBackdrops();
     $('catalog-admin-status').textContent='Dados preenchidos. Selecione a temporada e salve no catálogo.';
@@ -700,7 +701,7 @@
     if(edit){
       const item=catalogItems.find(x=>String(x.id)===edit.dataset.catalogEdit);if(!item)return;
       catalogReturnToLibrary=true;$('catalog-library').classList.add('hidden');$('catalog-manager').classList.remove('hidden');
-      resetCatalogForm();editingCatalogId=item.id;$('catalog-id').value=item.id;$('catalog-item-title').value=item.title||'';$('catalog-item-category').value=item.category||'Filme';$('catalog-item-status').value=['Na Fila','Está na Fila'].includes(item.status)?'Está na Fila':item.status==='Assistindo'?'Em Andamento':(item.status||'Está na Fila');$('catalog-item-image').value=item.image||'';const descriptionData=splitCatalogDescription(item.description);$('catalog-item-description').value=descriptionData.description;$('catalog-item-backdrop').value=descriptionData.backdrop;$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent=descriptionData.backdrop?'Imagem de fundo salva. Clique em “Buscar imagens de fundo” para ver outras opções.':'';$('catalog-item-season').value=item.season||'';$('catalog-item-episode').value=item.episode||'';updateCatalogSeasonField();
+      resetCatalogForm();editingCatalogId=item.id;$('catalog-id').value=item.id;$('catalog-item-title').value=item.title||'';$('catalog-item-category').value=item.category||'Filme';$('catalog-item-status').value=['Na Fila','Está na Fila'].includes(item.status)?'Está na Fila':item.status==='Assistindo'?'Em Andamento':(item.status||'Está na Fila');$('catalog-item-image').value=item.image||'';const descriptionData=splitCatalogDescription(item.description);$('catalog-item-description').value=descriptionData.description;$('catalog-item-backdrop').value=descriptionData.backdrop;$('catalog-backdrop-picker').classList.remove('hidden');$('catalog-backdrop-options').innerHTML='';$('catalog-backdrop-status').textContent=descriptionData.backdrop?'Imagem de fundo salva. Clique em “Escolher imagem de fundo” para ver outras opções.':'';$('catalog-item-season').value=item.season||'';$('catalog-item-episode').value=item.episode||'';updateCatalogSeasonField();
       if(['Já Assistido','Finalizado'].includes($('catalog-item-status').value)&&$('catalog-item-category').value!=='Filme')$('catalog-item-season').value='Todas as temporadas';
       $('catalog-manager-title').textContent='✧ Editar Conteúdo do Catálogo';$('save-catalog-item').textContent='Salvar alterações';$('catalog-item-title').focus();return;
     }
