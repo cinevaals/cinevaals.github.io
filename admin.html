@@ -726,7 +726,7 @@
     event.preventDefault();
     const titleToSave=$('catalog-item-title').value.trim();
     const categoryToSave=$('catalog-item-category').value;
-    const normalizeCatalogTitle=value=>String(value||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/\\s+/g,' ').trim().toLocaleLowerCase('pt-BR');
+    const normalizeCatalogTitle=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim().toLocaleLowerCase('pt-BR');
     const duplicate=catalogItems.find(existing=>
       String(existing.id)!==String(editingCatalogId||'') &&
       existing.category===categoryToSave &&
