@@ -615,8 +615,36 @@ function catalogDetailsFor(item){
   const matches=catalogTitles.filter(entry=>normalize(entry.title)===title);
   return matches.find(entry=>normalize(entry.category)===category)||(matches.length===1?matches[0]:null)||null;
 }
+const contentDetailsCache=new Map();
+let activeContentDetailsRequest=0;
+function renderLoadedContentDetails(item,catalogEntry,d,fallbackDescription,selectedBackdrop){
+  const $detail=id=>document.getElementById(id);
+  const hero=$detail('detailHero');
+  const title=item.title||'Sem título';
+  const info=$detail('detailExtra');
+  const wrap=$detail('detailPosterWrap');
+  const alternateBackdrop=d.images?.backdrops?.find(image=>image.file_path)?.file_path||d.backdrop_path;
+  const alternatePoster=d.images?.posters?.find(image=>image.file_path&&image.file_path!==d.poster_path)?.file_path;
+  const heroImage=alternateBackdrop||alternatePoster;
+  if(!selectedBackdrop&&heroImage)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+heroImage+'")';
+  renderSeasonProgress(item,catalogEntry,d);
+  const isTv=Boolean(d.name||d.number_of_seasons!==undefined);
+  const formatRuntime=(minutes,suffix='')=>{const value=Number(minutes);if(!Number.isFinite(value)||value<=0)return 'Não informado';const hours=Math.floor(value/60),mins=value%60;const formatted=hours?hours+'h'+(mins?' '+mins+'min':''):mins+' min';return formatted+suffix;};
+  const runtime=isTv?(Array.isArray(d.episode_run_time)&&d.episode_run_time.length?formatRuntime(d.episode_run_time[0],' por episódio'):'Não informado'):formatRuntime(d.runtime);
+  const seasons=isTv?d.number_of_seasons:'';
+  const episodes=isTv?d.number_of_episodes:'';
+  const cast=renderDetailCredits(d.credits?.cast);
+  const genres=renderDetailGenres(d.genres);
+  $detail('detailDescription').textContent=d.overview||fallbackDescription||'Sinopse não disponível.';
+  const certification=(Array.isArray(d.release_dates?.results)?d.release_dates.results.find(country=>country.iso_3166_1==='BR')?.release_dates?.find(release=>release.certification)?.certification:'')||(Array.isArray(d.content_ratings?.results)?d.content_ratings.results.find(country=>country.iso_3166_1==='BR'&&country.rating)?.rating:'');
+  const releaseYear=String(d.release_date||d.first_air_date||'').slice(0,4)||String(item.date||'').slice(0,4);
+  $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,certification,releaseYear);
+  if(info)info.innerHTML='<div class="detail-facts"><div><span>🎭 Gêneros</span><strong>'+escapeHtml(genres)+'</strong></div><div><span>⏱️ Duração</span><strong>'+escapeHtml(runtime)+'</strong></div>'+(isTv?'<div><span>📺 Temporadas</span><strong>'+escapeHtml(detailText(seasons))+'</strong></div><div><span>🎞️ Episódios</span><strong>'+escapeHtml(detailText(episodes))+'</strong></div>':'')+'<div class="detail-cast"><span>🎬 Elenco principal</span><strong>'+escapeHtml(cast)+'</strong></div></div>';
+  if(d.poster_path)wrap.innerHTML='<img class="detail-poster" src="https://image.tmdb.org/t/p/w500'+escapeHtml(d.poster_path)+'" alt="Capa de '+escapeHtml(title)+'">';
+}
 async function openContentDetails(item){
   if(!item)return;
+  const requestId=++activeContentDetailsRequest;
   const title=item.title||'Sem título';
   const $detail=id=>document.getElementById(id);
   const hero=$detail('detailHero');
@@ -626,46 +654,34 @@ async function openContentDetails(item){
   $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,'',item.date?String(item.date).slice(0,4):'');
   renderSeasonProgress(item,catalogEntry);
   const selectedBackdrop=String(catalogEntry?.description||'').match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
-  // Mostra o fundo escolhido assim que o painel abre, sem esperar a resposta do TMDB.
-  if(selectedBackdrop){
-    hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+selectedBackdrop+'")';
-  }
+  if(selectedBackdrop)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+selectedBackdrop+'")';
   const scheduleDescription=/^Episódios para assistir: \d+$/.test(String(item.description||''))?'':(item.description||'');
   const cleanCatalogDescription=String(catalogEntry?.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').trim();
   const catalogDescription=/^Episódios para assistir: \d+$/.test(cleanCatalogDescription)?'':cleanCatalogDescription;
   const fallbackDescription=scheduleDescription||catalogDescription;
   $detail('detailDescription').textContent=fallbackDescription||'Carregando a sinopse…';
   const wrap=$detail('detailPosterWrap');
-  wrap.innerHTML=item.image?`<img class="detail-poster" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(title)}">`:'<div class="detail-poster" style="display:grid;place-items:center;color:#65bfff">🎬</div>';
+  wrap.innerHTML=item.image?'<img class="detail-poster" src="'+escapeHtml(item.image)+'" alt="Capa de '+escapeHtml(title)+'">':'<div class="detail-poster" style="display:grid;place-items:center;color:#65bfff">🎬</div>';
   const info=$detail('detailExtra');
-  if(info)info.innerHTML='<p class="detail-loading">Buscando informações completas…</p>';
   contentDetailModal.style.display='flex';
   document.body.style.overflow='hidden';
+  const cacheKey=String(item.category||'')+'::'+String(item.id??title).toLocaleLowerCase('pt-BR');
+  const cached=contentDetailsCache.get(cacheKey);
+  if(cached){
+    renderLoadedContentDetails(item,catalogEntry,cached,fallbackDescription,selectedBackdrop);
+    return;
+  }
+  if(info)info.innerHTML='<p class="detail-loading">Buscando informações completas…</p>';
   try{
     const {data,error}=await supabaseClient.functions.invoke('tmdb-details',{body:{title,category:item.category}});
+    if(requestId!==activeContentDetailsRequest)return;
     if(error)throw error;
     const d=data?.details||data;
     if(!d||!d.id)throw new Error('Detalhes não encontrados');
-    const alternateBackdrop=d.images?.backdrops?.find(image=>image.file_path)?.file_path||d.backdrop_path;
-    const alternatePoster=d.images?.posters?.find(image=>image.file_path&&image.file_path!==d.poster_path)?.file_path;
-    const heroImage=alternateBackdrop||alternatePoster;
-    if(!selectedBackdrop&&heroImage)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+heroImage+'")';
-    renderSeasonProgress(item,catalogEntry,d);
-    const isTv=Boolean(d.name||d.number_of_seasons!==undefined);
-    const formatRuntime=(minutes,suffix='')=>{const value=Number(minutes);if(!Number.isFinite(value)||value<=0)return 'Não informado';const hours=Math.floor(value/60),mins=value%60;const formatted=hours?`${hours}h${mins?` ${mins}min`:''}`:`${mins} min`;return formatted+suffix;};
-     const runtime=isTv?(Array.isArray(d.episode_run_time)&&d.episode_run_time.length?formatRuntime(d.episode_run_time[0],' por episódio'):'Não informado'):formatRuntime(d.runtime);
-    const seasons=isTv?d.number_of_seasons:'';
-    const episodes=isTv?d.number_of_episodes:'';
-    const cast=renderDetailCredits(d.credits?.cast);
-    const genres=renderDetailGenres(d.genres);
-    const description=d.overview||fallbackDescription||'Sinopse não disponível.';
-    $detail('detailDescription').textContent=description;
-    const certification=(Array.isArray(d.release_dates?.results)?d.release_dates.results.find(country=>country.iso_3166_1==='BR')?.release_dates?.find(release=>release.certification)?.certification:'')||(Array.isArray(d.content_ratings?.results)?d.content_ratings.results.find(country=>country.iso_3166_1==='BR'&&country.rating)?.rating:'');
-    const releaseYear=String(d.release_date||d.first_air_date||'').slice(0,4)||String(item.date||'').slice(0,4);
-    $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,certification,releaseYear);
-    if(info)info.innerHTML=`<div class="detail-facts"><div><span>🎭 Gêneros</span><strong>${escapeHtml(genres)}</strong></div><div><span>⏱️ ${isTv?'Duração':'Duração'}</span><strong>${escapeHtml(runtime)}</strong></div>${isTv?`<div><span>📺 Temporadas</span><strong>${escapeHtml(detailText(seasons))}</strong></div><div><span>🎞️ Episódios</span><strong>${escapeHtml(detailText(episodes))}</strong></div>`:''}<div class="detail-cast"><span>🎬 Elenco principal</span><strong>${escapeHtml(cast)}</strong></div></div>`;
-    if(d.poster_path){wrap.innerHTML=`<img class="detail-poster" src="https://image.tmdb.org/t/p/w500${escapeHtml(d.poster_path)}" alt="Capa de ${escapeHtml(title)}">`;}
+    contentDetailsCache.set(cacheKey,d);
+    renderLoadedContentDetails(item,catalogEntry,d,fallbackDescription,selectedBackdrop);
   }catch(error){
+    if(requestId!==activeContentDetailsRequest)return;
     console.error('Não foi possível carregar os detalhes do TMDB:',error);
     if(info)info.innerHTML='<p class="detail-loading">Não foi possível carregar os detalhes completos agora. A descrição cadastrada no catálogo continua disponível, quando houver.</p>';
     $detail('detailDescription').textContent=fallbackDescription||'Sinopse não disponível para este conteúdo.';
