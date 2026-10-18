@@ -633,13 +633,37 @@ function catalogDetailsFor(item){
 }
 const contentDetailsCache=new Map();
 const contentDetailsPending=new Map();
+const CONTENT_DETAILS_STORAGE_PREFIX='cinevaals:content-details:v1:';
+const CONTENT_DETAILS_CACHE_TTL=7*24*60*60*1000;
 let activeContentDetailsRequest=0;
 function contentDetailsKey(item){
   return String(item.category||'')+'::'+String(item.id??item.title??'').toLocaleLowerCase('pt-BR');
 }
+function readStoredContentDetails(key){
+  try{
+    const raw=localStorage.getItem(CONTENT_DETAILS_STORAGE_PREFIX+encodeURIComponent(key));
+    if(!raw)return null;
+    const saved=JSON.parse(raw);
+    if(!saved||!saved.details||!saved.savedAt||Date.now()-saved.savedAt>CONTENT_DETAILS_CACHE_TTL){
+      localStorage.removeItem(CONTENT_DETAILS_STORAGE_PREFIX+encodeURIComponent(key));
+      return null;
+    }
+    return saved.details;
+  }catch(error){return null;}
+}
+function storeContentDetails(key,details){
+  try{
+    localStorage.setItem(CONTENT_DETAILS_STORAGE_PREFIX+encodeURIComponent(key),JSON.stringify({savedAt:Date.now(),details}));
+  }catch(error){}
+}
 function fetchContentDetails(item){
   const key=contentDetailsKey(item);
   if(contentDetailsCache.has(key))return Promise.resolve(contentDetailsCache.get(key));
+  const stored=readStoredContentDetails(key);
+  if(stored){
+    contentDetailsCache.set(key,stored);
+    return Promise.resolve(stored);
+  }
   if(contentDetailsPending.has(key))return contentDetailsPending.get(key);
   const request=supabaseClient.functions.invoke('tmdb-details',{body:{title:item.title||'Sem título',category:item.category}})
     .then(({data,error})=>{
@@ -647,6 +671,7 @@ function fetchContentDetails(item){
       const details=data?.details||data;
       if(!details||!details.id)throw new Error('Detalhes não encontrados');
       contentDetailsCache.set(key,details);
+      storeContentDetails(key,details);
       return details;
     })
     .finally(()=>contentDetailsPending.delete(key));
