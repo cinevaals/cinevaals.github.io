@@ -516,14 +516,14 @@ function openCatalogDetail(item){
   const progressBar=document.getElementById('catalogDetailProgressBar');
   progress.style.display='none';progress.textContent='';
   progressBar.style.display='none';progressBar.innerHTML='';
-  if(inProgress){
-    const seasonMatch=String(item.season||'').match(/(\\d+)/);
-    const episode=Number(item.episode);
-    const seasonNumber=seasonMatch?Number(seasonMatch[1]):null;
-    if(seasonNumber&&Number.isFinite(episode)&&episode>0){
-      progress.textContent='Temporada '+seasonNumber+'  ·  Episódio '+Math.floor(episode);
-      progress.style.display='inline-flex';
-    }
+  if(inProgress&&(item.season||item.episode)){
+    const seasonText=String(item.season||'').trim();
+    const episodeText=String(item.episode||'').trim();
+    const parts=[];
+    if(seasonText)parts.push(/^temporada\\s/i.test(seasonText)?seasonText:'Temporada '+seasonText.replace(/^s(eason)?\\s*/i,''));
+    if(episodeText)parts.push(/^epis[oó]dio\\s/i.test(episodeText)?episodeText:'Episódio '+episodeText.replace(/^e(p(isode)?)?\\s*/i,''));
+    progress.textContent=parts.join('  ·  ');
+    if(parts.length)progress.style.display='inline-flex';
   }
   const cleanDescription=String(item.description||'').replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]+\]\]/g,'').replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]+\]\]/g,'').trim();
   const oldSynopsis=document.getElementById('catalogDetailSynopsis');
