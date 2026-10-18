@@ -117,8 +117,8 @@
         <div class="toolbar"><div><h2 id="catalog-library-title">▦ Gerenciar Catálogo</h2><p class="subtitle">Filtre por categoria e status para atualizar seu progresso.</p></div><button id="close-catalog-library" class="secondary" type="button">Fechar</button></div>
         <div id="catalog-category-filters" class="catalog-admin-filters" aria-label="Filtrar por categoria"></div>
         <div class="catalog-admin-filter-row">
-          <button id="catalog-status-filter-toggle" class="catalog-admin-filter catalog-admin-status-filter-toggle" type="button" aria-expanded="false">☷ Filtrar</button>
           <div class="catalog-admin-search-wrap"><input id="catalog-admin-search" type="search" placeholder="⌕  Buscar título..." aria-label="Buscar título"></div>
+          <button id="catalog-status-filter-toggle" class="catalog-admin-filter catalog-admin-status-filter-toggle" type="button" aria-expanded="false">☷ Filtrar</button>
         </div>
         <div id="catalog-status-filters" class="catalog-admin-filters hidden" aria-label="Filtrar por status"></div>
         <p id="catalog-library-status" class="subtitle" role="status"></p>
@@ -265,9 +265,12 @@
     if(event.target===$('editor'))closeEditor();
   });
   document.addEventListener('keydown',event=>{
-    if(event.key==='Escape' && !$('rating-editor').classList.contains('hidden'))$('rating-editor').classList.add('hidden');
-    else if(event.key==='Escape' && !$('ratings-manager').classList.contains('hidden'))$('ratings-manager').classList.add('hidden');
-    else if(event.key==='Escape' && !$('editor').classList.contains('hidden'))closeEditor();
+    if(event.key!=='Escape')return;
+    if(!$('rating-editor').classList.contains('hidden')){$('rating-editor').classList.add('hidden');return;}
+    if(!$('ratings-manager').classList.contains('hidden')){$('ratings-manager').classList.add('hidden');return;}
+    if(!$('catalog-manager').classList.contains('hidden')){$('catalog-manager').classList.add('hidden');if(catalogReturnToLibrary){catalogReturnToLibrary=false;$('catalog-library').classList.remove('hidden');}return;}
+    if(!$('catalog-library').classList.contains('hidden')){$('catalog-library').classList.add('hidden');return;}
+    if(!$('editor').classList.contains('hidden')){closeEditor();return;}
   });
 
   $('login-form').addEventListener('submit',async event=>{
