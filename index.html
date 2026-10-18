@@ -638,13 +638,22 @@ function catalogDetailsFor(item){
   const matches=catalogTitles.filter(entry=>normalize(entry.title)===title);
   return matches.find(entry=>normalize(entry.category)===category)||(matches.length===1?matches[0]:null)||null;
 }
+function contentDetailsTmdbId(item){
+  const catalogEntry=catalogDetailsFor(item);
+  const source=String(catalogEntry?.description||item?.description||'');
+  const savedId=source.match(/\[\[CINEVAALS_TMDB_ID:(\d+)\]\]/)?.[1];
+  if(savedId)return savedId;
+  const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLocaleLowerCase('pt-BR');
+  if(normalize(item?.title)==='dom'&&normalize(item?.category)==='série')return '123377';
+  return null;
+}
 const contentDetailsCache=new Map();
 const contentDetailsPending=new Map();
-const CONTENT_DETAILS_STORAGE_PREFIX='cinevaals:content-details:v1:';
+const CONTENT_DETAILS_STORAGE_PREFIX='cinevaals:content-details:v2:';
 const CONTENT_DETAILS_CACHE_TTL=7*24*60*60*1000;
 let activeContentDetailsRequest=0;
 function contentDetailsKey(item){
-  return String(item.category||'')+'::'+String(item.id??item.title??'').toLocaleLowerCase('pt-BR');
+  return String(item.category||'')+'::'+String(item.id??item.title??'').toLocaleLowerCase('pt-BR')+'::tmdb:'+String(contentDetailsTmdbId(item)||'');
 }
 function readStoredContentDetails(key){
   try{
@@ -672,7 +681,7 @@ function fetchContentDetails(item){
     return Promise.resolve(stored);
   }
   if(contentDetailsPending.has(key))return contentDetailsPending.get(key);
-  const request=supabaseClient.functions.invoke('tmdb-details',{body:{title:item.title||'Sem título',category:item.category}})
+  const request=supabaseClient.functions.invoke('tmdb-details',{body:{title:item.title||'Sem título',category:item.category,tmdbId:contentDetailsTmdbId(item)}})
     .then(({data,error})=>{
       if(error)throw error;
       const details=data?.details||data;
