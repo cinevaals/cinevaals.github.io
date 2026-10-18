@@ -21,7 +21,8 @@ serve(async (req) => {
     const body = await req.json();
     const title = String(body?.title ?? "").trim();
     const category = String(body?.category ?? "").trim();
-    if (!title) return Response.json({ error: "Informe um título." }, { status: 400, headers: corsHeaders });
+    const requestedTmdbId = String(body?.tmdbId ?? "").trim();
+    if (!title && !/^\d+$/.test(requestedTmdbId)) return Response.json({ error: "Informe um título ou ID do TMDB." }, { status: 400, headers: corsHeaders });
 
     // Try the v4 Bearer token first. If it is a v3 key, retry with api_key query parameter.
     const tmdbFetch = async (input: URL) => {
@@ -47,19 +48,23 @@ serve(async (req) => {
     };
 
     let type = category === "Filme" ? "movie" : "tv";
-    let results = await search(type);
-    if (!results.length) {
-      type = type === "movie" ? "tv" : "movie";
-      results = await search(type);
-    }
-    if (!results.length) {
-      return Response.json({ error: "Título não encontrado no TMDB." }, { status: 404, headers: corsHeaders });
+    let selectedId = requestedTmdbId;
+    if (!/^\d+$/.test(selectedId)) {
+      let results = await search(type);
+      if (!results.length) {
+        type = type === "movie" ? "tv" : "movie";
+        results = await search(type);
+      }
+      if (!results.length) {
+        return Response.json({ error: "Título não encontrado no TMDB." }, { status: 404, headers: corsHeaders });
+      }
+
+      const normalized = (value: string) => value.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
+      const best = results.find((item: any) => normalized(item.title || item.name || "") === normalized(title)) || results[0];
+      selectedId = String(best.id);
     }
 
-    const normalized = (value: string) => value.toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, "");
-    const best = results.find((item: any) => normalized(item.title || item.name || "") === normalized(title)) || results[0];
-
-    const detailsUrl = new URL(`https://api.themoviedb.org/3/${type}/${best.id}`);
+    const detailsUrl = new URL(`https://api.themoviedb.org/3/${type}/${selectedId}`);
     detailsUrl.searchParams.set("language", "pt-BR");
     detailsUrl.searchParams.set("append_to_response", type === "movie" ? "credits,images,release_dates" : "credits,images,content_ratings");
     detailsUrl.searchParams.set("include_image_language", "pt-BR,en,null");
