@@ -206,7 +206,7 @@
 
   function render(){
     const end=new Date(weekStart); end.setDate(end.getDate()+6);
-    $('week-title').innerHTML=`${prettyDate(weekStart,{day:'2-digit',month:'short'})} – ${prettyDate(end,{day:'2-digit',month:'short',year:'numeric'})}<small>✦ ${dateKey(weekStart)===dateKey(mondayOf(new Date()))?'SEMANA<br>ATUAL':'PROGRAMAÇÃO SEMANAL'} ✦</small>`;
+    $('week-title').innerHTML=`${prettyDate(weekStart,{day:'2-digit',month:'short'})} – ${prettyDate(end,{day:'2-digit',month:'short',year:'numeric'})}<small>✦ ${dateKey(weekStart)===dateKey(mondayOf(new Date()))?'SEMANA ATUAL':'PROGRAMAÇÃO SEMANAL'} ✦</small>`;
     const weekdays=['Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado','Domingo'];
     $('days').innerHTML=weekdays.map((name,i)=>{
       const d=new Date(weekStart); d.setDate(d.getDate()+i); const key=dateKey(d);
