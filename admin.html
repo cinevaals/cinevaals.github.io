@@ -635,10 +635,26 @@
     const {data:sessionData}=await supabase.auth.getSession(),token=sessionData.session?.access_token;
     if(!token){$('catalog-library-status').textContent='Não foi possível identificar os conteúdos antigos: sessão administrativa não encontrada.';return;}
     let identified=0, failed=0;
+    const verifiedLegacyIds={
+      'dom|série':'123377',
+      'yellowstone|série':'73586',
+      'duna|filme':'438631',
+      'o pequeno príncipe|filme':'37627',
+      'motoqueiros selvagens|filme':'11199',
+      'missão quase impossível|filme':'23172'
+    };
     for(const item of pending){
       tmdbAutoIdentificationAttempted.add(String(item.id));
       if(!['Filme','Série','Dorama','Anime','Animação'].includes(item.category)){failed++;continue;}
       try{
+        const manualId=verifiedLegacyIds[normalizeTmdbMatchTitle(item.title)+'|'+normalizeTmdbMatchTitle(item.category)];
+        if(manualId){
+          const description=String(item.description||'').trim();
+          const updatedDescription=(description?description+'\n\n':'')+'[[CINEVAALS_TMDB_ID:'+manualId+']]';
+          const {error:updateError}=await supabase.from('catalog').update({description:updatedDescription}).eq('id',item.id);
+          if(!updateError){item.description=updatedDescription;identified++;continue;}
+          failed++;continue;
+        }
         const {data,error}=await supabase.functions.invoke('tmdb-search',{body:{query:item.title},headers:{Authorization:'Bearer '+token}});
         if(error){failed++;continue;}
         const results=Array.isArray(data)?data:(data?.results||[]);
