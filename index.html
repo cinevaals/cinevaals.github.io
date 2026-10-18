@@ -602,7 +602,8 @@ function renderSeasonProgress(item,catalogEntry,tvDetails=null){
   if(!Number.isFinite(total)||total<1)return;
   const current=Math.min(Math.floor(episode),total);
   const percent=Math.round(current/total*100);
-  const label=season?.name||('Temporada '+seasonNumber);
+  const isMiniseries=String(tvDetails?.type||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'')==='miniseries';
+  const label=isMiniseries?'Minissérie':(season?.name||('Temporada '+seasonNumber));
   box.innerHTML='<div class="detail-season-progress-head"><span class="detail-season-progress-label">'+escapeHtml(label)+'</span><span class="detail-season-progress-count">'+current+' / '+total+' episódios</span></div><div class="detail-season-progress-track" role="progressbar" aria-label="Progresso de '+escapeHtml(label)+'" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+current+'"><div class="detail-season-progress-fill" style="width:'+percent+'%"></div></div><div class="detail-season-progress-percent">'+percent+'% concluído</div>';
   box.style.display='block';
 }
