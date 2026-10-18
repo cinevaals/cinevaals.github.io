@@ -625,7 +625,31 @@ function catalogDetailsFor(item){
   return matches.find(entry=>normalize(entry.category)===category)||(matches.length===1?matches[0]:null)||null;
 }
 const contentDetailsCache=new Map();
+const contentDetailsPending=new Map();
 let activeContentDetailsRequest=0;
+function contentDetailsKey(item){
+  return String(item.category||'')+'::'+String(item.id??item.title??'').toLocaleLowerCase('pt-BR');
+}
+function fetchContentDetails(item){
+  const key=contentDetailsKey(item);
+  if(contentDetailsCache.has(key))return Promise.resolve(contentDetailsCache.get(key));
+  if(contentDetailsPending.has(key))return contentDetailsPending.get(key);
+  const request=supabaseClient.functions.invoke('tmdb-details',{body:{title:item.title||'Sem título',category:item.category}})
+    .then(({data,error})=>{
+      if(error)throw error;
+      const details=data?.details||data;
+      if(!details||!details.id)throw new Error('Detalhes não encontrados');
+      contentDetailsCache.set(key,details);
+      return details;
+    })
+    .finally(()=>contentDetailsPending.delete(key));
+  contentDetailsPending.set(key,request);
+  return request;
+}
+function prefetchContentDetails(item){
+  if(!item)return;
+  fetchContentDetails(item).catch(()=>{});
+}
 function renderLoadedContentDetails(item,catalogEntry,d,fallbackDescription,selectedBackdrop){
   const $detail=id=>document.getElementById(id);
   const hero=$detail('detailHero');
@@ -674,20 +698,16 @@ async function openContentDetails(item){
   const info=$detail('detailExtra');
   contentDetailModal.style.display='flex';
   document.body.style.overflow='hidden';
-  const cacheKey=String(item.category||'')+'::'+String(item.id??title).toLocaleLowerCase('pt-BR');
+  const cacheKey=contentDetailsKey(item);
   const cached=contentDetailsCache.get(cacheKey);
   if(cached){
     renderLoadedContentDetails(item,catalogEntry,cached,fallbackDescription,selectedBackdrop);
     return;
   }
-  if(info)info.innerHTML='<p class="detail-loading">Buscando informações completas…</p>';
+  if(info)info.innerHTML='<p class="detail-loading">Carregando informações…</p>';
   try{
-    const {data,error}=await supabaseClient.functions.invoke('tmdb-details',{body:{title,category:item.category}});
+    const d=await fetchContentDetails(item);
     if(requestId!==activeContentDetailsRequest)return;
-    if(error)throw error;
-    const d=data?.details||data;
-    if(!d||!d.id)throw new Error('Detalhes não encontrados');
-    contentDetailsCache.set(cacheKey,d);
     renderLoadedContentDetails(item,catalogEntry,d,fallbackDescription,selectedBackdrop);
   }catch(error){
     if(requestId!==activeContentDetailsRequest)return;
@@ -697,11 +717,22 @@ async function openContentDetails(item){
   }
 }
 function closeContentDetails(){contentDetailModal.style.display='none';document.body.style.overflow='';}
-schedule.addEventListener('click',event=>{
+function scheduleContentFromEvent(event){
   const trigger=event.target.closest('[data-content-id]');
-  if(!trigger)return;
-  const item=titles.find(entry=>String(entry.id??entry.title)===trigger.dataset.contentId);
-  openContentDetails(item);
+  if(!trigger)return null;
+  return titles.find(entry=>String(entry.id??entry.title)===trigger.dataset.contentId)||null;
+}
+schedule.addEventListener('pointerover',event=>{
+  const item=scheduleContentFromEvent(event);
+  if(item)prefetchContentDetails(item);
+});
+schedule.addEventListener('focusin',event=>{
+  const item=scheduleContentFromEvent(event);
+  if(item)prefetchContentDetails(item);
+});
+schedule.addEventListener('click',event=>{
+  const item=scheduleContentFromEvent(event);
+  if(item)openContentDetails(item);
 });
 document.getElementById('closeContentDetail').addEventListener('click',closeContentDetails);
 contentDetailModal.addEventListener('click',event=>{if(event.target===contentDetailModal)closeContentDetails();});
