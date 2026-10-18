@@ -190,6 +190,13 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 #contentDetailModal .detail-poster{width:100%;aspect-ratio:2/3;object-fit:cover;background:#081426;border-radius:12px;border:1px solid #4a81b7;box-shadow:0 12px 30px #0009;display:block}
 #contentDetailModal h2{margin:78px 42px 8px 0;color:#f4f8ff;font-size:clamp(23px,4.2vw,34px);line-height:1.12;letter-spacing:-.5px}
 #contentDetailModal .detail-meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:17px}#contentDetailModal .detail-meta .detail-tag{display:inline-flex;align-items:center;padding:5px 10px;border:1px solid #37618b;border-radius:8px;background:linear-gradient(145deg,#102846,#071326);color:#cce7ff;font-size:11px;font-weight:700;line-height:1.4;letter-spacing:.2px}
+#contentDetailModal .detail-season-progress{margin:16px 0 4px;padding:12px 13px;border:1px solid #21466e;border-radius:11px;background:linear-gradient(145deg,#0b1b30,#081222);box-shadow:inset 0 1px 0 #ffffff08}
+#contentDetailModal .detail-season-progress-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:9px}
+#contentDetailModal .detail-season-progress-label{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#78bfff}
+#contentDetailModal .detail-season-progress-count{font-size:12px;font-weight:800;color:#eaf5ff;white-space:nowrap}
+#contentDetailModal .detail-season-progress-track{height:7px;overflow:hidden;border-radius:99px;background:#071326;border:1px solid #1d3b5e}
+#contentDetailModal .detail-season-progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#168bff,#65bfff);box-shadow:0 0 10px #168bff55;transition:width .25s ease}
+#contentDetailModal .detail-season-progress-percent{margin-top:7px;text-align:right;color:#9fcdf5;font-size:10px;font-weight:700}
 #contentDetailModal .detail-description-title{font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:#65bfff;margin:20px 0 8px}
 #contentDetailModal .detail-description{color:#d3dfef;font-size:14px;line-height:1.8;white-space:pre-line}
 #contentDetailModal .detail-extra{margin-top:20px}
@@ -296,6 +303,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
         <div>
           <h2 id="detailTitle"></h2>
           <div class="detail-meta" id="detailMeta"></div>
+          <div id="detailSeasonProgress" class="detail-season-progress" style="display:none" aria-label="Progresso da temporada"></div>
           <div class="detail-description-title">Sinopse</div>
           <div class="detail-description" id="detailDescription"></div>
         </div>
@@ -571,6 +579,32 @@ function renderDetailTags(category,status,certification,year){
   if(certification)tags.push(String(certification));
   return tags.map(value=>'<span class="detail-tag">'+escapeHtml(value)+'</span>').join('');
 }
+function catalogTvDataFromDescription(value){
+  const match=String(value||'').match(/\\[\\[CINEVAALS_TV_DATA:([^\\]]+)\\]\\]/);
+  if(!match)return null;
+  try{const data=JSON.parse(decodeURIComponent(match[1]));return Array.isArray(data.seasons)?data:null;}catch{return null;}
+}
+function renderSeasonProgress(item,catalogEntry){
+  const box=document.getElementById('detailSeasonProgress');
+  if(!box)return;
+  box.style.display='none';box.innerHTML='';
+  const category=String(item?.category||'');
+  const supported=['Série','Animação','Anime'].includes(category);
+  if(!supported||normalizedCatalogStatus(catalogEntry?.status)!=='Em Andamento')return;
+  const seasonMatch=String(catalogEntry?.season||'').match(/(\\d+)/);
+  const episode=Number(catalogEntry?.episode);
+  if(!seasonMatch||!Number.isFinite(episode)||episode<1)return;
+  const seasonNumber=Number(seasonMatch[1]);
+  const tvData=catalogTvDataFromDescription(catalogEntry?.description);
+  const season=tvData?.seasons?.find(entry=>Number(entry.number)===seasonNumber);
+  const total=Number(season?.episodeCount);
+  if(!Number.isFinite(total)||total<1)return;
+  const current=Math.min(Math.floor(episode),total);
+  const percent=Math.round(current/total*100);
+  const label=season?.name||('Temporada '+seasonNumber);
+  box.innerHTML='<div class="detail-season-progress-head"><span class="detail-season-progress-label">'+escapeHtml(label)+'</span><span class="detail-season-progress-count">'+current+' / '+total+' episódios</span></div><div class="detail-season-progress-track" role="progressbar" aria-label="Progresso de '+escapeHtml(label)+'" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+current+'"><div class="detail-season-progress-fill" style="width:'+percent+'%"></div></div><div class="detail-season-progress-percent">'+percent+'% concluído</div>';
+  box.style.display='block';
+}
 function catalogDetailsFor(item){
   const normalize=value=>String(value||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   return catalogTitles.find(entry=>normalize(entry.title)===normalize(item?.title)&&entry.category===item?.category)||null;
@@ -584,6 +618,7 @@ async function openContentDetails(item){
   $detail('detailTitle').textContent=title;
   const catalogEntry=catalogDetailsFor(item);
   $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,'',item.date?String(item.date).slice(0,4):'');
+  renderSeasonProgress(item,catalogEntry);
   const selectedBackdrop=String(catalogEntry?.description||'').match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
   // Mostra o fundo escolhido assim que o painel abre, sem esperar a resposta do TMDB.
   if(selectedBackdrop){
