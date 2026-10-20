@@ -213,8 +213,9 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   #catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal{animation:portraitBackdropIn .32s ease-out both;}
   #catalogModal>section,#ratingsModal>section,#aboutModal>div,#catalogDetailModal>section,#contentDetailModal .detail-card{animation:portraitPanelRise .38s cubic-bezier(.22,.75,.25,1) both;}
   @media(prefers-reduced-motion:reduce){#catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal,#catalogModal>section,#ratingsModal>section,#aboutModal>div,#catalogDetailModal>section,#contentDetailModal .detail-card{animation-duration:.01ms!important}}
-  .panel-drag-tracking{transition:none!important;animation:none!important;will-change:transform}
-  .panel-drag-return{transition:transform .22s cubic-bezier(.2,.8,.2,1)!important}
+  .panel-drag-tracking,.panel-drag-closing{transition:none!important;animation:none!important;will-change:transform}
+  .panel-drag-active,.panel-drag-closing{animation:none!important}
+  .panel-drag-return{transition:transform .22s cubic-bezier(.2,.8,.2,1)!important;animation:none!important}
   #catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal{transition:opacity .2s ease-out}
   #catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal{position:fixed!important;inset:0!important;width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;padding:0!important;margin:0!important;align-items:stretch!important;justify-content:stretch!important;border-radius:0!important}
   #catalogModal>section,#ratingsModal>section{width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:0!important;overflow-y:auto!important;overscroll-behavior:contain;padding:max(20px,env(safe-area-inset-top)) 14px max(20px,env(safe-area-inset-bottom))!important}
@@ -985,17 +986,17 @@ function closePanelWhenScrolledToEnd(element,closeFn){
   const atEnd=()=>element.scrollHeight<=element.clientHeight+3||(element.scrollTop>0&&element.scrollTop+element.clientHeight>=element.scrollHeight-3);
   const reset=()=>{
     touchStartY=null;startedAtEnd=false;dragging=false;
-    element.classList.remove('panel-drag-tracking','panel-drag-return');
+    element.classList.remove('panel-drag-tracking','panel-drag-return','panel-drag-closing');
     element.style.transform='';
     element.style.transition='';
-    if(overlay){overlay.style.opacity='';overlay.style.transition='';overlay=null;}
+    if(overlay){overlay.classList.remove('panel-drag-active','panel-drag-closing');overlay.style.opacity='';overlay.style.transition='';overlay=null;}
   };
   element.addEventListener('touchstart',event=>{
     if(!isPortraitMobile()||event.touches.length!==1){reset();return;}
     touchStartY=event.touches[0].clientY;
     startedAtEnd=atEnd();
     overlay=element.closest('#catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal');
-    if(overlay){overlay.style.opacity='';overlay.style.transition='';}
+    if(overlay){overlay.classList.add('panel-drag-active');overlay.style.opacity='';overlay.style.transition='';}
   },{passive:true});
   element.addEventListener('touchmove',event=>{
     if(!isPortraitMobile()||touchStartY===null||!startedAtEnd||!atEnd()||event.touches.length!==1)return;
@@ -1003,6 +1004,7 @@ function closePanelWhenScrolledToEnd(element,closeFn){
     if(delta<=0)return;
     dragging=true;
     element.classList.add('panel-drag-tracking');
+    if(overlay)overlay.classList.add('panel-drag-active');
     element.style.transform='translateY('+(-delta)+'px)';
     if(overlay)overlay.style.opacity=String(Math.max(0,1-delta/Math.max(260,window.innerHeight*.72)));
   },{passive:true});
@@ -1011,16 +1013,16 @@ function closePanelWhenScrolledToEnd(element,closeFn){
     const endY=event.changedTouches[0]?.clientY;
     const delta=typeof endY==='number'?touchStartY-endY:0;
     if(startedAtEnd&&atEnd()&&dragging&&delta>=100){
-      element.classList.remove('panel-drag-tracking');
+      element.classList.remove('panel-drag-return');
+      element.classList.add('panel-drag-tracking','panel-drag-closing');
+      if(overlay)overlay.classList.add('panel-drag-active','panel-drag-closing');
       element.style.transition='transform .24s cubic-bezier(.4,0,1,1)';
       element.style.transform='translateY(-110%)';
       if(overlay){overlay.style.transition='opacity .24s linear';overlay.style.opacity='0';}
-      const closingOverlay=overlay;
       setTimeout(()=>{
+        // Primeiro oculta o modal; só depois remove os estilos temporários para impedir que a animação de abertura reapareça.
         closeFn();
-        // Limpa os estilos só depois de ocultar o painel, para não o fazer reaparecer por um instante.
         reset();
-        if(closingOverlay){closingOverlay.style.opacity='';closingOverlay.style.transition='';}
       },250);
       return;
     }
