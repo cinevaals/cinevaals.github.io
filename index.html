@@ -202,6 +202,19 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 .nav-dropdown.open .nav-dropdown-menu{
   display:block;
 }
+
+/* Modo retrato: painéis em tela inteira e cabeçalho que se esconde ao rolar para baixo. */
+@media (max-width:800px) and (orientation:portrait){
+  .topnav{transition:transform .22s ease;will-change:transform}
+  .topnav.mobile-scroll-hidden{transform:translateY(-110%)}
+  .topnav.menu-open{transform:none!important}
+  #catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal{position:fixed!important;inset:0!important;width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;padding:0!important;margin:0!important;align-items:stretch!important;justify-content:stretch!important;border-radius:0!important}
+  #catalogModal>section,#ratingsModal>section{width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:0!important;overflow-y:auto!important;overscroll-behavior:contain;padding:max(20px,env(safe-area-inset-top)) 14px max(20px,env(safe-area-inset-bottom))!important}
+  #catalogDetailModal>section{width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:0!important;overflow-y:auto!important;overscroll-behavior:contain;padding:max(22px,env(safe-area-inset-top)) 16px max(22px,env(safe-area-inset-bottom))!important}
+  #aboutModal>div{width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:0!important;overflow-y:auto!important;overscroll-behavior:contain;text-align:left!important;padding:max(30px,env(safe-area-inset-top)) 22px max(28px,env(safe-area-inset-bottom))!important}
+  #contentDetailModal .detail-card{width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;border:0!important;border-radius:0!important;overflow-y:auto!important;overscroll-behavior:contain;padding-top:env(safe-area-inset-top)!important;padding-bottom:env(safe-area-inset-bottom)!important}
+  #contentDetailModal .detail-hero{border-radius:0!important}
+}
 </style>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
@@ -937,6 +950,33 @@ function closeMobileNavigation(){topNavigation.classList.remove('menu-open');mob
 mobileMenuToggle.addEventListener('click',()=>{const isOpen=topNavigation.classList.toggle('menu-open');mobileMenuToggle.setAttribute('aria-expanded',String(isOpen));mobileMenuToggle.setAttribute('aria-label',isOpen?'Fechar menu':'Abrir menu');mobileMenuToggle.textContent=isOpen?'×':'☰';});
 primaryNav.addEventListener('click',event=>{const dropdownButton=event.target.closest('.nav-dropdown-btn');if(dropdownButton){const dropdown=dropdownButton.closest('.nav-dropdown');const isOpen=dropdown.classList.toggle('open');dropdownButton.setAttribute('aria-expanded',String(isOpen));return;}if(event.target.closest('a,.nav-links .nav-link'))closeMobileNavigation();});
 document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMobileNavigation();});
+
+// Em celulares no modo retrato, esconder o cabeçalho ao descer e revelá-lo ao subir.
+let lastPortraitScrollY=window.scrollY;
+window.addEventListener('scroll',()=>{
+  const portraitMobile=window.matchMedia('(max-width:800px) and (orientation:portrait)').matches;
+  if(!portraitMobile){topNavigation.classList.remove('mobile-scroll-hidden');lastPortraitScrollY=window.scrollY;return;}
+  if(topNavigation.classList.contains('menu-open')){lastPortraitScrollY=window.scrollY;return;}
+  const currentY=window.scrollY;
+  if(currentY<24||currentY<lastPortraitScrollY-5)topNavigation.classList.remove('mobile-scroll-hidden');
+  else if(currentY>lastPortraitScrollY+5)topNavigation.classList.add('mobile-scroll-hidden');
+  lastPortraitScrollY=currentY;
+},{passive:true});
+
+// Chegar ao fim de um painel com rolagem fecha-o; o botão X continua disponível.
+function closePanelWhenScrolledToEnd(element,closeFn){
+  if(!element)return;
+  element.addEventListener('scroll',()=>{
+    if(!window.matchMedia('(max-width:800px) and (orientation:portrait)').matches)return;
+    const atEnd=element.scrollTop>0&&element.scrollTop+element.clientHeight>=element.scrollHeight-3;
+    if(atEnd)closeFn();
+  },{passive:true});
+}
+closePanelWhenScrolledToEnd(document.querySelector('#catalogModal>section'),()=>{catalogModal.style.display='none';});
+closePanelWhenScrolledToEnd(document.querySelector('#ratingsModal>section'),()=>{ratingsModal.style.display='none';document.body.style.overflow='';});
+closePanelWhenScrolledToEnd(document.querySelector('#catalogDetailModal>section'),closeCatalogDetail);
+closePanelWhenScrolledToEnd(document.querySelector('#aboutModal>div'),()=>{aboutModal.style.display='none';});
+closePanelWhenScrolledToEnd(document.querySelector('#contentDetailModal .detail-card'),closeContentDetails);
 loadContents();
 loadCatalog();
 loadContentRatings();
