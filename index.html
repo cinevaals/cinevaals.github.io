@@ -105,6 +105,20 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   .empty-day{gap:5px;padding:6px 3px;font-size:9px}
   .empty-bat{width:34px;height:22px}
 }
+/* Grade semanal responsiva em telas de retrato: mesmos pontos de quebra da referência Lunaflix. */
+@media (orientation:portrait) and (min-width:640px) and (max-width:767px){
+  .days-wrap{overflow-x:auto;overflow-y:hidden}
+  .days{grid-template-columns:repeat(7,calc((100vw - 36px)/3));width:max-content;min-width:0;gap:6px}
+}
+@media (orientation:portrait) and (min-width:768px) and (max-width:1023px){
+  .days-wrap{overflow-x:auto;overflow-y:hidden}
+  .days{grid-template-columns:repeat(7,calc((100vw - 42px)/4));width:max-content;min-width:0;gap:6px}
+}
+@media (orientation:portrait) and (min-width:1024px) and (max-width:1200px){
+  .days-wrap{overflow-x:auto;overflow-y:hidden}
+  .days{grid-template-columns:repeat(7,calc((100vw - 48px)/5));width:max-content;min-width:0;gap:6px}
+}
+
 /* Menu suspenso Vaquinhas */
 .nav-dropdown{
   position:relative;
