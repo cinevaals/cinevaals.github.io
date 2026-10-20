@@ -1036,8 +1036,9 @@ function closePanelWhenScrolledToEnd(element,closeFn){
     }else reset();
   },{passive:true});
 }
-// O gesto de arrastar para revelar o cronograma fica exclusivo no painel de descrição do conteúdo.
+// O gesto de arrastar para fechar fica disponível nos painéis de descrição do conteúdo e de detalhes dos itens patrocinados.
 closePanelWhenScrolledToEnd(document.querySelector('#contentDetailModal .detail-card'),closeContentDetails);
+closePanelWhenScrolledToEnd(document.querySelector('#catalogDetailModal>section'),closeCatalogDetail);
 loadContents();
 loadCatalog();
 loadContentRatings();
