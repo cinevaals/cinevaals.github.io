@@ -208,6 +208,11 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   .topnav{transition:transform .22s ease;will-change:transform}
   .topnav.mobile-scroll-hidden{transform:translateY(-110%)}
   .topnav.menu-open{transform:none!important}
+  @keyframes portraitBackdropIn{from{opacity:0}to{opacity:1}}
+  @keyframes portraitPanelRise{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  #catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal{animation:portraitBackdropIn .32s ease-out both;}
+  #catalogModal>section,#ratingsModal>section,#aboutModal>div,#catalogDetailModal>section,#contentDetailModal .detail-card{animation:portraitPanelRise .38s cubic-bezier(.22,.75,.25,1) both;}
+  @media(prefers-reduced-motion:reduce){#catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal,#catalogModal>section,#ratingsModal>section,#aboutModal>div,#catalogDetailModal>section,#contentDetailModal .detail-card{animation-duration:.01ms!important}}
   #catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal{position:fixed!important;inset:0!important;width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;padding:0!important;margin:0!important;align-items:stretch!important;justify-content:stretch!important;border-radius:0!important}
   #catalogModal>section,#ratingsModal>section{width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:0!important;overflow-y:auto!important;overscroll-behavior:contain;padding:max(20px,env(safe-area-inset-top)) 14px max(20px,env(safe-area-inset-bottom))!important}
   #catalogDetailModal>section{width:100%!important;height:100vh!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;border-radius:0!important;overflow-y:auto!important;overscroll-behavior:contain;padding:max(22px,env(safe-area-inset-top)) 16px max(22px,env(safe-area-inset-bottom))!important}
