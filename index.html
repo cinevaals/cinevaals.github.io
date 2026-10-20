@@ -987,6 +987,7 @@ function closePanelWhenScrolledToEnd(element,closeFn){
     touchStartY=null;startedAtEnd=false;dragging=false;
     element.classList.remove('panel-drag-tracking','panel-drag-return');
     element.style.transform='';
+    element.style.transition='';
     if(overlay){overlay.style.opacity='';overlay.style.transition='';overlay=null;}
   };
   element.addEventListener('touchstart',event=>{
@@ -1003,7 +1004,7 @@ function closePanelWhenScrolledToEnd(element,closeFn){
     dragging=true;
     element.classList.add('panel-drag-tracking');
     element.style.transform='translateY('+(-delta)+'px)';
-    if(overlay)overlay.style.opacity=String(Math.max(.15,1-delta/420));
+    if(overlay)overlay.style.opacity=String(Math.max(0,1-delta/Math.max(260,window.innerHeight*.72)));
   },{passive:true});
   element.addEventListener('touchend',event=>{
     if(!isPortraitMobile()||touchStartY===null){reset();return;}
@@ -1011,10 +1012,16 @@ function closePanelWhenScrolledToEnd(element,closeFn){
     const delta=typeof endY==='number'?touchStartY-endY:0;
     if(startedAtEnd&&atEnd()&&dragging&&delta>=100){
       element.classList.remove('panel-drag-tracking');
-      element.style.transition='transform .2s cubic-bezier(.4,0,1,1)';
-      element.style.transform='translateY(-100%)';
-      if(overlay){overlay.style.transition='opacity .2s ease-out';overlay.style.opacity='0';}
-      setTimeout(()=>{reset();closeFn();},210);
+      element.style.transition='transform .24s cubic-bezier(.4,0,1,1)';
+      element.style.transform='translateY(-110%)';
+      if(overlay){overlay.style.transition='opacity .24s linear';overlay.style.opacity='0';}
+      const closingOverlay=overlay;
+      setTimeout(()=>{
+        closeFn();
+        // Limpa os estilos só depois de ocultar o painel, para não o fazer reaparecer por um instante.
+        reset();
+        if(closingOverlay){closingOverlay.style.opacity='';closingOverlay.style.transition='';}
+      },250);
       return;
     }
     if(dragging){
