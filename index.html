@@ -225,6 +225,9 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   #contentDetailModal .detail-hero{border-radius:0!important}
   #aboutModal button#closeAbout,#catalogDetailModal button#closeCatalogDetail{position:fixed!important;top:calc(env(safe-area-inset-top) + 12px)!important;right:12px!important;z-index:20!important}
   #contentDetailModal .detail-close{position:fixed!important;top:calc(env(safe-area-inset-top) + 12px)!important;right:12px!important;z-index:20!important}
+  #catalogModal #closeCatalog,#ratingsModal #closeRatings{position:fixed!important;top:calc(env(safe-area-inset-top) + 12px)!important;right:12px!important;z-index:30!important;width:42px!important;height:42px!important;padding:0!important;display:flex!important;align-items:center!important;justify-content:center!important;float:none!important;font-size:0!important;line-height:1!important;transition:opacity .18s ease,transform .18s ease!important}
+  #catalogModal #closeCatalog::before,#ratingsModal #closeRatings::before{content:"✕";font-size:20px;line-height:1;display:block}
+  #catalogModal #closeCatalog.panel-close-hidden,#ratingsModal #closeRatings.panel-close-hidden{opacity:0!important;transform:translateY(-8px)!important;pointer-events:none!important}
 }
 </style>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -619,7 +622,7 @@ async function loadContentRatings(){
  if(error){console.warn('Avaliações indisponíveis. Confira se o SQL content-ratings.sql foi executado no Supabase.',error);contentRatings=[];}else contentRatings=data||[];
  render();if(ratingsModal&&ratingsModal.style.display==='flex')renderPublicRatings();
 }
-document.getElementById('ratingsLink').addEventListener('click',()=>{publicRatingCategory='Todos';document.querySelectorAll('[data-rating-category]').forEach(button=>button.classList.toggle('active',button.dataset.ratingCategory==='Todos'));publicRatingsSearch.value='';publicRatingsSort.value='rating-desc';renderPublicRatings();ratingsModal.style.display='flex';document.body.style.overflow='hidden';});
+document.getElementById('ratingsLink').addEventListener('click',()=>{publicRatingCategory='Todos';document.querySelectorAll('[data-rating-category]').forEach(button=>button.classList.toggle('active',button.dataset.ratingCategory==='Todos'));publicRatingsSearch.value='';publicRatingsSort.value='rating-desc';renderPublicRatings();ratingsModal.querySelector('section').scrollTop=0;document.getElementById('closeRatings').classList.remove('panel-close-hidden');ratingsModal.style.display='flex';document.body.style.overflow='hidden';});
 document.getElementById('closeRatings').addEventListener('click',()=>{ratingsModal.style.display='none';document.body.style.overflow='';});
 ratingsModal.addEventListener('click',event=>{if(event.target===ratingsModal){ratingsModal.style.display='none';document.body.style.overflow='';}});
 publicRatingsSearch.addEventListener('input',renderPublicRatings);publicRatingsSort.addEventListener('change',renderPublicRatings);
@@ -648,6 +651,8 @@ function openCatalog(category){
   catalogTitle.textContent='♡ Patrocinados';
   catalogSearch.value='';
   renderCatalog();
+  catalogModal.querySelector('section').scrollTop=0;
+  document.getElementById('closeCatalog').classList.remove('panel-close-hidden');
   catalogModal.style.display='flex';
 }
 document.getElementById('sponsoredLink').addEventListener('click',()=>openCatalog('Todos'));
@@ -722,6 +727,15 @@ catalogGrid.addEventListener('keydown',event=>{
 document.getElementById('closeCatalogDetail').addEventListener('click',closeCatalogDetail);
 catalogDetailModal.addEventListener('click',event=>{if(event.target===catalogDetailModal)closeCatalogDetail();});
 
+// Nas abas longas, o botão de fechar some ao rolar para baixo e só reaparece no topo.
+[[catalogModal,'closeCatalog'],[ratingsModal,'closeRatings']].forEach(([modal,buttonId])=>{
+  const panel=modal.querySelector('section');
+  const closeButton=document.getElementById(buttonId);
+  if(!panel||!closeButton)return;
+  panel.addEventListener('scroll',()=>{
+    closeButton.classList.toggle('panel-close-hidden',panel.scrollTop>8);
+  },{passive:true});
+});
 document.getElementById('closeCatalog').addEventListener('click',()=>{catalogModal.style.display='none';});
 catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)catalogModal.style.display='none';});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){catalogModal.style.display='none';if(catalogDetailModal&&catalogDetailModal.style.display==='flex')closeCatalogDetail();if(ratingsModal&&ratingsModal.style.display==='flex'){ratingsModal.style.display='none';document.body.style.overflow='';}}});
