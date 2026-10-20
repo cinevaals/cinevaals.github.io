@@ -211,6 +211,8 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   @keyframes portraitBackdropIn{from{opacity:0}to{opacity:1}}
   @keyframes portraitPanelRise{from{transform:translateY(100%)}to{transform:translateY(0)}}
   #catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal{animation:portraitBackdropIn .32s ease-out both;}
+  /* Nas abas Sobre, Avaliações e Patrocinados, manter a camada azul do site durante a entrada do painel. */
+  #catalogModal,#ratingsModal,#aboutModal{animation:none!important;background:radial-gradient(ellipse at 50% 0%,#10213b 0,#050811 46rem)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
   #catalogModal>section,#ratingsModal>section,#aboutModal>div,#catalogDetailModal>section,#contentDetailModal .detail-card{animation:portraitPanelRise .38s cubic-bezier(.22,.75,.25,1) both;}
   @media(prefers-reduced-motion:reduce){#catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal,#catalogModal>section,#ratingsModal>section,#aboutModal>div,#catalogDetailModal>section,#contentDetailModal .detail-card{animation-duration:.01ms!important}}
   .panel-drag-tracking,.panel-drag-closing{transition:none!important;animation:none!important;will-change:transform}
