@@ -982,7 +982,7 @@ function closePanelWhenScrolledToEnd(element,closeFn){
   let dragging=false;
   let overlay=null;
   const isPortraitMobile=()=>window.matchMedia('(max-width:800px) and (orientation:portrait)').matches;
-  const atEnd=()=>element.scrollTop>0&&element.scrollTop+element.clientHeight>=element.scrollHeight-3;
+  const atEnd=()=>element.scrollHeight<=element.clientHeight+3||(element.scrollTop>0&&element.scrollTop+element.clientHeight>=element.scrollHeight-3);
   const reset=()=>{
     touchStartY=null;startedAtEnd=false;dragging=false;
     element.classList.remove('panel-drag-tracking','panel-drag-return');
