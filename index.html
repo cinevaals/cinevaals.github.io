@@ -997,7 +997,8 @@ function closePanelWhenScrolledToEnd(element,closeFn){
     touchStartY=event.touches[0].clientY;
     startedAtEnd=atEnd();
     overlay=element.closest('#catalogModal,#ratingsModal,#aboutModal,#catalogDetailModal,#contentDetailModal');
-    if(overlay){overlay.classList.add('panel-drag-active');overlay.style.opacity='';overlay.style.transition='';}
+    // Ao iniciar um toque não alteramos o painel nem a camada de fundo.
+    // O efeito visual só é ativado depois que um gesto válido de fechamento começa no fim do conteúdo.
   },{passive:true});
   element.addEventListener('touchmove',event=>{
     if(!isPortraitMobile()||touchStartY===null||!startedAtEnd||!atEnd()||event.touches.length!==1)return;
