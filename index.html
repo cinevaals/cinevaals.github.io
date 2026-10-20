@@ -58,7 +58,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   .week-label{min-width:0;flex:1;font-size:11px}
   .week-btn{padding:8px 5px;font-size:10px}
   .days-wrap{overflow-x:auto;overflow-y:hidden;padding-bottom:8px;scrollbar-color:#1b568d #07101e;scrollbar-width:thin}
-  .days{grid-template-columns:repeat(7,calc((100vw - 24px)/2));width:max-content;min-width:0;gap:6px}
+  .days{grid-template-columns:repeat(7,calc((100vw - 48px)/2.15));width:max-content;min-width:0;gap:6px}
   .day-head{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;padding:0 1px 5px;min-height:0}
   .day-name{font-size:clamp(6px,1.65vw,9px);line-height:1.15;overflow-wrap:anywhere}
   .day-date{font-size:clamp(6px,1.55vw,8px);line-height:1.2;white-space:normal}
@@ -77,10 +77,10 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   .controls{margin-top:14px}
 }
 @media (orientation:landscape) and (max-width:1000px){
-  .nav-inner{gap:3px;padding:4px 8px;min-height:40px;flex-wrap:nowrap}
-  .brand{font-size:clamp(13px,2.2vw,17px);margin-right:3px}
+  .nav-inner{gap:3px;padding:4px 13px;min-height:40px;flex-wrap:nowrap}
+  .brand{font-size:clamp(13px,2.2vw,17px);margin-right:6px}
   .mobile-menu-toggle{display:none!important}
-  .nav-links{display:flex!important;flex:1;gap:0;justify-content:space-between}
+  .nav-links{display:flex!important;flex:1;gap:0;justify-content:space-between;padding-right:5px;box-sizing:border-box}
   .nav-links .nav-link{font-size:clamp(7px,1.05vw,10px);padding:4px .5px;gap:2px;border-radius:6px;white-space:nowrap}
   .nav-dropdown-menu a{font-size:10px;padding:7px 8px}
   .search{display:none}
