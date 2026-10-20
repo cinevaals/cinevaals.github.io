@@ -204,8 +204,8 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   display:block;
 }
 
-/* Modo retrato: painéis em tela inteira e cabeçalho que se esconde ao rolar para baixo. */
-@media (max-width:800px) and (orientation:portrait){
+/* Em celulares, esconder o cabeçalho ao rolar para baixo e revelá-lo ao subir. */
+@media (max-width:800px) and (orientation:portrait), (orientation:landscape) and (max-width:1000px){
   .topnav{transition:transform .22s ease;will-change:transform}
   .topnav.mobile-scroll-hidden{transform:translateY(-110%)}
   .topnav.menu-open{transform:none!important}
@@ -981,8 +981,8 @@ document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMobileN
 // Em celulares no modo retrato, esconder o cabeçalho ao descer e revelá-lo ao subir.
 let lastPortraitScrollY=window.scrollY;
 window.addEventListener('scroll',()=>{
-  const portraitMobile=window.matchMedia('(max-width:800px) and (orientation:portrait)').matches;
-  if(!portraitMobile){topNavigation.classList.remove('mobile-scroll-hidden');lastPortraitScrollY=window.scrollY;return;}
+  const mobileScheduleView=window.matchMedia('(max-width:800px) and (orientation:portrait), (orientation:landscape) and (max-width:1000px)').matches;
+  if(!mobileScheduleView){topNavigation.classList.remove('mobile-scroll-hidden');lastPortraitScrollY=window.scrollY;return;}
   if(topNavigation.classList.contains('menu-open')){lastPortraitScrollY=window.scrollY;return;}
   const currentY=window.scrollY;
   if(currentY<24||currentY<lastPortraitScrollY-5)topNavigation.classList.remove('mobile-scroll-hidden');
