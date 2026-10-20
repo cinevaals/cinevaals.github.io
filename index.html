@@ -621,7 +621,6 @@ function openCatalog(category){
   catalogSearch.value='';
   renderCatalog();
   catalogModal.style.display='flex';
-  catalogSearch.focus();
 }
 document.getElementById('sponsoredLink').addEventListener('click',()=>openCatalog('Todos'));
 catalogSearch.addEventListener('input',renderCatalog);
