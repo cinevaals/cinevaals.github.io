@@ -970,13 +970,25 @@ window.addEventListener('scroll',()=>{
   lastPortraitScrollY=currentY;
 },{passive:true});
 
-// Chegar ao fim de um painel com rolagem fecha-o; o botão X continua disponível.
+// No celular em modo retrato, o painel só fecha com um gesto extra para cima
+// iniciado quando a rolagem já está no fim. Uma única rolagem apenas chega ao fim.
 function closePanelWhenScrolledToEnd(element,closeFn){
   if(!element)return;
-  element.addEventListener('scroll',()=>{
-    if(!window.matchMedia('(max-width:800px) and (orientation:portrait)').matches)return;
-    const atEnd=element.scrollTop>0&&element.scrollTop+element.clientHeight>=element.scrollHeight-3;
-    if(atEnd)closeFn();
+  let touchStartY=null;
+  let startedAtEnd=false;
+  const isPortraitMobile=()=>window.matchMedia('(max-width:800px) and (orientation:portrait)').matches;
+  const atEnd=()=>element.scrollTop>0&&element.scrollTop+element.clientHeight>=element.scrollHeight-3;
+  element.addEventListener('touchstart',event=>{
+    if(!isPortraitMobile()||event.touches.length!==1){touchStartY=null;startedAtEnd=false;return;}
+    touchStartY=event.touches[0].clientY;
+    startedAtEnd=atEnd();
+  },{passive:true});
+  element.addEventListener('touchend',event=>{
+    if(!isPortraitMobile()||touchStartY===null||!startedAtEnd||!atEnd()){touchStartY=null;startedAtEnd=false;return;}
+    const endY=event.changedTouches[0]?.clientY;
+    const upwardDrag=typeof endY==='number'&&touchStartY-endY>=65;
+    if(upwardDrag)closeFn();
+    touchStartY=null;startedAtEnd=false;
   },{passive:true});
 }
 closePanelWhenScrolledToEnd(document.querySelector('#catalogModal>section'),()=>{catalogModal.style.display='none';});
