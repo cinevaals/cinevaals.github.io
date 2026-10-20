@@ -983,7 +983,8 @@ function closePanelWhenScrolledToEnd(element,closeFn){
   let dragging=false;
   let overlay=null;
   const isPortraitMobile=()=>window.matchMedia('(max-width:800px) and (orientation:portrait)').matches;
-  const atEnd=()=>element.scrollHeight<=element.clientHeight+3||(element.scrollTop>0&&element.scrollTop+element.clientHeight>=element.scrollHeight-3);
+  // Só permite arrastar para fechar quando o painel tem rolagem real e já está no fim; nunca ao puxar a partir do topo.
+  const atEnd=()=>element.scrollHeight>element.clientHeight+3&&element.scrollTop>0&&element.scrollTop+element.clientHeight>=element.scrollHeight-3;
   const reset=()=>{
     touchStartY=null;startedAtEnd=false;dragging=false;
     element.classList.remove('panel-drag-tracking','panel-drag-return','panel-drag-closing');
