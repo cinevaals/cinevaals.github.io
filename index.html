@@ -1035,10 +1035,7 @@ function closePanelWhenScrolledToEnd(element,closeFn){
     }else reset();
   },{passive:true});
 }
-closePanelWhenScrolledToEnd(document.querySelector('#catalogModal>section'),()=>{catalogModal.style.display='none';});
-closePanelWhenScrolledToEnd(document.querySelector('#ratingsModal>section'),()=>{ratingsModal.style.display='none';document.body.style.overflow='';});
-closePanelWhenScrolledToEnd(document.querySelector('#catalogDetailModal>section'),closeCatalogDetail);
-closePanelWhenScrolledToEnd(document.querySelector('#aboutModal>div'),()=>{aboutModal.style.display='none';});
+// O gesto de arrastar para revelar o cronograma fica exclusivo no painel de descrição do conteúdo.
 closePanelWhenScrolledToEnd(document.querySelector('#contentDetailModal .detail-card'),closeContentDetails);
 loadContents();
 loadCatalog();
