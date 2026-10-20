@@ -29,6 +29,14 @@
     .editor-card{max-width:850px;margin:2vh auto 5vh;padding:22px;background:linear-gradient(180deg,#09172a,#060d19);border:1px solid #2c5f91;border-radius:14px;box-shadow:0 20px 70px #0009}
     .search-box{margin-bottom:16px;padding:14px;background:#071326;border:1px solid #21466e;border-radius:10px}.search-row{display:flex;gap:8px;align-items:stretch}.search-row input{min-width:0;flex:1}.search-row button{margin-top:6px;white-space:nowrap}
     .catalog-results{display:grid;gap:8px;margin-top:10px;max-height:42vh;overflow-y:auto}.catalog-result{display:flex;align-items:center;gap:10px;text-align:left;width:100%;background:#0b1c33;border:1px solid #21466e}.catalog-result img{width:42px;height:62px;object-fit:cover;border-radius:4px;background:#15243a;flex-shrink:0}.catalog-result span{display:block}.catalog-result .result-title{font-size:14px;color:#f4f7ff}.catalog-result .result-meta{font-size:11px;color:#9bc9f4;margin-top:4px}.catalog-message{font-size:13px;color:#9bc9f4;margin:10px 0 0}
+    .admin-heading{display:flex;flex-direction:column;align-items:flex-start;gap:0}
+    .admin-heading .subtitle{margin-bottom:10px}
+    .admin-tools-menu{position:relative;z-index:20}
+    .admin-tools-menu summary{list-style:none;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:9px 13px;border:1px solid #204b79;border-radius:9px;background:linear-gradient(180deg,#0b1c33,#071225);color:#dceeff;font-weight:700;font-size:13px}
+    .admin-tools-menu summary::-webkit-details-marker{display:none}
+    .admin-tools-menu[open] summary{border-color:#4cb5ff}
+    .admin-tools-options{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding:10px;min-width:220px;background:#071326;border:1px solid #21466e;border-radius:10px;box-shadow:0 12px 30px #0009}
+    .admin-tools-options button{width:100%;text-align:left;white-space:nowrap}
     .catalog-top-actions{display:flex;flex-direction:column;gap:9px;min-width:220px}
     .catalog-admin-filters{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 12px}
     .catalog-admin-filter{flex:1 0 auto;min-height:42px;background:linear-gradient(180deg,#0b1c33,#071225);border:1px solid #204b79;color:#dceeff;border-radius:10px;padding:11px 16px;font-size:14px;cursor:pointer;white-space:nowrap}
@@ -82,7 +90,18 @@
 <body>
 <main>
   <header>
-    <div><h1>CineVaals</h1><p class="subtitle">Painel administrativo</p></div>
+    <div class="admin-heading">
+      <h1>CineVaals</h1>
+      <p class="subtitle">Painel administrativo</p>
+      <details class="admin-tools-menu">
+        <summary class="secondary">☰ Ferramentas administrativas</summary>
+        <div class="admin-tools-options">
+          <button id="new-content" class="secondary" type="button">＋ Adicionar Catálogo</button>
+          <button id="open-catalog-library" class="secondary" type="button">▦ Gerenciar Patrocínios</button>
+          <button id="open-ratings-manager" class="secondary" type="button">⭐ Avaliações</button>
+        </div>
+      </details>
+    </div>
     <button id="logout" class="secondary hidden" type="button">Sair</button>
   </header>
 
@@ -96,10 +115,7 @@
   </section>
 
   <section id="admin-area">
-    <div class="toolbar">
-      
-      <div class="catalog-top-actions"><button id="new-content" class="secondary" type="button">＋ Adicionar Catálogo</button><button id="open-catalog-library" class="secondary" type="button">▦ Gerenciar Patrocínios</button><button id="open-ratings-manager" class="secondary" type="button">⭐ Avaliações</button></div>
-    </div>
+    <div class="toolbar"></div>
     <div class="week-controls">
       <button id="prev-week" class="secondary" type="button">← Semana anterior</button>
       <div id="week-title" class="week-title"></div>
