@@ -79,6 +79,10 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 /* Celular em tela deitada: esconder o banner e distribuir a navegação por todo o cabeçalho. */
 @media (orientation:landscape) and (max-width:950px) and (max-height:500px){
   .banner{display:none!important}
+  /* Permitir que o cabeçalho deslize para fora da tela também em paisagem. */
+  .topnav{transition:transform .22s ease;will-change:transform}
+  .topnav.mobile-scroll-hidden{transform:translateY(-110%)}
+  .topnav.menu-open{transform:none!important}
   .brand{display:none!important}
   .nav-inner{width:100%;box-sizing:border-box;padding:6px 8px;gap:0;min-height:48px;justify-content:stretch}
   .nav-links{display:flex!important;flex:1 1 100%;width:100%;min-width:0;justify-content:space-between;gap:3px}
