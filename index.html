@@ -76,9 +76,13 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   .intro .filters{max-width:100%;margin:12px 0 0;justify-content:flex-start;gap:9px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:5px}
   .controls{margin-top:14px}
 }
-/* Celular em tela deitada: esconder o banner sem alterar PC ou celular em pé. */
+/* Celular em tela deitada: esconder o banner e distribuir a navegação por todo o cabeçalho. */
 @media (orientation:landscape) and (max-width:950px) and (max-height:500px){
   .banner{display:none!important}
+  .brand{display:none!important}
+  .nav-inner{width:100%;box-sizing:border-box;padding:6px 8px;gap:0;min-height:48px;justify-content:stretch}
+  .nav-links{display:flex!important;flex:1 1 100%;width:100%;min-width:0;justify-content:space-between;gap:3px}
+  .nav-link{flex:1 1 0;min-width:0;padding:8px 3px;gap:3px;font-size:clamp(9px,1.35vw,12px);white-space:normal;text-align:center}
 }
 
 /* Grade semanal responsiva em telas de retrato: mesmos pontos de quebra da referência Lunaflix. */
