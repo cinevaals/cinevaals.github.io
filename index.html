@@ -953,13 +953,20 @@ primaryNav.addEventListener('click',event=>{const dropdownButton=event.target.cl
 document.addEventListener('click',event=>{if(!event.target.closest('.nav-dropdown')){primaryNav.querySelectorAll('.nav-dropdown.open').forEach(dropdown=>{dropdown.classList.remove('open');dropdown.querySelector('.nav-dropdown-btn')?.setAttribute('aria-expanded','false');});}});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'){primaryNav.querySelectorAll('.nav-dropdown.open').forEach(dropdown=>{dropdown.classList.remove('open');dropdown.querySelector('.nav-dropdown-btn')?.setAttribute('aria-expanded','false');});closeMobileNavigation();}});
 
-// Em celulares no modo retrato, esconder o cabeçalho ao descer e revelá-lo ao subir.
+// No celular em retrato, esconder ao descer e revelar ao subir; em paisagem, mostrar somente no topo.
 let lastPortraitScrollY=window.scrollY;
 window.addEventListener('scroll',()=>{
-  const mobileScheduleView=window.matchMedia('(max-width:800px) and (orientation:portrait)').matches;
-  if(!mobileScheduleView){topNavigation.classList.remove('mobile-scroll-hidden');lastPortraitScrollY=window.scrollY;return;}
-  if(topNavigation.classList.contains('menu-open')){lastPortraitScrollY=window.scrollY;return;}
+  const mobilePortraitView=window.matchMedia('(max-width:800px) and (orientation:portrait)').matches;
+  const mobileLandscapeView=window.matchMedia('(orientation:landscape) and (max-width:950px) and (max-height:500px)').matches;
   const currentY=window.scrollY;
+  if(topNavigation.classList.contains('menu-open')){lastPortraitScrollY=currentY;return;}
+  if(mobileLandscapeView){
+    if(currentY<24)topNavigation.classList.remove('mobile-scroll-hidden');
+    else topNavigation.classList.add('mobile-scroll-hidden');
+    lastPortraitScrollY=currentY;
+    return;
+  }
+  if(!mobilePortraitView){topNavigation.classList.remove('mobile-scroll-hidden');lastPortraitScrollY=currentY;return;}
   if(currentY<24||currentY<lastPortraitScrollY-5)topNavigation.classList.remove('mobile-scroll-hidden');
   else if(currentY>lastPortraitScrollY+5)topNavigation.classList.add('mobile-scroll-hidden');
   lastPortraitScrollY=currentY;
