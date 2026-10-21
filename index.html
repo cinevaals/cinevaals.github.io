@@ -499,6 +499,7 @@ function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;',
 function cleanInternalMarkers(value){
   return String(value??'')
     .replace(/\s*\[\[CINEVAALS_BACKDROP:[^\]]*\]\]/g,'')
+    .replace(/\s*\[\[CINEVAALS_BACKDROP_POSITION:\d{1,3},\d{1,3}\]\]/g,'')
     .replace(/\s*\[\[CINEVAALS_TV_DATA:[^\]]*\]\]/g,'')
     .replace(/\s*\[\[CINEVAALS_TMDB_ID:\d+\]\]/g,'')
     .replace(/\\r\\n/g,'\n')
@@ -907,8 +908,15 @@ async function openContentDetails(item){
   const catalogEntry=catalogDetailsFor(item);
   $detail('detailMeta').innerHTML=renderDetailTags(item.category,catalogEntry?.status,'',item.date?String(item.date).slice(0,4):'');
   renderSeasonProgress(item,catalogEntry);
-  const selectedBackdrop=String(catalogEntry?.description||'').match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
-  if(selectedBackdrop)hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+selectedBackdrop+'")';
+  const catalogDescriptionSource=String(catalogEntry?.description||'');
+  const selectedBackdrop=catalogDescriptionSource.match(/\[\[CINEVAALS_BACKDROP:([^\]]+)\]\]/)?.[1]||'';
+  const backdropPositionMatch=catalogDescriptionSource.match(/\[\[CINEVAALS_BACKDROP_POSITION:(\d{1,3}),(\d{1,3})\]\]/);
+  if(selectedBackdrop){
+    hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+selectedBackdrop+'")';
+    const positionX=backdropPositionMatch?Math.max(0,Math.min(100,Number(backdropPositionMatch[1]))):50;
+    const positionY=backdropPositionMatch?Math.max(0,Math.min(100,Number(backdropPositionMatch[2]))):50;
+    hero.style.backgroundPosition='center, center, '+positionX+'% '+positionY+'%';
+  }
   const cleanScheduleDescription=cleanInternalMarkers(item.description);
   const scheduleDescription=/^Episódios para assistir: \d+$/.test(cleanScheduleDescription)?'':cleanScheduleDescription;
   const cleanCatalogDescription=cleanInternalMarkers(catalogEntry?.description);
