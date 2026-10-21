@@ -665,8 +665,10 @@ catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('butt
 
 const catalogDetailModal=document.getElementById('catalogDetailModal');
 let catalogDetailPreviousBodyOverflow='';
+let catalogDetailPreviousRootOverflow='';
+let catalogDetailLandscapeLocked=false;
 function isPhoneLandscape(){return window.matchMedia('(orientation:landscape) and (max-width:950px) and (max-height:500px)').matches;}
-function closeCatalogDetail(){catalogDetailModal.style.display='none';if(isPhoneLandscape()){document.body.style.overflow=catalogDetailPreviousBodyOverflow;document.documentElement.style.overflow='';}}
+function closeCatalogDetail(){catalogDetailModal.style.display='none';if(catalogDetailLandscapeLocked){document.body.style.overflow=catalogDetailPreviousBodyOverflow;document.documentElement.style.overflow=catalogDetailPreviousRootOverflow;catalogDetailLandscapeLocked=false;}}
 function openCatalogDetail(item){
   if(!item)return;
   const title=item.title||'Conteúdo';
@@ -708,6 +710,8 @@ function openCatalogDetail(item){
   }
   if(isPhoneLandscape()){
     catalogDetailPreviousBodyOverflow=document.body.style.overflow;
+    catalogDetailPreviousRootOverflow=document.documentElement.style.overflow;
+    catalogDetailLandscapeLocked=true;
     document.body.style.overflow='hidden';
     document.documentElement.style.overflow='hidden';
     catalogDetailModal.scrollTop=0;
