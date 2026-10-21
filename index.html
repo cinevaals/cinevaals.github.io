@@ -1048,12 +1048,16 @@ function closePanelWhenScrolledToEnd(element,closeFn){
   const hasScrollableContent=()=>element.scrollHeight>element.clientHeight+3;
   const atEnd=()=>hasScrollableContent()&&element.scrollTop+element.clientHeight>=element.scrollHeight-3;
   const canStartCloseGesture=()=>!hasScrollableContent()||atEnd();
-  const reset=()=>{
+  const reset=(keepOverlayAnimationDisabled=false)=>{
     touchStartY=null;startedAtEnd=false;dragging=false;
     element.classList.remove('panel-drag-tracking','panel-drag-return','panel-drag-closing');
     element.style.transform='';
     element.style.transition='';
-    if(overlay){overlay.classList.remove('panel-drag-active','panel-drag-closing');overlay.style.opacity='';overlay.style.transition='';overlay=null;}
+    if(overlay){
+      overlay.classList.remove('panel-drag-closing');
+      if(!keepOverlayAnimationDisabled)overlay.classList.remove('panel-drag-active');
+      overlay.style.opacity='';overlay.style.transition='';overlay=null;
+    }
   };
   element.addEventListener('touchstart',event=>{
     if(!isPortraitMobile()||event.touches.length!==1){reset();return;}
@@ -1096,7 +1100,8 @@ function closePanelWhenScrolledToEnd(element,closeFn){
       element.classList.add('panel-drag-return');
       element.style.transform='translateY(0)';
       if(overlay){overlay.style.transition='opacity .36s ease-out';overlay.style.opacity='1';}
-      setTimeout(reset,370);
+      // Mantém a animação de entrada desativada enquanto o painel retorna, evitando uma 'piscada'.
+      setTimeout(()=>reset(true),370);
     }else reset();
   },{passive:true});
 }
