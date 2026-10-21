@@ -87,6 +87,10 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   .nav-inner{width:100%;box-sizing:border-box;padding:6px 8px;gap:0;min-height:48px;justify-content:stretch}
   .nav-links{display:flex!important;flex:1 1 100%;width:100%;min-width:0;justify-content:space-between;gap:3px}
   .nav-link{flex:1 1 0;min-width:0;padding:8px 3px;gap:3px;font-size:clamp(9px,1.35vw,12px);white-space:normal;text-align:center}
+  /* Patrocinados: no celular deitado, travar a página de trás e rolar somente o painel. */
+  #catalogDetailModal{position:fixed!important;inset:0!important;z-index:10010!important;box-sizing:border-box!important;display:none;align-items:flex-start!important;justify-content:center!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;touch-action:pan-y!important;padding: max(8px,env(safe-area-inset-top)) 10px max(8px,env(safe-area-inset-bottom))!important;background:#050b16!important;backdrop-filter:none!important;-webkit-overflow-scrolling:touch}
+  #catalogDetailModal>section{position:relative!important;align-self:flex-start!important;flex:0 0 auto!important;width:100%!important;max-width:390px!important;max-height:none!important;height:auto!important;min-height:0!important;margin:0 auto!important;overflow:visible!important;overscroll-behavior:contain!important;box-sizing:border-box!important}
+  #catalogDetailModal #closeCatalogDetail{position:sticky!important;top:0!important;float:right!important;z-index:5!important}
 }
 
 /* Grade semanal responsiva em telas de retrato: mesmos pontos de quebra da referência Lunaflix. */
@@ -660,7 +664,9 @@ catalogStatusToggle.addEventListener('click',()=>{catalogStatusPanelOpen=!catalo
 catalogStatusFilters.addEventListener('click',e=>{const b=e.target.closest('button[data-catalog-status]');if(!b)return;catalogStatus=catalogStatus===b.dataset.catalogStatus?'Todos':b.dataset.catalogStatus;catalogStatusPanelOpen=false;renderCatalog();});
 
 const catalogDetailModal=document.getElementById('catalogDetailModal');
-function closeCatalogDetail(){catalogDetailModal.style.display='none';}
+let catalogDetailPreviousBodyOverflow='';
+function isPhoneLandscape(){return window.matchMedia('(orientation:landscape) and (max-width:950px) and (max-height:500px)').matches;}
+function closeCatalogDetail(){catalogDetailModal.style.display='none';if(isPhoneLandscape()){document.body.style.overflow=catalogDetailPreviousBodyOverflow;document.documentElement.style.overflow='';}}
 function openCatalogDetail(item){
   if(!item)return;
   const title=item.title||'Conteúdo';
@@ -700,6 +706,13 @@ function openCatalogDetail(item){
     const text=document.createElement('div');text.textContent=cleanDescription;text.style.cssText='margin:0;padding:0;text-align:justify;text-justify:inter-word;hyphens:auto;white-space:normal;overflow-wrap:break-word;word-break:normal;line-height:1.8;max-width:100%';
     synopsis.append(label,text);document.querySelector('#catalogDetailModal section').appendChild(synopsis);
   }
+  if(isPhoneLandscape()){
+    catalogDetailPreviousBodyOverflow=document.body.style.overflow;
+    document.body.style.overflow='hidden';
+    document.documentElement.style.overflow='hidden';
+    catalogDetailModal.scrollTop=0;
+    const panel=catalogDetailModal.querySelector('section');if(panel)panel.scrollTop=0;
+  }
   catalogDetailModal.style.display='flex';
 }
 catalogGrid.addEventListener('click',event=>{
@@ -718,6 +731,8 @@ catalogGrid.addEventListener('keydown',event=>{
 });
 document.getElementById('closeCatalogDetail').addEventListener('click',closeCatalogDetail);
 catalogDetailModal.addEventListener('click',event=>{if(event.target===catalogDetailModal)closeCatalogDetail();});
+// Ao abrir detalhes em celular deitado, impede que gestos no painel rolem o cronograma atrás dele.
+catalogDetailModal.addEventListener('touchmove',event=>{if(isPhoneLandscape()&&event.target===catalogDetailModal)event.preventDefault();},{passive:false});
 
 // Nas abas longas, o botão de fechar some ao rolar para baixo e só reaparece no topo.
 [[catalogModal,'closeCatalog'],[ratingsModal,'closeRatings']].forEach(([modal,buttonId])=>{
