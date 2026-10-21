@@ -915,7 +915,7 @@ async function openContentDetails(item){
     hero.style.backgroundImage='linear-gradient(180deg,rgba(5,11,22,.04),rgba(5,11,22,.18) 45%,#050b16 100%),url("https://image.tmdb.org/t/p/w1280'+selectedBackdrop+'")';
     const positionX=backdropPositionMatch?Math.max(0,Math.min(100,Number(backdropPositionMatch[1]))):50;
     const positionY=backdropPositionMatch?Math.max(0,Math.min(100,Number(backdropPositionMatch[2]))):50;
-    hero.style.backgroundPosition='center, center, '+positionX+'% '+positionY+'%';
+    hero.style.backgroundPosition='center, '+positionX+'% '+positionY+'%';
   }
   const cleanScheduleDescription=cleanInternalMarkers(item.description);
   const scheduleDescription=/^Episódios para assistir: \d+$/.test(cleanScheduleDescription)?'':cleanScheduleDescription;
