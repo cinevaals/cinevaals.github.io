@@ -662,6 +662,7 @@ function openCatalog(category){
   catalogTitle.textContent='♡ Patrocinados';
   catalogSearch.value='';
   renderCatalog();
+  catalogModal.querySelector('section').classList.remove('panel-drag-return');
   catalogModal.querySelector('section').scrollTop=0;
   document.getElementById('closeCatalog').classList.remove('panel-close-hidden');
   catalogPreviousBodyOverflow=document.body.style.overflow;
@@ -691,6 +692,7 @@ function isPhoneLandscape(){return window.matchMedia('(orientation:landscape) an
 function closeCatalogDetail(){catalogDetailModal.style.display='none';if(catalogDetailLandscapeLocked){document.body.style.overflow=catalogDetailPreviousBodyOverflow;document.documentElement.style.overflow=catalogDetailPreviousRootOverflow;catalogDetailLandscapeLocked=false;}}
 function openCatalogDetail(item){
   if(!item)return;
+  catalogDetailModal.querySelector('section').classList.remove('panel-drag-return');
   const title=item.title||'Conteúdo';
   const status=normalizedCatalogStatus(item.status);
   const inProgress=item.category!=='Filme'&&status==='Em Andamento';
@@ -965,6 +967,7 @@ async function openContentDetails(item){
   const wrap=$detail('detailPosterWrap');
   wrap.innerHTML=item.image?'<img class="detail-poster" src="'+escapeHtml(item.image)+'" alt="Capa de '+escapeHtml(title)+'">':'<div class="detail-poster" style="display:grid;place-items:center;color:#65bfff">🎬</div>';
   const info=$detail('detailExtra');
+  contentDetailModal.querySelector('.detail-card')?.classList.remove('panel-drag-return');
   contentDetailModal.style.display='flex';
   document.body.style.overflow='hidden';
   const cacheKey=contentDetailsKey(item);
@@ -1050,7 +1053,8 @@ function closePanelWhenScrolledToEnd(element,closeFn){
   const canStartCloseGesture=()=>!hasScrollableContent()||atEnd();
   const reset=(keepOverlayAnimationDisabled=false)=>{
     touchStartY=null;startedAtEnd=false;dragging=false;
-    element.classList.remove('panel-drag-tracking','panel-drag-return','panel-drag-closing');
+    // Mantém panel-drag-return após o retorno para não reativar a animação de entrada do painel.
+    element.classList.remove('panel-drag-tracking','panel-drag-closing');
     element.style.transform='';
     element.style.transition='';
     if(overlay){
