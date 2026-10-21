@@ -1085,7 +1085,7 @@ function closePanelWhenScrolledToEnd(element,closeFn){
     if(!isPortraitMobile()||touchStartY===null){reset();return;}
     const endY=event.changedTouches[0]?.clientY;
     const delta=typeof endY==='number'?touchStartY-endY:0;
-    if(startedAtEnd&&canStartCloseGesture()&&dragging&&delta>=100){
+    if(startedAtEnd&&canStartCloseGesture()&&dragging&&delta>=150){
       element.classList.remove('panel-drag-return');
       element.classList.add('panel-drag-tracking','panel-drag-closing');
       if(overlay)overlay.classList.add('panel-drag-active','panel-drag-closing');
