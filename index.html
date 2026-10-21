@@ -168,11 +168,10 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   background:#0d2b50;
 }
 
-.nav-dropdown:hover .nav-dropdown-menu,
-.nav-dropdown:focus-within .nav-dropdown-menu,
-.nav-dropdown.open .nav-dropdown-menu{
-  display:block;
+@media (hover:hover) and (pointer:fine){
+  .nav-dropdown:hover .nav-dropdown-menu{display:block}
 }
+.nav-dropdown.open .nav-dropdown-menu{display:block}
 
 /* Em celulares, esconder o cabeçalho ao rolar para baixo e revelá-lo ao subir. */
 @media (max-width:800px) and (orientation:portrait){
@@ -945,8 +944,9 @@ const primaryNav=document.getElementById('primaryNav');
 const topNavigation=document.querySelector('.topnav');
 function closeMobileNavigation(){topNavigation.classList.remove('menu-open');mobileMenuToggle.setAttribute('aria-expanded','false');mobileMenuToggle.setAttribute('aria-label','Abrir menu');mobileMenuToggle.textContent='☰';}
 mobileMenuToggle.addEventListener('click',()=>{const isOpen=topNavigation.classList.toggle('menu-open');mobileMenuToggle.setAttribute('aria-expanded',String(isOpen));mobileMenuToggle.setAttribute('aria-label',isOpen?'Fechar menu':'Abrir menu');mobileMenuToggle.textContent=isOpen?'×':'☰';});
-primaryNav.addEventListener('click',event=>{const dropdownButton=event.target.closest('.nav-dropdown-btn');if(dropdownButton){const dropdown=dropdownButton.closest('.nav-dropdown');const isOpen=dropdown.classList.toggle('open');dropdownButton.setAttribute('aria-expanded',String(isOpen));return;}if(event.target.closest('a,.nav-links .nav-link'))closeMobileNavigation();});
-document.addEventListener('keydown',event=>{if(event.key==='Escape')closeMobileNavigation();});
+primaryNav.addEventListener('click',event=>{const dropdownButton=event.target.closest('.nav-dropdown-btn');if(dropdownButton){const dropdown=dropdownButton.closest('.nav-dropdown');const isOpen=dropdown.classList.toggle('open');dropdownButton.setAttribute('aria-expanded',String(isOpen));return;}if(event.target.closest('a,.nav-links .nav-link')){primaryNav.querySelectorAll('.nav-dropdown.open').forEach(dropdown=>{dropdown.classList.remove('open');dropdown.querySelector('.nav-dropdown-btn')?.setAttribute('aria-expanded','false');});closeMobileNavigation();}});
+document.addEventListener('click',event=>{if(!event.target.closest('.nav-dropdown')){primaryNav.querySelectorAll('.nav-dropdown.open').forEach(dropdown=>{dropdown.classList.remove('open');dropdown.querySelector('.nav-dropdown-btn')?.setAttribute('aria-expanded','false');});}});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'){primaryNav.querySelectorAll('.nav-dropdown.open').forEach(dropdown=>{dropdown.classList.remove('open');dropdown.querySelector('.nav-dropdown-btn')?.setAttribute('aria-expanded','false');});closeMobileNavigation();}});
 
 // Em celulares no modo retrato, esconder o cabeçalho ao descer e revelá-lo ao subir.
 let lastPortraitScrollY=window.scrollY;
