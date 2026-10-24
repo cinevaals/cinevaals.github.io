@@ -804,7 +804,7 @@
     const button=event.target.closest('[data-catalog-status-filter]');if(!button)return;
     const selected=button.dataset.catalogStatusFilter;catalogStatusFilter=catalogStatusFilter===selected?'Todos':selected;catalogStatusFilterPanelOpen=false;renderCatalogAdmin();
   });
-  $('catalog-item-category').addEventListener('change',()=>{catalogTvData=null;catalogTvDataLoaded=false;catalogTvDataCustom=false;updateCatalogSeasonField();if(['Série','Dorama','Anime','Animação'].includes($('catalog-item-category').value))loadCatalogTvData(true);});
+  $('catalog-item-category').addEventListener('change',()=>{catalogTvData=null;catalogTvDataLoaded=false;catalogTvDataCustom=false;catalogCompletedSeasons=[];updateCatalogSeasonField();if(['Série','Dorama','Anime','Animação'].includes($('catalog-item-category').value))loadCatalogTvData(true);});
   $('catalog-item-status').addEventListener('change',()=>{updateCatalogSeasonField();if($('catalog-item-status').value!=='Finalizado')$('catalog-item-season').value='';populateCatalogProgressOptions();});
   $('catalog-manager-search').addEventListener('click',()=>searchCatalogForManager(false));
   $('catalog-manager-query').addEventListener('input',()=>{
