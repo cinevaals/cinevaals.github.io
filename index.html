@@ -345,6 +345,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 #contentDetailModal .detail-season-progress{margin:16px 0 4px;padding:12px 13px;border:1px solid #21466e;border-radius:11px;background:linear-gradient(145deg,#0b1b30,#081222);box-shadow:inset 0 1px 0 #ffffff08}
 #contentDetailModal .detail-season-progress-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:9px}
 #contentDetailModal .detail-season-progress-label{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#78bfff}
+#contentDetailModal .detail-season-progress-badge{display:inline-flex;align-items:center;margin-left:8px;padding:3px 7px;border:1px solid #32875b;border-radius:999px;background:#103526;color:#b8f5d0;font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;vertical-align:middle}
 #contentDetailModal .detail-season-progress-count{font-size:12px;font-weight:800;color:#eaf5ff;white-space:nowrap}
 #contentDetailModal .detail-season-progress-track{height:7px;overflow:hidden;border-radius:99px;background:#071326;border:1px solid #1d3b5e}
 #contentDetailModal .detail-season-progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#168bff,#65bfff);box-shadow:0 0 10px #168bff55;transition:width .25s ease}
@@ -811,10 +812,12 @@ function renderSeasonProgress(item,catalogEntry,tvDetails=null){
   box.style.display='none';box.innerHTML='';
   const category=String(catalogEntry?.category||item?.category||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   const supported=['serie','dorama','animacao','anime'].includes(category);
-  if(!supported||normalizedCatalogStatus(catalogEntry?.status)!=='Em Andamento')return;
+  const status=normalizedCatalogStatus(catalogEntry?.status);
+  const isFinished=status==='Finalizado';
+  if(!supported||(!isFinished&&status!=='Em Andamento'))return;
   const seasonMatch=String(catalogEntry?.season||'').match(/(\d+)/);
   const episode=Number(catalogEntry?.episode);
-  if(!seasonMatch||!Number.isFinite(episode)||episode<1)return;
+  if(!seasonMatch||(!isFinished&&(!Number.isFinite(episode)||episode<1)))return;
   const seasonNumber=Number(seasonMatch[1]);
   const tvData=catalogTvDataFromDescription(catalogEntry?.description);
   const savedSeason=tvData?.seasons?.find(entry=>Number(entry.number)===seasonNumber);
@@ -822,11 +825,11 @@ function renderSeasonProgress(item,catalogEntry,tvDetails=null){
   const season=tvData?.custom?(savedSeason||null):(liveSeason?{number:seasonNumber,name:liveSeason.name||('Temporada '+seasonNumber),episodeCount:Number(liveSeason.episode_count??liveSeason.episodeCount)}:savedSeason);
   const total=Number(season?.episodeCount);
   if(!Number.isFinite(total)||total<1)return;
-  const current=Math.min(Math.floor(episode),total);
+  const current=isFinished?total:Math.min(Math.floor(episode),total);
   const percent=Math.round(current/total*100);
-  const isMiniseries=String(tvDetails?.type||'').trim().toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'')==='miniseries';
   const label='Temporada '+seasonNumber;
-  box.innerHTML='<div class="detail-season-progress-head"><span class="detail-season-progress-label">'+escapeHtml(label)+'</span><span class="detail-season-progress-count">'+current+' / '+total+' episódios</span></div><div class="detail-season-progress-track" role="progressbar" aria-label="Progresso de '+escapeHtml(label)+'" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+current+'"><div class="detail-season-progress-fill" style="width:'+percent+'%"></div></div><div class="detail-season-progress-percent">'+percent+'% concluído</div>';
+  const finishedBadge=isFinished?'<span class="detail-season-progress-badge">Finalizada</span>':'';
+  box.innerHTML='<div class="detail-season-progress-head"><span class="detail-season-progress-label">'+escapeHtml(label)+finishedBadge+'</span><span class="detail-season-progress-count">'+current+' / '+total+' episódios</span></div><div class="detail-season-progress-track" role="progressbar" aria-label="Progresso de '+escapeHtml(label)+'" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+current+'"><div class="detail-season-progress-fill" style="width:'+percent+'%"></div></div><div class="detail-season-progress-percent">'+percent+'% concluído</div>';
   box.style.display='block';
 }
 function catalogDetailsFor(item){
