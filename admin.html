@@ -546,7 +546,8 @@
   });
 
 
-  let catalogTvData=null,catalogTvDataLoaded=false,catalogTvDataCustom=false;\n  let catalogCompletedSeasons=[];
+  let catalogTvData=null,catalogTvDataLoaded=false,catalogTvDataCustom=false;
+  let catalogCompletedSeasons=[];
   let catalogTmdbId=null;
   let pendingBackdropPath=null;
   function defaultTvData(d){const seasons=(Array.isArray(d?.seasons)?d.seasons:[]).filter(s=>Number(s.season_number)>0).map(s=>({number:Number(s.season_number),name:s.name||('Temporada '+s.season_number),episodeCount:Math.max(0,Number(s.episode_count)||0)})).sort((a,b)=>a.number-b.number);return {totalSeasons:Math.max(Number(d?.number_of_seasons)||0,seasons.length),seasons};}
