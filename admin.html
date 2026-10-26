@@ -309,7 +309,11 @@
       const cards=dayOff?`<div class="day-off-card"><div class="day-off-art" aria-hidden="true">☾</div><strong>Folguinha</strong><button class="small danger" type="button" data-delete="${escapeHtml(dayItems.find(item=>item.category==='Folguinha').id)}">Cancelar folguinha</button></div>`:dayItems.length?dayItems.map(item=>`
         <article class="item" draggable="true" data-drag-id="${escapeHtml(item.id)}" aria-label="${escapeHtml(item.title)}">
           <div class="item-main">${item.image?`<img class="item-poster" src="${escapeHtml(item.image)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.outerHTML='<div class=&quot;item-poster-placeholder&quot;>🎬</div>'">`:'<div class="item-poster-placeholder">🎬</div>'}${episodeCountFromDescription(item.description)?`<div class="episode-count-badge">${escapeHtml(episodeCountFromDescription(item.description))} ${Number(episodeCountFromDescription(item.description))===1?"EP":"EPS"}</div>`:''}</div>
-          <div class="item-actions"><button class="small danger" type="button" data-delete="${escapeHtml(item.id)}" aria-label="Cancelar programação de ${escapeHtml(item.title)}">✕ Cancelar Programação</button></div>
+          <div class="item-actions" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+            <button class="small secondary" type="button" data-move-item="up" data-move-id="${escapeHtml(item.id)}" aria-label="Mover ${escapeHtml(item.title)} para cima" title="Mover para cima">⬆️</button>
+            <button class="small secondary" type="button" data-move-item="down" data-move-id="${escapeHtml(item.id)}" aria-label="Mover ${escapeHtml(item.title)} para baixo" title="Mover para baixo">⬇️</button>
+            <button class="small danger" type="button" data-delete="${escapeHtml(item.id)}" aria-label="Cancelar programação de ${escapeHtml(item.title)}">✕ Cancelar Programação</button>
+          </div>
         </article>`).join(''):'<div class="empty"><span class="empty-bat" aria-hidden="true"><svg viewBox="0 0 100 70" role="img"><path d="M50 17 L44 3 L43 23 C35 22 28 17 22 10 C20 22 15 30 7 35 C11 43 17 49 24 47 C31 45 36 54 40 63 L46 49 L50 56 L54 49 L60 63 C64 54 69 45 76 47 C83 49 89 43 93 35 C85 30 80 22 78 10 C72 17 65 22 57 23 L56 3 L50 17 Z"/></svg></span><span class="empty-label">Nenhum conteúdo programado.</span></div>';
       return `<section class="day ${key===dateKey(new Date())?'today':''}"><div class="day-head"><div><h3>${name}</h3><span class="day-date">${prettyDate(d,{day:'2-digit',month:'short',year:'numeric'})}${key===dateKey(new Date())?' <span class="today-label">HOJE</span>':''}</span></div><div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end">${!dayOff?`<button class="small primary" type="button" data-add-date="${key}" aria-label="Adicionar conteúdo em ${name}">＋</button>`:'' }${!dayOff&&dayItems.length?`<button class="small secondary" type="button" data-edit-date="${key}" aria-label="Escolher conteúdo para editar em ${name}">✎</button>`:'' }${!dayItems.length?`<button class="small secondary" type="button" data-mark-off="${key}" aria-label="Marcar ${name} como folguinha">☾</button>`:''}</div></div><div class="day-items">${cards}</div></section>`;
     }).join('');
@@ -456,6 +460,32 @@
     $('save-content').disabled=false;
     if(result.error){status.textContent='Erro ao salvar: '+result.error.message;return;}
     closeEditor(); await loadContents(); status.textContent=editingId?'':'Conteúdo salvo com sucesso!';
+  });
+  // Botões para reorganizar conteúdos sem depender do gesto de arrastar.
+  $('days').addEventListener('click',async event=>{
+    const button=event.target.closest('[data-move-item][data-move-id]');
+    if(!button)return;
+    event.preventDefault();
+    event.stopPropagation();
+    const item=contents.find(x=>String(x.id)===String(button.dataset.moveId));
+    if(!item)return;
+    const sameDay=contents.filter(x=>x.date===item.date).sort((a,b)=>{
+      const ao=Number.isFinite(Number(a.sort_order))?Number(a.sort_order):999999;
+      const bo=Number.isFinite(Number(b.sort_order))?Number(b.sort_order):999999;
+      return ao-bo||(a.time||'99:99').localeCompare(b.time||'99:99');
+    });
+    const from=sameDay.findIndex(x=>String(x.id)===String(item.id));
+    const to=from+(button.dataset.moveItem==='up'?-1:1);
+    if(from<0||to<0||to>=sameDay.length){
+      status.textContent=button.dataset.moveItem==='up'?'Esse conteúdo já está em primeiro lugar.':'Esse conteúdo já está em último lugar.';
+      return;
+    }
+    [sameDay[from],sameDay[to]]=[sameDay[to],sameDay[from]];
+    status.textContent='Salvando nova ordem...';
+    const updates=await Promise.all(sameDay.map((entry,index)=>supabase.from('contents').update({sort_order:index}).eq('id',entry.id)));
+    const failed=updates.find(result=>result.error);
+    if(failed){status.textContent='Não foi possível salvar a ordem: '+failed.error.message;await loadContents();return;}
+    await loadContents();status.textContent='Ordem atualizada!';
   });
   $('days').addEventListener('click',async event=>{
     const edit=event.target.closest('[data-edit]'), del=event.target.closest('[data-delete]'), add=event.target.closest('[data-add-date]'), editDate=event.target.closest('[data-edit-date]');
