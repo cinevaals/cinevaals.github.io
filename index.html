@@ -224,6 +224,11 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   transform:translateY(-8px)!important;
   pointer-events:none!important;
 }
+/* Celular em pé: mostrar três colunas do cronograma ao mesmo tempo. */
+@media (max-width:800px) and (orientation:portrait){
+  .days-wrap{overflow-x:auto;overflow-y:hidden}
+  .days{grid-template-columns:repeat(7,calc((100vw - 28px)/3))!important;width:max-content;min-width:0;gap:6px}
+}
 </style>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
