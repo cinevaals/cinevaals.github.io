@@ -23,7 +23,7 @@
     .week-controls{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:8px 0 36px}.week-center{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;order:0}.week-controls>#prev-week{order:-1}.week-controls>#next-week{order:1}.week-title{font-weight:700;text-align:center;min-width:190px;color:#f3f8ff;font-size:14px}.week-title small{display:block;font-size:10px;color:#9bc9f4;margin-top:4px;font-weight:normal}.current-week{font-size:.78rem;padding:8px 11px;white-space:nowrap}
     .days-wrap{overflow-x:auto;padding:0 0 12px;scrollbar-color:#1b568d #07101e;scrollbar-width:thin}.days{display:grid;grid-template-columns:repeat(7,minmax(160px,1fr));gap:14px;min-width:1160px;align-items:start}.day{width:100%;max-width:100%;min-width:0}.day-items,.day-items>*{width:100%;min-width:0;max-width:100%}.empty,.day-off-card{aspect-ratio:2/2.85;min-height:0;height:auto;max-width:100%;box-sizing:border-box}
     .days>.day{min-width:0;box-sizing:border-box}.days>.day .today-label{flex-shrink:0}.days>.day .day-off-card{width:100%;min-width:0;max-width:100%;box-sizing:border-box}.day{position:relative;background:transparent;border:0;border-radius:0;overflow:visible;min-width:0;box-shadow:none;padding:0}.day-head{display:flex;flex-direction:column;gap:7px;margin:0;padding:0 0 10px;background:transparent;border:0;align-items:center;text-align:center;min-height:32px}.day-head>div:first-child{width:100%;display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;text-align:center}.day-head h3{margin:0;font-size:12px;font-weight:bold;color:#a8dcff;text-align:center}.day-date{display:inline-block;color:#a8dcff;font-size:11px;margin-top:0;text-align:center}.today-label{display:inline-flex;align-items:center;justify-content:center;color:#8fd1ff;background:#0e3156;border:1px solid #164879;border-radius:4px;padding:2px 5px;font-size:9px;font-weight:bold;margin-left:4px;white-space:nowrap;text-transform:uppercase;line-height:1.2}.day-head>div:last-child{order:-1;width:100%;min-height:30px;box-sizing:border-box;display:flex;gap:5px;flex-wrap:wrap;justify-content:center!important;align-items:center}.day-items{padding:0;display:flex;flex-direction:column;gap:9px;min-height:0;background:transparent;border:0;border-radius:0;box-shadow:none}
-    .item{position:relative;display:flex;flex-direction:column;background:transparent;border:1px solid #16385b;border-radius:9px;padding:0;align-items:stretch;gap:6px;transition:transform .15s,border-color .15s;cursor:grab;min-width:0;overflow:hidden;box-shadow:none}.item[draggable="true"]:active{cursor:grabbing}.item.dragging{opacity:.42;border:1px dashed #65bfff}.item.drag-over{border-color:#65bfff;box-shadow:0 0 0 2px #168bff33}.item:hover{transform:translateY(-2px);border-color:#2f83d1}.item-main{position:relative;min-width:0;flex:1;align-self:stretch}.item-poster{display:block;width:100%;aspect-ratio:2/2.85;object-fit:cover;background:transparent;border-radius:0;border:0}.episode-count-badge{position:absolute;top:5px;right:5px;left:auto;bottom:auto;z-index:4;margin:0;padding:4px 6px;text-align:center;border:1px solid #247fc4;border-radius:7px;background:rgba(3,9,20,.94);color:#a9d8ff;font-size:11px;font-weight:800;box-shadow:0 2px 8px #0008;pointer-events:none}.item-poster-placeholder{width:100%;aspect-ratio:2/2.85;display:grid;place-items:center;background:transparent;color:#65bfff;font-size:25px;border-radius:0}.item-actions{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;gap:4px;flex-wrap:wrap;justify-content:center;align-content:center;width:100%;padding:18px 4px 6px;background:linear-gradient(180deg,transparent,rgba(3,9,20,.88));box-sizing:border-box}.item-actions button{padding:5px 7px;min-width:30px}.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;aspect-ratio:2/2.85;box-sizing:border-box;padding:12px 8px;color:#a8c9ed;font-size:12px;line-height:1.5;text-align:center;border:1px solid #16385b;border-radius:9px;background:transparent}.empty-bat{width:58px;height:36px;display:block;color:#65bfff;opacity:.9}.empty-bat svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.empty-label{max-width:135px}.day-off-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;aspect-ratio:2/2.85;box-sizing:border-box;text-align:center;margin:0;padding:12px 6px;border:1px solid #16385b;border-radius:9px;background:transparent;color:#a8c9ed;overflow:hidden}.day-off-art{position:relative;font-size:30px;line-height:1;padding:0;color:#a8c9ed}.day-off-art span{display:none}.day-off-card strong{display:block;color:#a8c9ed;font-size:12px;font-weight:400;letter-spacing:0;text-transform:none}.day-off-card p,.day-off-card small{display:none}.day-off-card button{white-space:normal;margin-top:8px}.day.today .item,.day.today .empty,.day.today .day-off-card{border-color:#d5edff;box-shadow:0 0 12px #a8dcff55}.day.today .item:hover{border-color:#eff9ff;box-shadow:0 0 16px #a8dcff88}
+    .item{position:relative;display:flex;flex-direction:column;background:transparent;border:1px solid #16385b;border-radius:9px;padding:0;align-items:stretch;gap:6px;transition:transform .15s,border-color .15s;cursor:grab;min-width:0;overflow:hidden;box-shadow:none}.item[draggable="true"]:active{cursor:grabbing}.item{touch-action:pan-y}.item.dragging{touch-action:none;user-select:none;-webkit-user-select:none}.item.dragging{opacity:.42;border:1px dashed #65bfff}.item.drag-over{border-color:#65bfff;box-shadow:0 0 0 2px #168bff33}.item:hover{transform:translateY(-2px);border-color:#2f83d1}.item-main{position:relative;min-width:0;flex:1;align-self:stretch}.item-poster{display:block;width:100%;aspect-ratio:2/2.85;object-fit:cover;background:transparent;border-radius:0;border:0}.episode-count-badge{position:absolute;top:5px;right:5px;left:auto;bottom:auto;z-index:4;margin:0;padding:4px 6px;text-align:center;border:1px solid #247fc4;border-radius:7px;background:rgba(3,9,20,.94);color:#a9d8ff;font-size:11px;font-weight:800;box-shadow:0 2px 8px #0008;pointer-events:none}.item-poster-placeholder{width:100%;aspect-ratio:2/2.85;display:grid;place-items:center;background:transparent;color:#65bfff;font-size:25px;border-radius:0}.item-actions{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;gap:4px;flex-wrap:wrap;justify-content:center;align-content:center;width:100%;padding:18px 4px 6px;background:linear-gradient(180deg,transparent,rgba(3,9,20,.88));box-sizing:border-box}.item-actions button{padding:5px 7px;min-width:30px}.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;aspect-ratio:2/2.85;box-sizing:border-box;padding:12px 8px;color:#a8c9ed;font-size:12px;line-height:1.5;text-align:center;border:1px solid #16385b;border-radius:9px;background:transparent}.empty-bat{width:58px;height:36px;display:block;color:#65bfff;opacity:.9}.empty-bat svg{width:100%;height:100%;display:block;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.empty-label{max-width:135px}.day-off-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;aspect-ratio:2/2.85;box-sizing:border-box;text-align:center;margin:0;padding:12px 6px;border:1px solid #16385b;border-radius:9px;background:transparent;color:#a8c9ed;overflow:hidden}.day-off-art{position:relative;font-size:30px;line-height:1;padding:0;color:#a8c9ed}.day-off-art span{display:none}.day-off-card strong{display:block;color:#a8c9ed;font-size:12px;font-weight:400;letter-spacing:0;text-transform:none}.day-off-card p,.day-off-card small{display:none}.day-off-card button{white-space:normal;margin-top:8px}.day.today .item,.day.today .empty,.day.today .day-off-card{border-color:#d5edff;box-shadow:0 0 12px #a8dcff55}.day.today .item:hover{border-color:#eff9ff;box-shadow:0 0 16px #a8dcff88}
     .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.full{grid-column:1/-1}
     #editor{position:fixed;inset:0;z-index:1000;overflow:hidden;overscroll-behavior:contain;margin:0;padding:24px;background:rgba(1,5,13,.82);backdrop-filter:none;border:0;border-radius:0;box-shadow:none}
     .picker-overlay{position:fixed;inset:0;z-index:1100;display:flex;align-items:center;justify-content:center;overflow:hidden;overscroll-behavior:contain;padding:20px;background:rgba(1,5,13,.86);backdrop-filter:none}.picker-overlay.hidden{display:none!important}.picker-overlay .editor-card{width:min(100%,520px);max-height:85vh;overflow-y:auto}.picker-overlay .catalog-result{padding:12px;border-radius:8px}.picker-overlay [data-close-picker]{display:block;margin:14px auto 0}
@@ -500,6 +500,28 @@
       document.body.style.overflow='';
     }
   });
+  // Reordena e salva os conteúdos de um mesmo dia. Compartilhado por mouse e toque.
+  async function reorderDayContents(sourceId,targetId){
+    if(!sourceId||!targetId||String(sourceId)===String(targetId))return;
+    const source=contents.find(x=>String(x.id)===String(sourceId));
+    const destination=contents.find(x=>String(x.id)===String(targetId));
+    if(!source||!destination||source.date!==destination.date)return;
+    const sameDay=contents.filter(x=>x.date===source.date).sort((a,b)=>{
+      const ao=Number.isFinite(Number(a.sort_order))?Number(a.sort_order):999999;
+      const bo=Number.isFinite(Number(b.sort_order))?Number(b.sort_order):999999;
+      return ao-bo||(a.time||'99:99').localeCompare(b.time||'99:99');
+    });
+    const from=sameDay.findIndex(x=>String(x.id)===String(sourceId));
+    const to=sameDay.findIndex(x=>String(x.id)===String(targetId));
+    if(from<0||to<0)return;
+    const [moved]=sameDay.splice(from,1);sameDay.splice(to,0,moved);
+    status.textContent='Salvando nova ordem...';
+    const updates=await Promise.all(sameDay.map((item,index)=>supabase.from('contents').update({sort_order:index}).eq('id',item.id)));
+    const failed=updates.find(result=>result.error);
+    if(failed){status.textContent='Não foi possível salvar a ordem. Verifique se a coluna sort_order foi criada no Supabase.';await loadContents();return;}
+    await loadContents();status.textContent='Ordem atualizada!';
+  }
+
   $('days').addEventListener('dragstart', event=>{
     const card=event.target.closest('[data-drag-id]');
     if(!card)return;
@@ -525,25 +547,67 @@
     const destination=contents.find(x=>String(x.id)===target.dataset.dragId);
     if(!source || !destination || source.date!==destination.date)return;
     event.preventDefault();
-    const sameDay=contents.filter(x=>x.date===source.date).sort((a,b)=>{
-      const ao=Number.isFinite(Number(a.sort_order))?Number(a.sort_order):999999;
-      const bo=Number.isFinite(Number(b.sort_order))?Number(b.sort_order):999999;
-      return ao-bo||(a.time||'99:99').localeCompare(b.time||'99:99');
-    });
-    const from=sameDay.findIndex(x=>String(x.id)===String(draggedId));
-    const to=sameDay.findIndex(x=>String(x.id)===target.dataset.dragId);
-    if(from<0||to<0)return;
-    const [moved]=sameDay.splice(from,1);sameDay.splice(to,0,moved);
-    status.textContent='Salvando nova ordem...';
-    const updates=await Promise.all(sameDay.map((item,index)=>supabase.from('contents').update({sort_order:index}).eq('id',item.id)));
-    const failed=updates.find(result=>result.error);
-    if(failed){status.textContent='Não foi possível salvar a ordem. Verifique se a coluna sort_order foi criada no Supabase.';await loadContents();return;}
-    await loadContents();status.textContent='Ordem atualizada!';
+    await reorderDayContents(draggedId,target.dataset.dragId);
   });
   $('days').addEventListener('dragend',()=>{
     draggedId=null;
     document.querySelectorAll('.item.dragging,.item.drag-over').forEach(el=>el.classList.remove('dragging','drag-over'));
   });
+
+  // No celular, segurar brevemente um cartão inicia o arraste por toque.
+  let touchDragTimer=null,touchDragActive=false,touchDragStart=null,touchDragTarget=null;
+  const clearTouchDrag=()=>{
+    if(touchDragTimer)clearTimeout(touchDragTimer);
+    touchDragTimer=null;touchDragActive=false;touchDragStart=null;touchDragTarget=null;draggedId=null;
+    document.querySelectorAll('.item.dragging,.item.drag-over').forEach(el=>el.classList.remove('dragging','drag-over'));
+  };
+  $('days').addEventListener('touchstart',event=>{
+    const card=event.target.closest('[data-drag-id]');
+    if(!card||event.touches.length!==1)return;
+    const touch=event.touches[0];
+    touchDragStart={x:touch.clientX,y:touch.clientY,id:card.dataset.dragId};
+    touchDragTarget=card.dataset.dragId;
+    touchDragTimer=setTimeout(()=>{
+      touchDragActive=true;draggedId=touchDragStart.id;
+      card.classList.add('dragging');
+      status.textContent='Arraste até outro conteúdo do mesmo dia para mudar a ordem.';
+    },350);
+  },{passive:true});
+  $('days').addEventListener('touchmove',event=>{
+    if(!touchDragStart||event.touches.length!==1)return;
+    const touch=event.touches[0];
+    if(!touchDragActive){
+      if(Math.abs(touch.clientX-touchDragStart.x)>10||Math.abs(touch.clientY-touchDragStart.y)>10){
+        if(touchDragTimer)clearTimeout(touchDragTimer);
+        touchDragTimer=null;touchDragStart=null;
+      }
+      return;
+    }
+    event.preventDefault();
+    const underFinger=document.elementFromPoint(touch.clientX,touch.clientY);
+    const target=underFinger?.closest('[data-drag-id]');
+    document.querySelectorAll('.item.drag-over').forEach(el=>el.classList.remove('drag-over'));
+    if(target){
+      const source=contents.find(x=>String(x.id)===String(draggedId));
+      const destination=contents.find(x=>String(x.id)===target.dataset.dragId);
+      if(source&&destination&&source.date===destination.date){
+        touchDragTarget=target.dataset.dragId;
+        if(touchDragTarget!==draggedId)target.classList.add('drag-over');
+      }
+    }
+  },{passive:false});
+  $('days').addEventListener('touchend',async()=>{
+    if(touchDragTimer)clearTimeout(touchDragTimer);
+    touchDragTimer=null;
+    if(touchDragActive&&touchDragTarget&&draggedId){
+      const sourceId=draggedId,targetId=touchDragTarget;
+      clearTouchDrag();
+      await reorderDayContents(sourceId,targetId);
+      return;
+    }
+    clearTouchDrag();
+  });
+  $('days').addEventListener('touchcancel',clearTouchDrag);
 
 
   let catalogTvData=null,catalogTvDataLoaded=false,catalogTvDataCustom=false;
