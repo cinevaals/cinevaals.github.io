@@ -244,7 +244,7 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
 <a class="nav-link" href="https://cinefy.gg/a_valzinha" target="_blank" rel="noopener noreferrer">🎬 Cinefy</a>
 <button class="nav-link" type="button" id="ratingsLink">⭐ Avaliações</button>
 <div class="nav-dropdown"><button class="nav-link nav-dropdown-btn" type="button" aria-expanded="false">🌐 Sociais ▾</button><div class="nav-dropdown-menu"><a href="https://instagram.com/a_vaalzinha" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://www.tiktok.com/@a_vaalzinha" target="_blank" rel="noopener noreferrer">TikTok</a></div></div>
-<button class="nav-link" type="button" id="aboutLink">ℹ️ Sobre</button>
+<a class="nav-link" href="https://canva.link/8daajmyvy68whst" target="_blank" rel="noopener noreferrer">🎞️ Já Vistos</a>
 </nav>
 </div></div>
 <main id="cronograma">
@@ -470,13 +470,6 @@ main{max-width:1800px;margin:auto;padding:25px 18px 40px}.intro{display:flex;ali
   </div>
 </div>
 
-<div id="aboutModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);align-items:center;justify-content:center;padding:20px;">
-  <div style="position:relative;width:100%;max-width:420px;padding:28px 24px;background:linear-gradient(145deg,#102846,#071326);border:1px solid #65bfff;border-radius:16px;box-shadow:0 0 18px #087bff55;text-align:center;color:#c6d8ef;">
-    <button type="button" id="closeAbout" aria-label="Fechar" style="position:absolute;top:10px;right:12px;background:transparent;border:0;color:#65bfff;font-size:24px;cursor:pointer;">×</button>
-    <h2 style="margin:0 0 16px;color:#65bfff;text-shadow:0 0 10px #087bff66;">💙 Sobre a Vaal</h2>
-    <p style="margin:0;line-height:1.8;">Bom dia, boa tarde e boa noite! Eu espero que você 🫵🏼 esteja bem. Eu sou a Vaal e de seg a sáb (ou n), tem react. Gravo sozinha offlive. Bem vindos, espero que se divirtam! 💙</p>
-  </div>
-</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = 'https://bfiikxuyratcvhfmdeia.supabase.co';
@@ -784,16 +777,6 @@ document.getElementById('closeCatalog').addEventListener('click',closeCatalogMod
 catalogModal.addEventListener('click',e=>{if(e.target===catalogModal)closeCatalogModal();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCatalogModal();if(catalogDetailModal&&catalogDetailModal.style.display==='flex')closeCatalogDetail();if(ratingsModal&&ratingsModal.style.display==='flex'){ratingsModal.style.display='none';document.body.style.overflow='';}}});
 document.getElementById('prevWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,-7);render();});document.getElementById('nextWeek').addEventListener('click',()=>{weekStart=addDays(weekStart,7);render();});
-const aboutModal = document.getElementById('aboutModal');
-document.getElementById('aboutLink').addEventListener('click', () => {
-  aboutModal.style.display = 'flex';
-});
-document.getElementById('closeAbout').addEventListener('click', () => {
-  aboutModal.style.display = 'none';
-});
-aboutModal.addEventListener('click', e => {
-  if (e.target === aboutModal) aboutModal.style.display = 'none';
-});
 
 const contentDetailModal=document.getElementById('contentDetailModal');
 function detailText(value){return value===null||value===undefined||value===''?'—':String(value);}
